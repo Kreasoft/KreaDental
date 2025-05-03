@@ -1,0 +1,300 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ accion }} Tratamiento{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">{{ accion }} Tratamiento</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="tratamiento-form" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                        <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+                        
+                        <!-- Datos del tratamiento -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_paciente" class="form-label">Paciente *</label>
+                                <select name="paciente" id="id_paciente" class="form-select {% if form.paciente.errors %}is-invalid{% endif %}" required>
+                                    {% if form.paciente.value %}
+                                        <option value="{{ form.paciente.value }}" selected>{{ form.instance.paciente.nombre }} {{ form.instance.paciente.apellidos }} - RUT: {{ form.instance.paciente.rut }}</option>
+                                    {% endif %}
+                                </select>
+                                {% if form.paciente.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.paciente.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="id_fecha_inicio" class="form-label">Fecha Inicio *</label>
+                                <input type="date" name="fecha_inicio" id="id_fecha_inicio" 
+                                       class="form-control {% if form.fecha_inicio.errors %}is-invalid{% endif %}" 
+                                       value="{% if form.fecha_inicio.value %}{{ form.fecha_inicio.value|date:'Y-m-d' }}{% else %}{{ today|date:'Y-m-d' }}{% endif %}" required>
+                                {% if form.fecha_inicio.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.fecha_inicio.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_fecha_fin" class="form-label">Fecha Fin</label>
+                                <input type="date" name="fecha_fin" id="id_fecha_fin" 
+                                       class="form-control {% if form.fecha_fin.errors %}is-invalid{% endif %}" 
+                                       value="{% if form.fecha_fin.value %}{{ form.fecha_fin.value|date:'Y-m-d' }}{% else %}{{ today|date:'Y-m-d' }}{% endif %}">
+                                {% if form.fecha_fin.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.fecha_fin.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="id_estado" class="form-label">Estado</label>
+                                <select name="estado" id="id_estado" class="form-select {% if form.estado.errors %}is-invalid{% endif %}" required>
+                                    <option value="">Seleccione un estado...</option>
+                                    {% for estado, nombre in estados.items %}
+                                    <option value="{{ estado }}" {% if form.estado.value == estado %}selected{% endif %}>{{ nombre }}</option>
+                                    {% endfor %}
+                                </select>
+                                {% if form.estado.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.estado.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="id_observaciones" class="form-label">Observaciones</label>
+                                <textarea name="observaciones" id="id_observaciones" 
+                                          class="form-control {% if form.observaciones.errors %}is-invalid{% endif %}" 
+                                          rows="3">{{ form.observaciones.value }}</textarea>
+                                {% if form.observaciones.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.observaciones.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Procedimientos -->
+                        <h4 class="mt-4">Procedimientos</h4>
+                        {{ formset.management_form }}
+                        <div id="formset-container">
+                            {% for form in formset %}
+                            <div class="row formset-row mb-3">
+                                {{ form.id }}
+                                <div class="col-md-4">
+                                    <label class="form-label">Procedimiento *</label>
+                                    <select name="{{ form.prefix }}-procedimiento" 
+                                            class="form-select procedimiento-select {% if form.procedimiento.errors %}is-invalid{% endif %}" 
+                                            required title="Seleccione un procedimiento">
+                                        <option value="">Seleccione un procedimiento...</option>
+                                        {% for procedimiento in procedimientos %}
+                                        <option value="{{ procedimiento.id }}" 
+                                                {% if form.procedimiento.value|stringformat:"s" == procedimiento.id|stringformat:"s" %}selected{% endif %}>
+                                            <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="{{ form.procedimiento.id_for_label }}">Procedimiento</label>
+                                            {{ form.procedimiento }}
+                                            {% if form.procedimiento.errors %}
+                                            <div class="invalid-feedback d-block">{{ form.procedimiento.errors|join:", " }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="{{ form.profesional.id_for_label }}">Profesional</label>
+                                            {{ form.profesional }}
+                                            {% if form.profesional.errors %}
+                                            <div class="invalid-feedback d-block">{{ form.profesional.errors|join:", " }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="{{ form.cantidad.id_for_label }}">Cantidad</label>
+                                            {{ form.cantidad }}
+                                            {% if form.cantidad.errors %}
+                                            <div class="invalid-feedback d-block">{{ form.cantidad.errors|join:", " }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="valor">Valor</label>
+                                            <input type="text" class="form-control" id="valor" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="{{ form.descuento.id_for_label }}">Descuento (%)</label>
+                                            {{ form.descuento }}
+                                            {% if form.descuento.errors %}
+                                            <div class="invalid-feedback d-block">{{ form.descuento.errors|join:", " }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>{% endif %}
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Profesional *</label>
+                                    <select name="{{ form.prefix }}-profesional" 
+                                        class="form-select profesional-select {% if form.profesional.errors %}is-invalid{% endif %}" 
+                                        required title="Seleccione un profesional">
+                                    <option value="">Seleccione un profesional...</option>
+                                    {% for profesional in profesionales %}
+                                    {% if profesional.activo %}
+                                    <option value="{{ profesional.id }}" 
+                                            {% if form.profesional.value == profesional.id|stringformat:"s" %}selected{% endif %}>
+                                        {{ profesional.nombres }} {{ profesional.apellido_paterno }} {{ profesional.apellido_materno }}
+                                    </option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                                    {% if form.profesional.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.profesional.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-1">
+                                    <label class="form-label">&nbsp;</label>
+                                    <button type="button" class="btn btn-danger btn-sm eliminar-procedimiento" title="Eliminar procedimiento">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <button type="button" class="btn btn-success" id="add-procedimiento" onclick="agregarProcedimiento()">
+                                    <i class="fas fa-plus"></i> Agregar Procedimiento
+                                </button>
+                                <button type="submit" class="btn btn-primary">Grabar</button>
+                                <a href="{% url 'tratamientos:lista_tratamientos' %}" class="btn btn-secondary">Cancelar</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script src="{% static 'js/patient-search.js' %}"></script>
+<script>
+    // Configurar el token CSRF para todas las peticiones AJAX
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        // Agregar el token CSRF a todas las peticiones AJAX
+        const xhr = new XMLHttpRequest();
+        xhr.setRequestHeader('X-CSRFToken', csrftoken);
+        
+        // Agregar eventos de clic a los botones de eliminar existentes
+        document.querySelectorAll('.eliminar-procedimiento').forEach(function(button) {
+            button.addEventListener('click', function(e) {
+                e.stopPropagation();
+                eliminarProcedimiento(e);
+            });
+        });
+    });
+
+    // Función para agregar un nuevo procedimiento
+    function agregarProcedimiento() {
+        const formsetContainer = document.getElementById('formset-container');
+        const totalForms = document.getElementById('id_{{ formset.prefix }}-TOTAL_FORMS');
+        const formNum = parseInt(totalForms.value);
+        const formsetPrefix = '{{ formset.prefix }}';
+        
+        if (formNum >= 10) {
+            alert('No se pueden agregar más de 10 procedimientos');
+            return;
+        }
+        
+        const newForm = document.createElement('div');
+        newForm.className = 'row formset-row mb-3';
+        newForm.innerHTML = `
+            <div class="col-md-4">
+                <label class="form-label">Procedimiento *</label>
+                <select name="${formsetPrefix}-${formNum}-procedimiento" class="form-select procedimiento-select" required title="Seleccione un procedimiento">
+                    <option value="">Seleccione un procedimiento...</option>
+                    {% for procedimiento in procedimientos %}
+                    <option value="{{ procedimiento.id }}">{{ procedimiento.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Cantidad *</label>
+                <input type="number" name="${formsetPrefix}-${formNum}-cantidad" class="form-control" 
+                       value="1" min="1" required title="Ingrese la cantidad" placeholder="Cantidad">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Descuento %</label>
+                <input type="number" name="${formsetPrefix}-${formNum}-descuento" class="form-control" 
+                       value="0" min="0" max="100" step="0.01" title="Ingrese el descuento" placeholder="Descuento">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Profesional *</label>
+                <select name="${formsetPrefix}-${formNum}-profesional" class="form-select profesional-select" required title="Seleccione un profesional">
+                    <option value="">Seleccione un profesional...</option>
+                    {% for profesional in profesionales %}
+                    {% if profesional.activo %}
+                    <option value="{{ profesional.id }}">
+                        {{ profesional.nombres }} {{ profesional.apellido_paterno }} {{ profesional.apellido_materno }}
+                    </option>
+                    {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-1">
+                <label class="form-label">&nbsp;</label>
+                <button type="button" class="btn btn-danger btn-sm eliminar-procedimiento" title="Eliminar procedimiento">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        `;
+        
+        formsetContainer.appendChild(newForm);
+        totalForms.value = formNum + 1;
+        
+        // Agregar evento de clic al nuevo botón de eliminar
+        const deleteButton = newForm.querySelector('.eliminar-procedimiento');
+        deleteButton.addEventListener('click', function(e) {
+            e.stopPropagation();
+            eliminarProcedimiento(e);
+        });
+        
+        console.log('Nuevo formulario agregado correctamente');
+    }
+
+    // Función para eliminar un procedimiento
+    function eliminarProcedimiento(event) {
+        if (confirm('¿Está seguro que desea eliminar este procedimiento?')) {
+            const row = event.target.closest('.formset-row');
+            if (row) {
+                row.remove();
+                const formsetPrefix = '{{ formset.prefix }}';
+                const totalForms = document.getElementById(`id_${formsetPrefix}-TOTAL_FORMS`);
+                if (totalForms) {
+                    totalForms.value = document.querySelectorAll('.formset-row').length;
+                }
+            }
+        }
+    }
+</script>
+{% endblock %}
+{% endblock content %} 

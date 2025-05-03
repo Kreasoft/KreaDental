@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}Tratamientos{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Tratamientos</h1>
+        <a href="{% url 'tratamientos:crear_tratamiento' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Nuevo Tratamiento
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Paciente</th>
+                            <th>Fecha Inicio</th>
+                            <th>Procedimientos</th>
+                            <th>Estado</th>
+                            <th>Costo Total</th>
+                            <th>Pagado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tratamiento in tratamientos %}
+                        <tr>
+                            <td>{{ tratamiento.paciente }}</td>
+                            <td>{{ tratamiento.fecha_inicio }}</td>
+                            <td>
+                                <ul class="list-unstyled mb-0">
+                                {% for detalle in tratamiento.detalles.all %}
+                                    <li>{{ detalle.procedimiento }} (x{{ detalle.cantidad }})</li>
+                                {% endfor %}
+                                </ul>
+                            </td>
+                            <td>
+                                <span class="badge {% if tratamiento.estado == 'PENDIENTE' %}bg-warning
+                                      {% elif tratamiento.estado == 'EN_PROGRESO' %}bg-info
+                                      {% elif tratamiento.estado == 'COMPLETADO' %}bg-success
+                                      {% elif tratamiento.estado == 'CANCELADO' %}bg-danger{% endif %}">
+                                    {{ tratamiento.get_estado_display }}
+                                </span>
+                            </td>
+                            <td>${{ tratamiento.costo_total }}</td>
+                            <td>
+                                {% if tratamiento.pagado %}
+                                    <span class="badge bg-success">Sí</span>
+                                {% else %}
+                                    <span class="badge bg-danger">No</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{% url 'tratamientos:detalle_tratamiento' pk=tratamiento.pk %}" 
+                                       class="btn btn-sm btn-info" title="Ver detalles">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'tratamientos:editar_tratamiento' pk=tratamiento.pk %}" 
+                                       class="btn btn-sm btn-warning" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'tratamientos:eliminar_tratamiento' pk=tratamiento.pk %}" 
+                                       class="btn btn-sm btn-danger" title="Eliminar">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center">No hay tratamientos registrados</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

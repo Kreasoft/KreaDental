@@ -1,0 +1,108 @@
+:root {
+    --sidebar-width: 250px;
+}
+
+.sidebar {
+    width: var(--sidebar-width);
+    min-height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+}
+
+#page-content-wrapper {
+    min-height: 100vh;
+    margin-left: var(--sidebar-width);
+    background: #f8f9fc;
+}
+
+.sidebar .list-group-item {
+    border: none;
+    padding: 15px 30px;
+}
+
+.sidebar .list-group-item:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.sidebar-heading {
+    height: 60px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.list-group-item.active {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    border: none;
+}
+
+/* Navbar styles */
+.navbar {
+    background-color: #fff;
+    padding: 1rem;
+}
+
+/* Card styles */
+.card {
+    border: none;
+    border-radius: 10px;
+    transition: all 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Utility classes */
+.text-xs {
+    font-size: 0.7rem;
+}
+
+.bg-transparent {
+    background-color: transparent !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .sidebar {
+        margin-left: -var(--sidebar-width);
+    }
+    
+    #page-content-wrapper {
+        margin-left: 0;
+    }
+    
+    .sidebar.active {
+        margin-left: 0;
+    }
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.card h2 {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.card h6 {
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.fas {
+    opacity: 0.8;
+}
+
+.card-title {
+    color: #333;
+    font-weight: bold;
+}
+
+.card-text {
+    color: #2196F3;
+    font-weight: bold;
+} 

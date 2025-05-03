@@ -1,0 +1,119 @@
+/* Estados */
+.estado-pendiente {
+    background-color: #ffc107 !important;
+    border-color: #ffc107 !important;
+}
+
+.estado-confirmada {
+    background-color: #17a2b8 !important;
+    border-color: #17a2b8 !important;
+}
+
+.estado-cancelada {
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+}
+
+.estado-completada {
+    background-color: #28a745 !important;
+    border-color: #28a745 !important;
+}
+
+/* Formularios */
+.form-label {
+    color: #343a40 !important;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.form-control {
+    border-radius: 0.375rem;
+    border: 1px solid #ced4da;
+    padding: 0.5rem 0.75rem;
+    transition: border-color 0.15s ease-in-out;
+}
+
+.form-control:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Cards y contenedores */
+.card {
+    border-radius: 0.5rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    margin-bottom: 1rem;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid rgba(0,0,0,.125);
+    padding: 1rem;
+}
+
+/* Botones */
+.btn {
+    border-radius: 0.375rem;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    transition: all 0.15s ease-in-out;
+}
+
+.btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.btn-primary:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+}
+
+/* Tablas */
+.table {
+    margin-bottom: 1rem;
+    vertical-align: middle;
+}
+
+.table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    padding: 0.75rem;
+}
+
+.table td {
+    padding: 0.75rem;
+    vertical-align: middle;
+}
+
+/* Estilos específicos para formulario de profesionales */
+.form-label {
+    color: #343a40 !important;
+    font-weight: 500;
+}
+
+#profesionalModal .modal-content .profesional-form .form-label {
+    color: #0dcaf0 !important;
+    font-weight: 600;
+} 
+
+/* Navegación */
+.nav-tabs {
+    border-bottom: 1px solid #dee2e6;
+    margin-bottom: 1rem;
+}
+
+.nav-tabs .nav-link {
+    border: 1px solid transparent;
+    border-top-left-radius: 0.375rem;
+    border-top-right-radius: 0.375rem;
+    color: #495057;
+    padding: 0.5rem 1rem;
+}
+
+.nav-tabs .nav-link.active {
+    background-color: #fff;
+    border-color: #dee2e6 #dee2e6 #fff;
+    color: #0d6efd;
+    font-weight: 500;
+}

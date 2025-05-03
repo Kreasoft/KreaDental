@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Información de la Empresa</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row g-3">
+                            <!-- Información básica -->
+                            <div class="col-md-6">
+                                <label for="{{ form.nombre.id_for_label }}" class="form-label">Nombre *</label>
+                                {{ form.nombre }}
+                                {% if form.nombre.errors %}
+                                <div class="invalid-feedback d-block">{{ form.nombre.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="{{ form.ruc.id_for_label }}" class="form-label">RUC *</label>
+                                {{ form.ruc }}
+                                {% if form.ruc.errors %}
+                                <div class="invalid-feedback d-block">{{ form.ruc.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-12">
+                                <label for="{{ form.direccion.id_for_label }}" class="form-label">Dirección *</label>
+                                {{ form.direccion }}
+                                {% if form.direccion.errors %}
+                                <div class="invalid-feedback d-block">{{ form.direccion.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Contacto -->
+                            <div class="col-md-6">
+                                <label for="{{ form.telefono.id_for_label }}" class="form-label">Teléfono *</label>
+                                {{ form.telefono }}
+                                {% if form.telefono.errors %}
+                                <div class="invalid-feedback d-block">{{ form.telefono.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="{{ form.email.id_for_label }}" class="form-label">Email *</label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                <div class="invalid-feedback d-block">{{ form.email.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-12">
+                                <label for="{{ form.web.id_for_label }}" class="form-label">Sitio Web</label>
+                                {{ form.web }}
+                                {% if form.web.errors %}
+                                <div class="invalid-feedback d-block">{{ form.web.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Información legal -->
+                            <div class="col-md-6">
+                                <label for="{{ form.razon_social.id_for_label }}" class="form-label">Razón Social *</label>
+                                {{ form.razon_social }}
+                                {% if form.razon_social.errors %}
+                                <div class="invalid-feedback d-block">{{ form.razon_social.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="{{ form.representante_legal.id_for_label }}" class="form-label">Representante Legal *</label>
+                                {{ form.representante_legal }}
+                                {% if form.representante_legal.errors %}
+                                <div class="invalid-feedback d-block">{{ form.representante_legal.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Licencia -->
+                            <div class="col-md-6">
+                                <label for="{{ form.fecha_inicio_licencia.id_for_label }}" class="form-label">Inicio de Licencia *</label>
+                                {{ form.fecha_inicio_licencia }}
+                                {% if form.fecha_inicio_licencia.errors %}
+                                <div class="invalid-feedback d-block">{{ form.fecha_inicio_licencia.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="{{ form.fecha_fin_licencia.id_for_label }}" class="form-label">Fin de Licencia *</label>
+                                {{ form.fecha_fin_licencia }}
+                                {% if form.fecha_fin_licencia.errors %}
+                                <div class="invalid-feedback d-block">{{ form.fecha_fin_licencia.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Logo -->
+                            <div class="col-12">
+                                <label for="{{ form.logo.id_for_label }}" class="form-label">Logo</label>
+                                {{ form.logo }}
+                                {% if form.logo.errors %}
+                                <div class="invalid-feedback d-block">{{ form.logo.errors|join:", " }}</div>
+                                {% endif %}
+                                {% if empresa.logo %}
+                                <div class="mt-2">
+                                    <img src="{{ empresa.logo.url }}" alt="Logo actual" class="img-thumbnail" style="max-height: 100px;">
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Estado -->
+                            <div class="col-12">
+                                <div class="form-check">
+                                    {{ form.activo }}
+                                    <label class="form-check-label" for="{{ form.activo.id_for_label }}">
+                                        Empresa Activa
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

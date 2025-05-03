@@ -1,0 +1,99 @@
+{% extends 'informes/base_informes.html' %}
+
+{% block informe_titulo %}Informe de Pacientes{% endblock %}
+
+{% block acciones_encabezado %}
+<a href="?{{ request.GET.urlencode }}&export=excel" class="btn btn-success">
+    <i class="fas fa-file-excel"></i> Exportar a Excel
+</a>
+{% endblock %}
+
+{% block contenido_informe %}
+<!-- Tarjetas de resumen -->
+<div class="row">
+    <div class="col-xl-6 col-md-6">
+        <div class="stats-card">
+            <div class="stats-number">{{ total_pacientes }}</div>
+            <div class="stats-label">Total Pacientes</div>
+        </div>
+    </div>
+    <div class="col-xl-6 col-md-6">
+        <div class="stats-card">
+            <div class="stats-number">{{ pacientes_nuevos }}</div>
+            <div class="stats-label">Pacientes Nuevos en el Periodo</div>
+        </div>
+    </div>
+</div>
+
+<!-- Gráficos -->
+<div class="row">
+    <div class="col-lg-6">
+        <div class="stats-container">
+            <h4>Top 10 Pacientes por Número de Citas</h4>
+            <div class="chart-container">
+                {{ grafico_citas|safe }}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="stats-container">
+            <h4>Top 10 Pacientes por Gastos en Tratamientos</h4>
+            <div class="chart-container">
+                {{ grafico_gastos|safe }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tablas de análisis -->
+<div class="row">
+    <div class="col-lg-6">
+        <div class="stats-container">
+            <h4>Top 10 Pacientes por Número de Citas</h4>
+            <div class="table-responsive">
+                <table class="table table-bordered table-stats">
+                    <thead>
+                        <tr>
+                            <th>Paciente</th>
+                            <th>Total Citas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for paciente in citas_por_paciente %}
+                        <tr>
+                            <td>{{ paciente.paciente__nombre }} {{ paciente.paciente__apellidos }}</td>
+                            <td>{{ paciente.total_citas }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="stats-container">
+            <h4>Top 10 Pacientes por Gastos en Tratamientos</h4>
+            <div class="table-responsive">
+                <table class="table table-bordered table-stats">
+                    <thead>
+                        <tr>
+                            <th>Paciente</th>
+                            <th>Total Tratamientos</th>
+                            <th>Total Gastos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for paciente in tratamientos_por_paciente %}
+                        <tr>
+                            <td>{{ paciente.paciente__nombre }} {{ paciente.paciente__apellidos }}</td>
+                            <td>{{ paciente.total_tratamientos }}</td>
+                            <td>${{ paciente.total_gastos|floatformat:2 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

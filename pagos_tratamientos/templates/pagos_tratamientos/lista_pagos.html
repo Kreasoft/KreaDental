@@ -1,0 +1,234 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+<div class="container mt-4">
+    {% if tratamiento %}
+    <div class="alert alert-info mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h4 class="mb-1">Pagos del Tratamiento</h4>
+                <p class="mb-0">Paciente: {{ tratamiento.paciente }} | Procedimiento: {{ tratamiento.procedimiento }}</p>
+            </div>
+            <a href="{% url 'pagos_tratamientos:lista_pagos' %}" class="btn btn-outline-info">
+                <i class="fas fa-list"></i> Ver Todos los Pagos
+            </a>
+        </div>
+    </div>
+    {% endif %}
+    <!-- Panel de Estadísticas -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Total Pagado</h5>
+                    <h2 class="mb-0">${{ total_pagos|floatformat:0|intcomma }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Pendientes</h5>
+                    <h2 class="mb-0">{{ pagos_pendientes }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Completados</h5>
+                    <h2 class="mb-0">{{ pagos_completados }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-danger text-white">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Anulados</h5>
+                    <h2 class="mb-0">{{ pagos_anulados }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Barra de búsqueda -->
+    <div class="row mb-4">
+        <div class="col">
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="fas fa-search"></i>
+                </span>
+                <input type="text" id="searchInput" class="form-control" placeholder="Buscar pagos...">
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Pagos -->
+    <div class="card">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Lista de Pagos</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Paciente</th>
+                            <th>Tratamiento</th>
+                            <th>Monto Total</th>
+                            <th>Forma de Pago</th>
+                            <th>Monto Pagado</th>
+                            <th>Fecha</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pagosList">
+                        {% for pago in pagos %}
+                        <tr class="pago-row" data-search="{{ pago.tratamiento.paciente.nombre }} {{ pago.tratamiento.paciente.apellidos }} {{ pago.comprobante }}">
+                            <td>{{ pago.id }}</td>
+                            <td>{{ pago.tratamiento.paciente.nombre }} {{ pago.tratamiento.paciente.apellidos }}</td>
+                            <td>{{ pago.tratamiento }}</td>
+                            <td>${{ pago.tratamiento.costo_total|floatformat:0|intcomma }}</td>
+                            <td>{{ pago.forma_pago.nombre }}</td>
+                            <td>${{ pago.monto|floatformat:0|intcomma }}</td>
+                            <td>{{ pago.fecha_pago|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                <span class="badge {% if pago.estado == 'COMPLETADO' %}bg-success
+                                                {% elif pago.estado == 'PENDIENTE' %}bg-warning
+                                                {% else %}bg-danger{% endif %}">
+                                    {{ pago.estado }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{% url 'pagos_tratamientos:detalle_pago' pago.id %}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                {% if pago.estado != 'ANULADO' %}
+                                <button class="btn btn-sm btn-danger anular-pago" data-pago-id="{{ pago.id }}">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center py-4">
+                                <i class="fas fa-money-bill-wave fa-3x text-muted mb-3"></i>
+                                <p class="mb-0">No hay pagos registrados</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Anulación -->
+<div class="modal fade" id="anularPagoModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Anular Pago</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas anular este pago?</p>
+                <div class="form-group">
+                    <label for="motivoAnulacion">Motivo de la anulación:</label>
+                    <textarea id="motivoAnulacion" class="form-control" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmarAnulacion">Anular</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extrajs %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Búsqueda en tiempo real
+    const searchInput = document.getElementById('searchInput');
+    const pagosList = document.getElementById('pagosList');
+    const pagoRows = pagosList.getElementsByClassName('pago-row');
+
+    searchInput.addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        
+        Array.from(pagoRows).forEach(row => {
+            const searchText = row.dataset.search.toLowerCase();
+            row.style.display = searchText.includes(searchTerm) ? '' : 'none';
+        });
+    });
+
+    // Anulación de pagos
+    let pagoIdToAnular = null;
+    const anularPagoModal = new bootstrap.Modal(document.getElementById('anularPagoModal'));
+
+    document.querySelectorAll('.anular-pago').forEach(button => {
+        button.addEventListener('click', function() {
+            pagoIdToAnular = this.dataset.pagoId;
+            anularPagoModal.show();
+        });
+    });
+
+    document.getElementById('confirmarAnulacion').addEventListener('click', function() {
+        if (!pagoIdToAnular) return;
+
+        const motivo = document.getElementById('motivoAnulacion').value;
+        const url = `/pagos/anular/${pagoIdToAnular}/`;
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({ motivo_anulacion: motivo })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                location.reload();
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al procesar la solicitud');
+        })
+        .finally(() => {
+            anularPagoModal.hide();
+        });
+    });
+
+    // Animaciones
+    document.querySelectorAll('.card').forEach(card => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    });
+
+    setTimeout(() => {
+        document.querySelectorAll('.card').forEach((card, index) => {
+            setTimeout(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    }, 100);
+});
+</script>
+{% endblock %}

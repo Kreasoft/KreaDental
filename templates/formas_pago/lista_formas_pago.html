@@ -1,0 +1,335 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Lista de Formas de Pago{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: linear-gradient(135deg, #f8f9fc 0%, #e3e6f0 100%);
+        min-height: 100vh;
+    }
+    .card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        background: rgba(255, 255, 255, 0.98);
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 25px rgba(0,0,0,0.1);
+    }
+    .card-header {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fc 100%);
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        border-radius: 15px 15px 0 0 !important;
+    }
+    .btn-action {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.875rem;
+        border-radius: 8px;
+        transition: all 0.3s;
+        position: relative;
+        overflow: hidden;
+    }
+    .btn-action::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        background: rgba(255,255,255,0.2);
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        transition: width 0.6s ease, height 0.6s ease;
+    }
+    .btn-action:hover::after {
+        width: 150%;
+        height: 150%;
+    }
+    .btn-action:hover {
+        transform: translateY(-2px);
+    }
+    .table-hover tbody tr {
+        transition: all 0.3s ease;
+    }
+    .table-hover tbody tr:hover {
+        background-color: rgba(52, 152, 219, 0.05);
+        transform: scale(1.005);
+    }
+    .badge {
+        padding: 0.5em 1em;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    .search-box {
+        position: relative;
+        max-width: 300px;
+    }
+    .search-box input {
+        padding-left: 2.5rem;
+        border-radius: 20px;
+        border: 1px solid rgba(0,0,0,0.1);
+        background: rgba(255,255,255,0.9);
+        transition: all 0.3s ease;
+    }
+    .search-box input:focus {
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        background: #fff;
+    }
+    .search-box i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+    }
+    .stats-box {
+        background: rgba(255,255,255,0.9);
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+    .stats-item {
+        text-align: center;
+        padding: 0.5rem;
+    }
+    .stats-number {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #2c3e50;
+    }
+    .stats-label {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+    .empty-state {
+        text-align: center;
+        padding: 2rem;
+    }
+    .empty-state i {
+        font-size: 3rem;
+        color: #6c757d;
+        margin-bottom: 1rem;
+    }
+    .empty-state p {
+        color: #6c757d;
+        margin-bottom: 0;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in {
+        animation: fadeIn 0.3s ease forwards;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid fade-in">
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show mb-4" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <div class="row mb-4">
+        <div class="col-12 col-md-6">
+            <div class="stats-box">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="stats-item">
+                            <div class="stats-number text-success">
+                                {{ formas_pago|dictsort:"estado"|last|length }}
+                            </div>
+                            <div class="stats-label">Formas de Pago Activas</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="stats-item">
+                            <div class="stats-number text-danger">
+                                {{ formas_pago|dictsort:"estado"|first|length }}
+                            </div>
+                            <div class="stats-label">Formas de Pago Inactivas</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <div class="row align-items-center">
+                <div class="col-12 col-md-6 mb-2 mb-md-0">
+                    <h6 class="m-0 font-weight-bold text-primary">Lista de Formas de Pago</h6>
+                </div>
+                <div class="col-12 col-md-6 d-flex justify-content-md-end">
+                    <div class="search-box me-2 flex-grow-1 flex-md-grow-0">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" class="form-control" placeholder="Buscar forma de pago...">
+                    </div>
+                    <a href="{% url 'formas_pago:crear_forma_pago' %}" class="btn btn-primary btn-nuevo">
+                        <i class="fas fa-plus me-2"></i>Nueva Forma de Pago
+                    </a>
+                </div>
+            </div>
+        </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle" id="dataTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Estado</th>
+                            <th class="text-end">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for forma_pago in formas_pago %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ forma_pago.nombre }}</td>
+                            <td>{{ forma_pago.descripcion|default:"-" }}</td>
+                            <td>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" 
+                                           id="estado{{ forma_pago.id }}" 
+                                           {% if forma_pago.estado %}checked{% endif %}
+                                           onchange="cambiarEstado({{ forma_pago.id }})">
+                                    <label class="form-check-label" for="estado{{ forma_pago.id }}">
+                                        <span class="badge {% if forma_pago.estado %}bg-success{% else %}bg-danger{% endif %}">
+                                            {% if forma_pago.estado %}Activo{% else %}Inactivo{% endif %}
+                                        </span>
+                                    </label>
+                                </div>
+                            </td>
+                            <td class="text-end">
+                                <a href="{% url 'formas_pago:editar_forma_pago' forma_pago.id %}" 
+                                   class="btn btn-action btn-primary me-1" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'formas_pago:eliminar_forma_pago' forma_pago.id %}" 
+                                   class="btn btn-action btn-danger" title="Eliminar"
+                                   onclick="return confirm('¿Está seguro de eliminar esta forma de pago?')">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-4">
+                                <div class="empty-state">
+                                    <i class="fas fa-credit-card mb-3"></i>
+                                    <p class="mb-0">No hay formas de pago registradas</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar variables
+    const searchInput = document.getElementById('searchInput');
+    const table = document.getElementById('dataTable');
+    const tbody = table ? table.querySelector('tbody') : null;
+
+    // Función de búsqueda en tiempo real
+    if (searchInput && tbody) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            const rows = tbody.getElementsByTagName('tr');
+
+            Array.from(rows).forEach(row => {
+                if (row.querySelector('.empty-state')) {
+                    row.style.display = ''; // Siempre mostrar el mensaje de "no hay registros"
+                    return;
+                }
+
+                const cells = row.getElementsByTagName('td');
+                const found = Array.from(cells).some(cell => 
+                    cell.textContent.toLowerCase().includes(searchTerm)
+                );
+
+                row.style.display = found ? '' : 'none';
+            });
+        });
+    }
+
+    // Función para cambiar estado con animación
+    const switches = document.querySelectorAll('.form-check-input');
+    switches.forEach(switchEl => {
+        switchEl.addEventListener('change', function() {
+            const badge = this.parentElement.querySelector('.badge');
+            if (!badge) return;
+
+            const formaPagoId = this.id.replace('estado', '');
+            const activo = this.checked;
+            const originalState = !activo;
+
+            // Animación de transición
+            const updateBadgeUI = (estado) => {
+                badge.style.transform = 'scale(0.8)';
+                badge.style.opacity = '0.5';
+
+                setTimeout(() => {
+                    badge.classList.remove('bg-success', 'bg-danger');
+                    badge.classList.add(estado ? 'bg-success' : 'bg-danger');
+                    badge.textContent = estado ? 'Activo' : 'Inactivo';
+                    badge.style.transform = 'scale(1)';
+                    badge.style.opacity = '1';
+                }, 200);
+            };
+
+            // Actualizar UI inmediatamente
+            updateBadgeUI(activo);
+
+            // Llamada AJAX para actualizar el estado
+            fetch(`/formas_pago/cambiar_estado/${formaPagoId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ activo })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error en la respuesta del servidor');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (!data.success) {
+                    throw new Error(data.error || 'Error al cambiar el estado');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                this.checked = originalState;
+                updateBadgeUI(originalState);
+                alert('Error al cambiar el estado de la forma de pago: ' + error.message);
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

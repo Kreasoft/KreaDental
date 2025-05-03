@@ -1,0 +1,349 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sistema Dental{% endblock %}</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --sidebar-width: 250px;
+        }
+        
+        body {
+            min-height: 100vh;
+        }
+        
+        #wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        #sidebar {
+            width: var(--sidebar-width);
+            background: #2c3e50;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        #content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            background-color: #f8f9fa;
+        }
+        
+        .sidebar-heading {
+            padding: 1rem;
+            color: white;
+            font-size: 1.2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .sidebar-menu {
+            padding: 0;
+            list-style: none;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        /* Estilo para la barra de desplazamiento */
+        .sidebar-menu::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar-menu::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .sidebar-menu::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
+        }
+
+        .sidebar-menu::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .sidebar-menu li a {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-menu li a:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        
+        .sidebar-menu li a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .sidebar-menu li a.active {
+            background: #3498db;
+            color: white;
+        }
+        
+        #topbar {
+            background: white;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #2c3e50;
+        }
+        
+        .menu-category {
+            padding: 1rem 1rem 0.5rem;
+            color: #8a9cb1;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin-top: 1rem;
+        }
+        
+        .menu-category:first-child {
+            margin-top: 0;
+        }
+
+        /* Estilos para el menú desplegable */
+        .sidebar-menu .collapse {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-menu .collapse .nav-link {
+            padding: 0.5rem 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        .sidebar-menu .collapse .nav-link:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-menu .collapse .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-menu li a .fa-chevron-down {
+            transition: transform 0.3s;
+        }
+
+        .sidebar-menu li a[aria-expanded="true"] .fa-chevron-down {
+            transform: rotate(180deg);
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div id="wrapper">
+        <!-- Sidebar -->
+        <nav id="sidebar">
+            <div class="sidebar-heading">
+                <i class="fas fa-calendar-alt me-2"></i>Sistema Dental
+            </div>
+            <ul class="sidebar-menu">
+                <!-- Dashboard -->
+                <li>
+                    <a href="{% url 'core:home' %}" class="{% if request.path == '/' %}active{% endif %}">
+                        <i class="fas fa-tachometer-alt"></i>Dashboard
+                    </a>
+                </li>
+
+                <!-- Gestión de Citas -->
+                <li class="menu-category">Gestión de Citas</li>
+                <li>
+                    <a href="{% url 'citas:calendario_citas' %}" class="{% if 'calendario' in request.path %}active{% endif %}">
+                        <i class="fas fa-calendar"></i>Agendar Citas
+                    </a>
+                </li>
+                
+                <!-- Gestión de Personas -->
+                <li class="menu-category">Gestión de Personas</li>
+                <li>
+                    <a href="{% url 'pacientes:lista_pacientes' %}" class="{% if 'pacientes' in request.path %}active{% endif %}">
+                        <i class="fas fa-users"></i>Pacientes
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'profesionales:lista_profesionales' %}" class="{% if 'profesionales' in request.path %}active{% endif %}">
+                        <i class="fas fa-user-md"></i>Profesionales
+                    </a>
+                </li>
+
+                <!-- Servicios Médicos -->
+                <li class="menu-category">Servicios Médicos</li>
+                <li>
+                    <a href="{% url 'profesionales:lista_especialidades' %}" class="{% if 'especialidades' in request.path %}active{% endif %}">
+                        <i class="fas fa-stethoscope"></i>Especialidades
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'procedimientos:lista_procedimientos' %}" class="{% if 'procedimientos' in request.path %}active{% endif %}">
+                        <i class="fas fa-procedures"></i>Procedimientos
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'core:home' %}" class="{% if 'tratamientos' in request.path and 'pagos' not in request.path %}active{% endif %}">
+                        <i class="fas fa-clipboard-list"></i>Tratamientos
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'core:home' %}" class="{% if 'pagos' in request.path %}active{% endif %}">
+                        <i class="fas fa-money-bill-wave"></i>Pagos de Tratamientos
+                    </a>
+                </li>
+
+                <!-- Reportes -->
+                <li class="menu-category">Reportes</li>
+                <li>
+                    <a href="#" class="{% if 'informes' in request.path %}active{% endif %}" data-bs-toggle="collapse" data-bs-target="#collapseInformes">
+                        <i class="fas fa-chart-bar"></i>Informes
+                        <i class="fas fa-chevron-down ms-auto"></i>
+                    </a>
+                    <div class="collapse {% if 'informes' in request.path %}show{% endif %}" id="collapseInformes">
+                        <ul class="nav flex-column ms-3 mt-2">
+                            <li>
+                                <a href="{% url 'informes:dashboard' %}" class="text-white-50">
+                                    <i class="fas fa-tachometer-alt"></i>Dashboard
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'informes:tratamientos' %}" class="text-white-50">
+                                    <i class="fas fa-tooth"></i>Tratamientos
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'informes:financiero' %}" class="text-white-50">
+                                    <i class="fas fa-dollar-sign"></i>Financiero
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'informes:pacientes' %}" class="text-white-50">
+                                    <i class="fas fa-users"></i>Pacientes
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
+                <!-- Configuración -->
+                <li class="menu-category">Configuración</li>
+                <li>
+                    <a href="#" class="{% if 'configuracion' in request.path or 'previsiones' in request.path or 'formas-pago' in request.path %}active{% endif %}" 
+                       data-bs-toggle="collapse" data-bs-target="#collapseConfiguracion">
+                        <i class="fas fa-cog"></i>Configuración
+                        <i class="fas fa-chevron-down ms-auto"></i>
+                    </a>
+                    <div class="collapse {% if 'configuracion' in request.path or 'previsiones' in request.path or 'formas-pago' in request.path %}show{% endif %}" 
+                         id="collapseConfiguracion">
+                        <ul class="nav flex-column ms-3 mt-2">
+                            <li>
+                                <a href="{% url 'configuracion:empresa' %}" class="text-white-50">
+                                    <i class="fas fa-building"></i>Empresa
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'prevision:lista_previsiones' %}" class="text-white-50">
+                                    <i class="fas fa-heartbeat"></i>Previsiones
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'formas_pago:lista_formas_pago' %}" class="text-white-50">
+                                    <i class="fas fa-credit-card"></i>Formas de Pago
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Page Content -->
+        <div id="content">
+            <!-- Top Bar -->
+            <div id="topbar" class="d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">{% block page_title %}{% endblock %}</h4>
+                {% if user.is_authenticated %}
+                <div class="dropdown">
+                    <a class="user-menu" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-circle"></i>
+                        <span>{{ user.username }}</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a class="dropdown-item" href="{% url 'admin:index' %}">
+                                <i class="fas fa-cog me-2"></i>Administración
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'logout' %}">
+                                <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Main Content -->
+            <div class="p-4">
+                {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/es.js"></script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html> 

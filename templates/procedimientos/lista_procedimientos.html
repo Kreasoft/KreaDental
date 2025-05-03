@@ -1,0 +1,293 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Procedimientos{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: linear-gradient(135deg, #f8f9fc 0%, #e3e6f0 100%);
+        min-height: 100vh;
+    }
+    .card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        background: rgba(255, 255, 255, 0.8);
+        -webkit-backdrop-filter: blur(15px);
+        backdrop-filter: blur(15px);
+        transition: all 0.3s ease;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    .card-header {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 249, 252, 0.95) 100%);
+        border-bottom: 1px solid rgba(0,0,0,0.03);
+        border-radius: 15px 15px 0 0 !important;
+        padding: 1.5rem;
+        backdrop-filter: blur(10px);
+    }
+    .card-header h3 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0;
+        background: linear-gradient(135deg, #0a8ea8 0%, #0dcaf0 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        color: transparent;
+    }
+    .table {
+        margin-bottom: 0;
+        background: transparent;
+    }
+    .table th {
+        background: linear-gradient(135deg, #f8f9fc 0%, #e3e6f0 100%);
+        border-bottom: 2px solid rgba(0,0,0,0.05);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 0.5px;
+        color: #4e73df;
+        padding: 1rem;
+    }
+    .table td {
+        padding: 1rem;
+        vertical-align: middle;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    .table tbody tr:hover {
+        background-color: rgba(13, 202, 240, 0.05);
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, #0dcaf0 0%, #0a8ea8 100%);
+        border: none;
+        padding: 0.5rem 1.5rem;
+        font-weight: 500;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(13, 202, 240, 0.3);
+        transition: all 0.3s;
+    }
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #0a8ea8 0%, #0dcaf0 100%);
+        box-shadow: 0 4px 8px rgba(13, 202, 240, 0.4);
+        transform: translateY(-2px);
+    }
+    .btn-secondary {
+        background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        border: none;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(108, 117, 125, 0.3);
+        transition: all 0.3s;
+    }
+    .btn-secondary:hover {
+        background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+        box-shadow: 0 4px 8px rgba(108, 117, 125, 0.4);
+        transform: translateY(-2px);
+    }
+    .btn-danger {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        border: none;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(220, 53, 69, 0.3);
+        transition: all 0.3s;
+    }
+    .btn-danger:hover {
+        background: linear-gradient(135deg, #c82333 0%, #dc3545 100%);
+        box-shadow: 0 4px 8px rgba(220, 53, 69, 0.4);
+        transform: translateY(-2px);
+    }
+    .btn-group .btn {
+        margin-right: 0.5rem;
+    }
+    .btn-group .btn:last-child {
+        margin-right: 0;
+    }
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: #6c757d;
+    }
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 1.5rem;
+        background: linear-gradient(135deg, #0dcaf0 0%, #0a8ea8 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    .empty-state p {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+        color: #495057;
+    }
+    @media (max-width: 768px) {
+        .card {
+            margin: 1rem;
+        }
+        .table-responsive {
+            border-radius: 0 0 15px 15px;
+        }
+    }
+    .hover-card {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+
+    .hover-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+    }
+
+    .empty-state-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 1.5rem;
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .empty-state-icon i {
+        font-size: 2.5rem;
+        color: #1976d2;
+    }
+
+    .empty-state h4 {
+        margin-bottom: 0.5rem;
+        color: #333;
+    }
+
+    .empty-state p {
+        font-size: 1rem;
+        color: #666;
+        margin-bottom: 1.5rem;
+    }
+
+    .card-body .badge {
+        padding: 0.5em 0.8em;
+    }
+
+    .card-text.text-muted.small {
+        font-size: 0.875rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h3 class="m-0">Procedimientos</h3>
+            <a href="{% url 'procedimientos:crear_procedimiento' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Nuevo Procedimiento
+            </a>
+        </div>
+        <div class="card-body">
+            {% if procedimientos %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Especialidad</th>
+                            <th>Valor</th>
+                            <th>Tiempo</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for procedimiento in procedimientos %}
+                        <tr>
+                            <td>{{ procedimiento.nombre }}</td>
+                            <td>{{ procedimiento.descripcion|default:"--" }}</td>
+                            <td>{{ procedimiento.especialidad.nombre }}</td>
+                            <td>${{ procedimiento.valor }}</td>
+                            <td>{{ procedimiento.tiempo_estimado }} min</td>
+                            <td>
+                                {% if procedimiento.estado %}
+                                <span class="badge bg-success">Activo</span>
+                                {% else %}
+                                <span class="badge bg-danger">Inactivo</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{% url 'procedimientos:editar_procedimiento' procedimiento.id %}" 
+                                       class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form hx-post="{% url 'procedimientos:eliminar_procedimiento' procedimiento.id %}" 
+                                          hx-confirm="¿Está seguro que desea eliminar el procedimiento '{{ procedimiento.nombre }}'?"
+                                          hx-target="closest tr"
+                                          hx-swap="outerHTML swap:1s"
+                                          class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-procedures"></i>
+                </div>
+                <h4>No hay procedimientos registrados</h4>
+                <p class="text-muted">Comienza agregando un nuevo procedimiento</p>
+                <a href="{% url 'procedimientos:crear_procedimiento' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Agregar Procedimiento
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/htmx.org@1.9.10"></script>
+<script>
+htmx.on('htmx:afterRequest', function(evt) {
+    if (evt.detail.successful) {
+        // Mostrar mensaje de éxito
+        const toast = new bootstrap.Toast(document.getElementById('successToast'));
+        toast.show();
+    }
+});
+</script>
+
+<!-- Toast de éxito -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="successToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fas fa-check-circle me-2"></i>Procedimiento eliminado exitosamente
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+{% endblock %}

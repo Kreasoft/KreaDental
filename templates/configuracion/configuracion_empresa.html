@@ -1,0 +1,426 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+    .logo-preview-container {
+        border: 2px dashed #ddd;
+        border-radius: 8px;
+        padding: 1rem;
+        text-align: center;
+        background: #f8f9fa;
+        min-height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+    }
+    .logo-preview-container img {
+        max-height: 150px;
+        width: auto;
+        object-fit: contain;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .red-social-item {
+        background-color: #f8f9fa;
+        transition: all 0.3s ease;
+        border: 1px solid #dee2e6;
+    }
+    .red-social-item:hover {
+        background-color: #fff;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .red-social-tipo {
+        min-width: 120px;
+    }
+    .config-card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        margin-bottom: 1.5rem;
+    }
+
+    .config-card .card-header {
+        background-color: #f8f9fc;
+        border-bottom: 1px solid #e3e6f0;
+        padding: 1rem 1.25rem;
+    }
+
+    .config-card .card-body {
+        padding: 1.25rem;
+    }
+
+    .preview-logo {
+        max-width: 200px;
+        max-height: 200px;
+        margin-top: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block page_title %}Configuración de Empresa{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+        {% csrf_token %}
+
+        <!-- Información Básica -->
+        <div class="config-card">
+            <div class="card-header">
+                <h5 class="mb-0">Información Básica</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="{{ form.nombre.id_for_label }}" class="form-label">{{ form.nombre.label }}</label>
+                            {{ form.nombre }}
+                            {% if form.nombre.errors %}
+                            <div class="invalid-feedback">{{ form.nombre.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="{{ form.rut.id_for_label }}" class="form-label">{{ form.rut.label }}</label>
+                            {{ form.rut }}
+                            {% if form.rut.errors %}
+                            <div class="invalid-feedback">{{ form.rut.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="mb-3">
+                            <label for="{{ form.direccion.id_for_label }}" class="form-label">{{ form.direccion.label }}</label>
+                            {{ form.direccion }}
+                            {% if form.direccion.errors %}
+                            <div class="invalid-feedback">{{ form.direccion.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="{{ form.telefono.id_for_label }}" class="form-label">{{ form.telefono.label }}</label>
+                            {{ form.telefono }}
+                            {% if form.telefono.errors %}
+                            <div class="invalid-feedback">{{ form.telefono.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="{{ form.email.id_for_label }}" class="form-label">{{ form.email.label }}</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                            <div class="invalid-feedback">{{ form.email.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información Adicional -->
+        <div class="config-card">
+            <div class="card-header">
+                <h5 class="mb-0">Información Adicional</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="{{ form.sitio_web.id_for_label }}" class="form-label">{{ form.sitio_web.label }}</label>
+                            {{ form.sitio_web }}
+                            {% if form.sitio_web.errors %}
+                            <div class="invalid-feedback">{{ form.sitio_web.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.logo.id_for_label }}" class="form-label">{{ form.logo.label }}</label>
+                            <div class="input-group">
+                                {{ form.logo }}
+                                {% if form.logo.help_text %}
+                                <div class="form-text text-muted">{{ form.logo.help_text }}</div>
+                                {% endif %}
+                            </div>
+                            {% if form.logo.errors %}
+                            <div class="invalid-feedback">{{ form.logo.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="logo-preview-container">
+                            {% if config.logo %}
+                            <img src="{{ config.logo.url }}" alt="Logo actual" class="mb-2">
+                            <p class="text-muted mb-0"><small><i class="fas fa-image"></i> Logo actual</small></p>
+                            {% else %}
+                            <i class="fas fa-image fa-3x text-muted mb-2"></i>
+                            <p class="text-muted mb-0">No hay logo cargado</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="mb-3">
+                            <label for="{{ form.horario_atencion.id_for_label }}" class="form-label">{{ form.horario_atencion.label }}</label>
+                            {{ form.horario_atencion }}
+                            {% if form.horario_atencion.errors %}
+                            <div class="invalid-feedback">{{ form.horario_atencion.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="mb-3">
+                            <label for="{{ form.descripcion.id_for_label }}" class="form-label">{{ form.descripcion.label }}</label>
+                            {{ form.descripcion }}
+                            {% if form.descripcion.errors %}
+                            <div class="invalid-feedback">{{ form.descripcion.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Redes Sociales -->
+        <div class="config-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Redes Sociales</h5>
+                <button type="button" class="btn btn-sm btn-primary" id="agregar-red-social">
+                    <i class="fas fa-plus"></i> Agregar Red Social
+                </button>
+            </div>
+            <div class="card-body">
+                <div id="redes-sociales-container">
+                    <!-- Las redes sociales se agregarán aquí dinámicamente -->
+                </div>
+                {{ form.redes_sociales }}
+            </div>
+        </div>
+
+        <!-- Template para nueva red social -->
+        <template id="red-social-template">
+            <div class="red-social-item mb-3 border rounded p-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="input-group">
+                        <select class="form-select red-social-tipo">
+                            <option value="facebook" data-icon="fab fa-facebook">Facebook</option>
+                            <option value="instagram" data-icon="fab fa-instagram">Instagram</option>
+                            <option value="twitter" data-icon="fab fa-twitter">Twitter</option>
+                            <option value="linkedin" data-icon="fab fa-linkedin">LinkedIn</option>
+                            <option value="youtube" data-icon="fab fa-youtube">YouTube</option>
+                            <option value="tiktok" data-icon="fab fa-tiktok">TikTok</option>
+                            <option value="whatsapp" data-icon="fab fa-whatsapp">WhatsApp</option>
+                        </select>
+                        <span class="input-group-text red-social-icon"><i class="fab fa-facebook"></i></span>
+                        <input type="url" class="form-control red-social-url" placeholder="https://...">
+                    </div>
+                    <button type="button" class="btn btn-outline-danger btn-sm eliminar-red-social">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+                <div class="invalid-feedback" style="display: none;"></div>
+            </div>
+        </template>
+
+        <style>
+        .red-social-item {
+            background-color: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+        .red-social-item:hover {
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        </style>
+
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('redes-sociales-container');
+            const template = document.getElementById('red-social-template');
+            const hiddenInput = document.querySelector('input[name="redes_sociales"]');
+            let redesSociales = {};
+
+            // Cargar redes sociales existentes
+            try {
+                redesSociales = JSON.parse(hiddenInput.value || '{}');
+                for (const [tipo, url] of Object.entries(redesSociales)) {
+                    agregarRedSocial(tipo, url);
+                }
+            } catch (e) {
+                console.error('Error al cargar redes sociales:', e);
+            }
+
+            // Agregar nueva red social
+            document.getElementById('agregar-red-social').addEventListener('click', () => {
+                agregarRedSocial();
+            });
+
+            // Función para agregar red social
+            function agregarRedSocial(tipo = 'facebook', url = '') {
+                const clone = template.content.cloneNode(true);
+                const item = clone.querySelector('.red-social-item');
+                const select = clone.querySelector('.red-social-tipo');
+                const input = clone.querySelector('.red-social-url');
+                const iconContainer = clone.querySelector('.red-social-icon i');
+
+                select.value = tipo;
+                input.value = url;
+                actualizarIcono(select, iconContainer);
+
+                // Eventos para actualizar el JSON y validar
+                select.addEventListener('change', () => {
+                    actualizarIcono(select, iconContainer);
+                    validarYActualizar(item);
+                });
+
+                input.addEventListener('input', () => {
+                    validarYActualizar(item);
+                });
+
+                input.addEventListener('blur', () => {
+                    validarURL(input, item);
+                });
+
+                // Evento para eliminar
+                clone.querySelector('.eliminar-red-social').addEventListener('click', () => {
+                    if (container.querySelectorAll('.red-social-item').length > 1) {
+                        item.remove();
+                        actualizarJSON();
+                    } else {
+                        mostrarError(item, 'Debe mantener al menos una red social');
+                    }
+                });
+
+                container.appendChild(clone);
+                if (url) validarURL(input, item);
+            }
+
+            // Función para actualizar icono
+            function actualizarIcono(select, iconContainer) {
+                const selectedOption = select.options[select.selectedIndex];
+                const iconClass = selectedOption.getAttribute('data-icon');
+                iconContainer.className = iconClass;
+            }
+
+            // Función para validar URL
+            function validarURL(input, item) {
+                const url = input.value.trim();
+                const tipo = item.querySelector('.red-social-tipo').value;
+                const feedback = item.querySelector('.invalid-feedback');
+                let isValid = true;
+
+                if (url && !url.startsWith('https://')) {
+                    mostrarError(item, 'La URL debe comenzar con https://');
+                    isValid = false;
+                } else if (url) {
+                    try {
+                        new URL(url);
+                        switch(tipo) {
+                            case 'facebook':
+                                if (!url.includes('facebook.com')) {
+                                    mostrarError(item, 'Debe ser una URL válida de Facebook');
+                                    isValid = false;
+                                }
+                                break;
+                            case 'instagram':
+                                if (!url.includes('instagram.com')) {
+                                    mostrarError(item, 'Debe ser una URL válida de Instagram');
+                                    isValid = false;
+                                }
+                                break;
+                            // Agregar más validaciones para otras redes sociales
+                        }
+                    } catch (e) {
+                        mostrarError(item, 'URL inválida');
+                        isValid = false;
+                    }
+                }
+
+                if (isValid) {
+                    feedback.style.display = 'none';
+                    input.classList.remove('is-invalid');
+                    input.classList.add('is-valid');
+                }
+
+                return isValid;
+            }
+
+            // Función para mostrar error
+            function mostrarError(item, mensaje) {
+                const input = item.querySelector('.red-social-url');
+                const feedback = item.querySelector('.invalid-feedback');
+                input.classList.add('is-invalid');
+                input.classList.remove('is-valid');
+                feedback.textContent = mensaje;
+                feedback.style.display = 'block';
+            }
+
+            // Función para validar y actualizar JSON
+            function validarYActualizar(item) {
+                const input = item.querySelector('.red-social-url');
+                if (validarURL(input, item)) {
+                    actualizarJSON();
+                }
+            }
+
+            // Función para actualizar el JSON
+            function actualizarJSON() {
+                const redes = {};
+                container.querySelectorAll('.red-social-item').forEach(item => {
+                    const tipo = item.querySelector('.red-social-tipo').value;
+                    const url = item.querySelector('.red-social-url').value.trim();
+                    if (url && validarURL(item.querySelector('.red-social-url'), item)) {
+                        redes[tipo] = url;
+                    }
+                });
+                hiddenInput.value = JSON.stringify(redes);
+            }
+        });
+        </script>
+
+        <!-- Botones de Acción -->
+        <div class="row">
+            <div class="col-12 text-end">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Guardar Configuración
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Validación de formulario
+    (function () {
+        'use strict'
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+    })()
+</script>
+{% endblock %}
