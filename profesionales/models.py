@@ -1,9 +1,14 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.core.validators import MinLengthValidator
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+from django.contrib.auth import get_user_model
 from especialidades.models import Especialidad
+from empresa.models import Empresa
+
+# Obtener el modelo de usuario personalizado
+User = get_user_model()
 
 class Profesional(models.Model):
     GENERO_CHOICES = [
@@ -22,7 +27,15 @@ class Profesional(models.Model):
     email = models.EmailField(unique=True, null=True, blank=True)
     direccion = models.TextField(blank=True, null=True)
     especialidad = models.ForeignKey(Especialidad, on_delete=models.SET_NULL, null=True, blank=True, related_name='profesionales')
-    usuario = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True)
+    usuario = models.OneToOneField(
+        settings.AUTH_USER_MODEL, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True,
+        related_name='profesional_relacionado',
+        verbose_name='usuario asociado'
+    )
+    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='profesionales', null=True, blank=True)
     activo = models.BooleanField(default=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
@@ -45,19 +58,4 @@ class Profesional(models.Model):
         self.nombres = self.nombres.upper() if self.nombres else ''
         self.apellido_paterno = self.apellido_paterno.upper() if self.apellido_paterno else ''
         self.apellido_materno = self.apellido_materno.upper() if self.apellido_materno else ''
-        super().save(*args, **kwargs)
-
-    class Meta:
-        verbose_name = 'Profesional'
-        verbose_name_plural = 'Profesionales'
-        ordering = ['apellido_paterno', 'apellido_materno', 'nombres']
-
-class Especialidad(models.Model):
-    nombre = models.CharField(max_length=100)
-    descripcion = models.TextField(blank=True, null=True)
-    estado = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.nombre 
+        super().save(*args, **kwargs) 

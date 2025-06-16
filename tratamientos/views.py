@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db import transaction
+from django.db import transaction, models
 from django.contrib.auth import get_user_model
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.middleware.csrf import get_token
@@ -19,10 +19,49 @@ User = get_user_model()
 # Vista de lista
 @login_required
 def lista_tratamientos(request):
-    tratamientos = Tratamiento.objects.all().order_by('-fecha_creacion')
+    tratamientos = Tratamiento.objects.all()
+    
+    # Filtro por estado
+    estado = request.GET.get('estado')
+    if estado and estado != 'todos':
+        tratamientos = tratamientos.filter(estado=estado)
+    
+    # Filtro por pagado
+    pagado = request.GET.get('pagado')
+    if pagado:
+        pagado = pagado.lower() == 'true'
+        tratamientos = tratamientos.filter(pagado=pagado)
+    
+    # Búsqueda por paciente
+    busqueda = request.GET.get('busqueda', '').strip()
+    if busqueda:
+        tratamientos = tratamientos.filter(
+            models.Q(paciente__nombre__icontains=busqueda) |
+            models.Q(paciente__apellidos__icontains=busqueda)
+        )
+    
+    # Ordenar por fecha de creación
+    tratamientos = tratamientos.order_by('-fecha_creacion')
+    
+    # Obtener contadores para las tarjetas de resumen
+    total_tratamientos = Tratamiento.objects.count()
+    tratamientos_completados = Tratamiento.objects.filter(estado='COMPLETADO').count()
+    tratamientos_en_progreso = Tratamiento.objects.filter(estado='EN_PROGRESO').count()
+    tratamientos_pendientes_pago = Tratamiento.objects.filter(pagado=False).count()
+
     return render(request, 'tratamientos/lista.html', {
         'tratamientos': tratamientos,
-        'estados': dict(Tratamiento.ESTADO_CHOICES)
+        'estados': dict(Tratamiento.ESTADO_CHOICES),
+        'filtros': {
+            'estado': estado or 'todos',
+            'pagado': pagado if pagado is not None else '',
+            'busqueda': busqueda
+        },
+        # Agregar contadores al contexto
+        'total_tratamientos': total_tratamientos,
+        'tratamientos_completados': tratamientos_completados,
+        'tratamientos_en_progreso': tratamientos_en_progreso,
+        'tratamientos_pendientes_pago': tratamientos_pendientes_pago
     })
 
 # Vista de creación
@@ -131,9 +170,14 @@ def actualizar_estado(request, pk):
     tratamiento = get_object_or_404(Tratamiento, pk=pk)
     if request.method == 'POST':
         nuevo_estado = request.POST.get('estado')
-        tratamiento.estado = nuevo_estado
-        tratamiento.save()
-        messages.success(request, 'Estado del tratamiento actualizado')
+        if nuevo_estado in dict(Tratamiento.ESTADO_CHOICES):
+            tratamiento.estado = nuevo_estado
+            tratamiento.fecha_actualizacion = timezone.now()
+            tratamiento.save()
+            messages.success(request, f'Estado del tratamiento actualizado a {dict(Tratamiento.ESTADO_CHOICES)[nuevo_estado]}')
+            return redirect('tratamientos:lista_tratamientos')
+        else:
+            messages.error(request, 'Estado inválido')
     return redirect('tratamientos:detalle_tratamiento', pk=pk)
 
 @login_required
@@ -141,8 +185,10 @@ def marcar_pagado(request, pk):
     tratamiento = get_object_or_404(Tratamiento, pk=pk)
     if request.method == 'POST':
         tratamiento.pagado = True
-        tratamiento.save()
-        messages.success(request, 'Tratamiento marcado como pagado')
+        tratamiento.fecha_actualizacion = timezone.now()
+        tratamiento.save(update_fields=['pagado', 'fecha_actualizacion'])
+        messages.success(request, 'Tratamiento marcado como pagado exitosamente')
+        return redirect('tratamientos:lista_tratamientos')
     return redirect('tratamientos:detalle_tratamiento', pk=pk)
 
 # Vista de edición

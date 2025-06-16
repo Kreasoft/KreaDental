@@ -1,367 +1,286 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Lista de Pacientes{% endblock %}
-{% block page_title %}Lista de Pacientes{% endblock %}
+{% block title %}Pacientes{% endblock %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
 <style>
-    .stats-card {
-        position: relative;
-        padding: 1.75rem;
-        border-radius: 1rem;
-        overflow: hidden;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-        transition: all 0.3s ease;
-        color: white;
-    }
-    
-    .stats-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    .card {
+        border: 1px solid #AED6F1;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.05);
     }
 
-    .stats-icon {
-        position: absolute;
-        right: 1.5rem;
-        bottom: 1rem;
-        font-size: 4.5rem;
-        opacity: 0.15;
-        transform: rotate(-5deg);
-        transition: all 0.3s ease;
-    }
-
-    .stats-card:hover .stats-icon {
-        transform: rotate(0deg) scale(1.1);
-        opacity: 0.2;
-    }
-
-    .stats-number {
-        font-size: 2rem;
-        font-weight: 700;
-        margin-bottom: 0.75rem;
-        position: relative;
-        z-index: 1;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-    }
-
-    .stats-label {
-        font-size: 0.9rem;
-        font-weight: 500;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        position: relative;
-        z-index: 1;
-        opacity: 0.9;
-    }
-
-    .card-total-pacientes {
-        background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);
-    }
-
-    .card-pacientes-activos {
-        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-    }
-
-    .card-nuevos-mes {
-        background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
-    }
-
-    .card-citas-pendientes {
-        background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
-    }
     .card-header {
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 249, 252, 0.95) 100%);
-        border-bottom: 1px solid rgba(0,0,0,0.03);
+        background-color: #E8F4FC;
+        border-bottom: 1px solid #AED6F1;
         border-radius: 15px 15px 0 0 !important;
         padding: 1.5rem;
-        backdrop-filter: blur(10px);
     }
-    .card-header h6 {
+
+    .card-header h3 {
+        color: #1A5276;
         font-size: 1.5rem;
         font-weight: 600;
         margin: 0;
-        background: linear-gradient(135deg, #0a8ea8 0%, #0dcaf0 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        color: transparent;
+        font-family: 'Poppins', sans-serif;
     }
-    .table {
-        margin-bottom: 0;
-        background: transparent;
-    }
-    .table th {
-        background: linear-gradient(135deg, #f8f9fc 0%, #e3e6f0 100%);
-        border-bottom: 2px solid rgba(0,0,0,0.05);
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.8rem;
-        letter-spacing: 0.5px;
-        color: #4e73df;
-    }
-    .table td {
-        vertical-align: middle;
-        border-bottom: 1px solid rgba(0,0,0,0.05);
-    }
-    .btn-action {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.875rem;
-        border-radius: 8px;
-        transition: all 0.3s;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    .btn-action:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-    }
-    .btn-nuevo {
-        background: linear-gradient(135deg, #0dcaf0 0%, #0a8ea8 100%);
-        border: none;
-        padding: 0.5rem 1.5rem;
-        font-weight: 500;
-        border-radius: 8px;
-        box-shadow: 0 2px 5px rgba(13, 202, 240, 0.3);
-    }
-    .btn-nuevo:hover {
-        background: linear-gradient(135deg, #0a8ea8 0%, #0dcaf0 100%);
-        box-shadow: 0 4px 8px rgba(13, 202, 240, 0.4);
-    }
-    .badge-estado {
-        font-size: 0.75rem;
-        padding: 0.35em 0.65em;
-        border-radius: 50px;
-        font-weight: 500;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    .search-box {
-        position: relative;
-        max-width: 400px;
-    }
-    .search-box input {
-        padding-left: 2.5rem;
-        border-radius: 8px;
-        border: 1px solid rgba(0,0,0,0.1);
-        background: rgba(255, 255, 255, 0.9);
-        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        transition: all 0.3s;
-    }
-    .search-box input:focus {
-        background: #ffffff;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        border-color: #0dcaf0;
-    }
-    .search-box i {
-        position: absolute;
-        left: 1rem;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #6e707e;
-    }
-    .table-hover tbody tr:hover {
-        background: linear-gradient(135deg, rgba(13, 202, 240, 0.05) 0%, rgba(10, 142, 168, 0.05) 100%);
-        transform: scale(1.01);
-        transition: all 0.3s;
-    }
-    .avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #0dcaf0 0%, #0a8ea8 100%);
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 600;
-        font-size: 1.1rem;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    .btn-primary {
-        background: linear-gradient(135deg, #0dcaf0 0%, #0a8ea8 100%);
-        border: none;
-        box-shadow: 0 2px 5px rgba(13, 202, 240, 0.3);
-    }
-    .btn-primary:hover {
-        background: linear-gradient(135deg, #0a8ea8 0%, #0dcaf0 100%);
-        box-shadow: 0 4px 8px rgba(13, 202, 240, 0.4);
-    }
-    .form-check-input:checked {
-        background-color: #0dcaf0;
-        border-color: #0dcaf0;
-        box-shadow: 0 0 0 0.25rem rgba(13, 202, 240, 0.25);
-    }
-    .form-switch .form-check-input {
-        width: 3em;
-        height: 1.5em;
-        margin-right: 0.5rem;
-    }
+
     .card-body {
-        padding: 1.5rem;
-    }
-    .container-fluid {
         padding: 2rem;
     }
-    .text-muted {
-        color: #6e707e !important;
+
+    .table {
+        border: 1px solid #AED6F1;
+        border-radius: 8px;
+    }
+
+    .table th {
+        background-color: #E8F4FC;
+        color: #1A5276;
+        font-weight: 600;
+        border-bottom: 1px solid #AED6F1;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 0.85rem;
+        padding: 0.5rem;
+    }
+
+    .table td {
+        border-bottom: 1px solid #E8F4FC;
+        vertical-align: middle;
+        font-size: 0.9rem;
+        padding: 0.5rem;
+    }
+
+    .btn-primary {
+        background-color: #1A5276;
+        border-color: #1A5276;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        border-radius: 8px;
+        font-size: 0.9rem;
+    }
+
+    .btn-primary:hover {
+        background-color: #2874A6;
+        border-color: #2874A6;
+    }
+
+    .btn-warning {
+        background-color: #f39c12;
+        border-color: #f39c12;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+    }
+
+    .btn-warning:hover {
+        background-color: #d35400;
+        border-color: #d35400;
+    }
+
+    .btn-danger {
+        background-color: #e74c3c;
+        border-color: #e74c3c;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+    }
+
+    .btn-danger:hover {
+        background-color: #c0392b;
+        border-color: #c0392b;
+    }
+
+    .alert {
+        border-radius: 8px;
+        border: none;
+    }
+
+    .btn-group {
+        gap: 0.3rem;
+    }
+
+    .btn-group .btn {
+        padding: 0.4rem 0.6rem;
+        border-radius: 6px;
+    }
+
+    .estado-badge {
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    .estado-activo {
+        background-color: #2ecc71;
+        color: #fff;
+    }
+
+    .estado-inactivo {
+        background-color: #e74c3c;
+        color: #fff;
+    }
+
+    .search-box {
+        border: 1px solid #AED6F1;
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .search-box:focus {
+        border-color: #2874A6;
+        box-shadow: 0 0 0 0.2rem rgba(26, 82, 118, 0.1);
+    }
+
+    .pagination {
+        margin-top: 1rem;
+    }
+
+    .page-link {
+        color: #1A5276;
+        border: 1px solid #AED6F1;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+    }
+
+    .page-link:hover {
+        background-color: #E8F4FC;
+        color: #2874A6;
+    }
+
+    .page-item.active .page-link {
+        background-color: #1A5276;
+        border-color: #1A5276;
     }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container-fluid">
-    <!-- Estadísticas -->
-    <div class="row mb-4">
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="stats-card card-total-pacientes">
-                <div class="stats-number">{{ total_pacientes }}</div>
-                <div class="stats-label">Total Pacientes</div>
-                <i class="fas fa-users stats-icon"></i>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="stats-card card-pacientes-activos">
-                <div class="stats-number">{{ pacientes_activos }}</div>
-                <div class="stats-label">Pacientes Activos</div>
-                <i class="fas fa-user-check stats-icon"></i>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="stats-card card-nuevos-mes">
-                <div class="stats-number">{{ pacientes_nuevos }}</div>
-                <div class="stats-label">Nuevos este Mes</div>
-                <i class="fas fa-user-plus stats-icon"></i>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="stats-card card-citas-pendientes">
-                <div class="stats-number">{{ citas_pendientes }}</div>
-                <div class="stats-label">Citas Pendientes</div>
-                <i class="fas fa-calendar stats-icon"></i>
-            </div>
-        </div>
-    </div>
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-0"><i class="fas fa-users me-2"></i>Pacientes</h3>
+                            <p class="text-muted mb-0">Gestione los pacientes de la clínica. Puede agregar nuevos pacientes, editar información existente y realizar seguimiento de sus tratamientos.</p>
+                        </div>
+                        <a href="{% url 'pacientes:nuevo_paciente' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Nuevo Paciente
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Mensajes manejados por SweetAlert -->
 
-    <!-- Lista de Pacientes -->
-    <div class="card shadow mb-4">
-        <div class="card-header py-3 d-flex justify-content-between align-items-center">
-            <h6 class="m-0 font-weight-bold text-primary">Lista de Pacientes</h6>
-            <a href="{% url 'pacientes:nuevo_paciente' %}" class="btn btn-primary btn-nuevo">
-                <i class="fas fa-plus me-2"></i>Nuevo Paciente
-            </a>
-        </div>
-        <div class="card-body">
-            <div class="row mb-4">
-                <div class="col-md-4">
-                    <div class="search-box">
-                        <i class="fas fa-search"></i>
-                        <input type="text" class="form-control" id="searchInput" placeholder="Buscar paciente...">
+                    <!-- Barra de búsqueda -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <form method="get" class="d-flex">
+                                <input type="text" name="q" class="form-control search-box me-2" placeholder="Buscar por nombre, RUT o email..." value="{{ request.GET.q }}">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search me-2"></i>Buscar
+                                </button>
+                            </form>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-8">
-                    <div class="d-flex justify-content-end gap-2">
-                        <select class="form-select" style="width: auto;" id="filterPrevision">
-                            <option value="">Todas las previsiones</option>
-                            {% for prevision in previsiones %}
-                            <option value="{{ prevision.nombre }}">{{ prevision.nombre }}</option>
-                            {% endfor %}
-                        </select>
-                        <select class="form-select" style="width: auto;" id="filterEstado">
-                            <option value="">Todos los estados</option>
-                            <option value="activo">Activos</option>
-                            <option value="inactivo">Inactivos</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-hover" id="dataTable">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Paciente</th>
-                            <th>Documento</th>
-                            <th>Teléfono</th>
-                            <th>Email</th>
-                            <th>Previsión</th>
-                            <th>Estado</th>
-                            <th class="text-end">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for paciente in pacientes %}
-                        <tr>
-                            <td>{{ forloop.counter }}</td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="avatar me-2">
-                                        {{ paciente.nombre|first }}{{ paciente.apellido|first }}
-                                    </div>
-                                    <div>
-                                        <div class="fw-bold">{{ paciente.nombre_completo }}</div>
-                                        <div class="text-muted small">{{ paciente.fecha_nacimiento|date:"d/m/Y" }}</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>{{ paciente.documento }}</td>
-                            <td>{{ paciente.telefono }}</td>
-                            <td>{{ paciente.email }}</td>
-                            <td>{{ paciente.prevision.nombre|default:"-" }}</td>
-                            <td>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" 
-                                           id="estado{{ paciente.id }}" 
-                                           {% if paciente.activo %}checked{% endif %}
-                                           onchange="cambiarEstado({{ paciente.id }})">
-                                    <label class="form-check-label" for="estado{{ paciente.id }}">
-                                        <span class="badge badge-estado 
-                                            {% if paciente.activo %}bg-success{% else %}bg-danger{% endif %}">
-                                            {% if paciente.activo %}Activo{% else %}Inactivo{% endif %}
+
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>RUT</th>
+                                    <th>Nombre</th>
+                                    <th>Email</th>
+                                    <th>Teléfono</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for paciente in pacientes %}
+                                <tr>
+                                    <td>{{ paciente.documento }}</td>
+                                    <td>{{ paciente.nombre }} {{ paciente.apellidos }}</td>
+                                    <td>{{ paciente.email }}</td>
+                                    <td>{{ paciente.telefono }}</td>
+                                    <td>
+                                        <span class="estado-badge estado-{{ paciente.estado }}">
+                                            {{ paciente.get_estado_display }}
                                         </span>
-                                    </label>
-                                </div>
-                            </td>
-                            <td class="text-end">
-                                <a href="{% url 'pacientes:editar_paciente' paciente.id %}" 
-                                   class="btn btn-action btn-primary me-1" title="Editar">
-                                    <i class="fas fa-edit"></i>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="{% url 'pacientes:editar_paciente' paciente.id %}" class="btn btn-warning" title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'pacientes:agregar_historial' paciente.id %}" class="btn btn-info" title="Registros Clínicos">
+                                                <i class="fas fa-notes-medical"></i>
+                                            </a>
+                                            <button onclick="confirmarEliminacion('{% url 'pacientes:eliminar_paciente' paciente.id %}')" class="btn btn-danger" title="Eliminar">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center">No hay pacientes registrados</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Paginación -->
+                    {% if is_paginated %}
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" aria-label="First">
+                                    <span aria-hidden="true">&laquo;&laquo;</span>
                                 </a>
-                                <a href="{% url 'pacientes:eliminar_paciente' paciente.id %}" 
-                                   class="btn btn-action btn-danger" title="Eliminar">
-                                    <i class="fas fa-trash"></i>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
                                 </a>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="7" class="text-center">No hay pacientes registrados</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            <!-- Paginación -->
-            <div class="d-flex justify-content-between align-items-center mt-4">
-                <div class="text-muted">
-                    Mostrando <span id="startIndex">1</span> - <span id="endIndex">10</span> de {{ total_pacientes }} pacientes
+                            </li>
+                            {% endif %}
+
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ num }}</a>
+                                </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" aria-label="Last">
+                                    <span aria-hidden="true">&raquo;&raquo;</span>
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
                 </div>
-                <nav aria-label="Page navigation">
-                    <ul class="pagination justify-content-end mb-0">
-                        <li class="page-item" id="prevPage">
-                            <a class="page-link" href="#" aria-label="Previous">
-                                <span aria-hidden="true">&laquo;</span>
-                            </a>
-                        </li>
-                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        <li class="page-item" id="nextPage">
-                            <a class="page-link" href="#" aria-label="Next">
-                                <span aria-hidden="true">&raquo;</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
             </div>
         </div>
     </div>
@@ -369,210 +288,43 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('searchInput'),
-          filterPrevision = document.getElementById('filterPrevision'),
-          filterEstado = document.getElementById('filterEstado'),
-          table = document.getElementById('dataTable'),
-          tbody = table.getElementsByTagName('tbody')[0],
-          rows = tbody.getElementsByTagName('tr'),
-          itemsPerPage = 10;
-    let currentPage = 1;
-    
-    // Función para filtrar filas
-    function filterRows() {
-        const searchText = searchInput.value.toLowerCase();
-        const prevision = filterPrevision.value;
-        const estado = filterEstado.value;
-        let visibleRows = [];
-        
-        for (let row of rows) {
-            const cells = row.getElementsByTagName('td');
-            if (cells.length === 0) continue;
-            
-            let matchSearch = false;
-            let matchPrevision = true;
-            let matchEstado = true;
-            
-            // Buscar en todas las celdas
-            for (let cell of cells) {
-                if (cell.textContent.toLowerCase().includes(searchText)) {
-                    matchSearch = true;
-                    break;
-                }
-            }
-            
-            // Filtrar por previsión
-            if (prevision) {
-                const previsionCell = cells[5]; // Índice de la celda de previsión
-                matchPrevision = previsionCell.textContent.trim() === prevision;
-            }
-            
-            // Filtrar por estado
-            if (estado) {
-                const estadoCell = cells[6]; // Índice de la celda de estado
-                const estadoActual = estadoCell.textContent.trim().toLowerCase();
-                matchEstado = estado === 'activo' ? estadoActual === 'activo' : estadoActual === 'inactivo';
-            }
-            
-            if (matchSearch && matchPrevision && matchEstado) {
-                visibleRows.push(row);
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
-        }
-        
-        updatePagination(visibleRows);
-        showPage(1, visibleRows);
-    }
-    
-    // Función para actualizar la paginación
-    function updatePagination(visibleRows) {
-        const totalPages = Math.ceil(visibleRows.length / itemsPerPage);
-        const pagination = document.querySelector('.pagination');
-        const paginationHTML = [];
-        
-        paginationHTML.push(`
-            <li class="page-item" id="prevPage">
-                <a class="page-link" href="#" aria-label="Previous">
-                    <span aria-hidden="true">&laquo;</span>
-                </a>
-            </li>
-        `);
-        
-        for (let i = 1; i <= totalPages; i++) {
-            paginationHTML.push(`
-                <li class="page-item ${i === currentPage ? 'active' : ''}">
-                    <a class="page-link" href="#">${i}</a>
-                </li>
-            `);
-        }
-        
-        paginationHTML.push(`
-            <li class="page-item" id="nextPage">
-                <a class="page-link" href="#" aria-label="Next">
-                    <span aria-hidden="true">&raquo;</span>
-                </a>
-            </li>
-        `);
-        
-        pagination.innerHTML = paginationHTML.join('');
-        
-        // Actualizar el contador
-        const startIndex = Math.min((currentPage - 1) * itemsPerPage + 1, visibleRows.length);
-        const endIndex = Math.min(currentPage * itemsPerPage, visibleRows.length);
-        document.getElementById('startIndex').textContent = startIndex;
-        document.getElementById('endIndex').textContent = endIndex;
-        
-        // Eventos de paginación
-        document.getElementById('prevPage').addEventListener('click', function(e) {
-            e.preventDefault();
-            if (currentPage > 1) {
-                showPage(currentPage - 1, visibleRows);
-            }
-        });
-        
-        document.getElementById('nextPage').addEventListener('click', function(e) {
-            e.preventDefault();
-            if (currentPage < totalPages) {
-                showPage(currentPage + 1, visibleRows);
-            }
-        });
-        
-        document.querySelectorAll('.pagination .page-item:not(#prevPage):not(#nextPage)').forEach(item => {
-            item.addEventListener('click', function(e) {
-                e.preventDefault();
-                const page = parseInt(this.textContent);
-                showPage(page, visibleRows);
-            });
-        });
-    }
-    
-    // Función para mostrar una página específica
-    function showPage(page, visibleRows) {
-        currentPage = page;
-        const start = (page - 1) * itemsPerPage;
-        const end = start + itemsPerPage;
-        
-        visibleRows.forEach((row, index) => {
-            row.style.display = (index >= start && index < end) ? '' : 'none';
-        });
-        
-        // Actualizar estado activo de los botones de página
-        document.querySelectorAll('.pagination .page-item').forEach(item => {
-            item.classList.remove('active');
-            if (item.textContent.trim() === page.toString()) {
-                item.classList.add('active');
-            }
-        });
-        
-        // Actualizar el contador
-        const startIndex = Math.min(start + 1, visibleRows.length);
-        const endIndex = Math.min(end, visibleRows.length);
-        document.getElementById('startIndex').textContent = startIndex;
-        document.getElementById('endIndex').textContent = endIndex;
-    }
-    
-    // Event listeners
-    searchInput.addEventListener('keyup', filterRows);
-    filterPrevision.addEventListener('change', filterRows);
-    filterEstado.addEventListener('change', filterRows);
-    
-    // Inicializar
-    filterRows();
-});
-
-function cambiarEstado(pacienteId) {
-    const checkbox = document.getElementById(`estado${pacienteId}`);
-    const activo = checkbox.checked;
-    
-    fetch(`/pacientes/cambiar_estado/${pacienteId}/`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken')
-        },
-        body: JSON.stringify({ activo: activo })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            const badge = checkbox.nextElementSibling.querySelector('.badge');
-            badge.className = `badge badge-estado ${activo ? 'bg-success' : 'bg-danger'}`;
-            badge.textContent = activo ? 'Activo' : 'Inactivo';
-            
-            // Actualizar contador de pacientes activos
-            const pacientesActivosElement = document.querySelector('.text-success.text-uppercase').nextElementSibling;
-            let pacientesActivos = parseInt(pacientesActivosElement.textContent);
-            pacientesActivos = activo ? pacientesActivos + 1 : pacientesActivos - 1;
-            pacientesActivosElement.textContent = pacientesActivos;
-        } else {
-            checkbox.checked = !activo;
-            alert('Error al cambiar el estado del paciente');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        checkbox.checked = !activo;
-        alert('Error al cambiar el estado del paciente');
+    // Configuración base de Toast
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true
     });
-}
 
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
+    // Función para confirmar eliminación
+    function confirmarEliminacion(url) {
+        Swal.fire({
+            title: '¿Está seguro?',
+            text: "Esta acción no se puede deshacer",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#1A5276',
+            cancelButtonColor: '#95a5a6',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
             }
-        }
+        });
     }
-    return cookieValue;
-}
+
+    // Mostrar mensajes de Django
+    {% if messages %}
+        {% for message in messages %}
+            Toast.fire({
+                icon: '{{ message.tags }}',
+                title: '{{ message }}'
+            });
+        {% endfor %}
+    {% endif %}
 </script>
 {% endblock %} 

@@ -93,6 +93,26 @@
 
 {% block content %}
 <div class="container-fluid">
+    <!-- Información de la Empresa -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <img src="{% static 'img/logo.png' %}" alt="Logo" class="img-fluid" style="max-height: 100px;">
+                        </div>
+                        <div class="col">
+                            <h3 class="mb-2 font-weight-bold text-primary">{{ request.configuracion.nombre_empresa|default:'KreaDental' }}</h3>
+                            <p class="mb-1 text-gray-600">RUT: {{ request.configuracion.rut_empresa|default:'XX.XXX.XXX-X' }}</p>
+                            <p class="mb-0 text-gray-600">{{ request.configuracion.direccion_empresa|default:'Dirección no configurada' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Tarjetas de Estadísticas -->
     <div class="row">
         <!-- Total de Pacientes -->
@@ -195,7 +215,7 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-hover">
+                        <table class="table table-hover table-sm">
                             <thead>
                                 <tr>
                                     <th>Fecha</th>

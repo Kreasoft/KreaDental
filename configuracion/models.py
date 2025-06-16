@@ -1,4 +1,9 @@
 from django.db import models
+from django.conf import settings
+from django.contrib.auth import get_user_model
+
+# Obtener el modelo de usuario personalizado
+User = get_user_model()
 
 class ConfiguracionEmpresa(models.Model):
     nombre = models.CharField('Nombre de la Empresa', max_length=200)
@@ -32,4 +37,36 @@ class ConfiguracionEmpresa(models.Model):
     class Meta:
         verbose_name = 'Configuración de Empresa'
         verbose_name_plural = 'Configuración de Empresa'
+
+
+class PreferenciaUsuario(models.Model):
+    FUENTES_DISPONIBLES = [
+        ('Poppins', 'Poppins'),
+        ('Inter', 'Inter'),
+        ('Outfit', 'Outfit'),
+        ('Plus Jakarta Sans', 'Plus Jakarta Sans'),
+        ('DM Sans', 'DM Sans'),
+    ]
+
+    usuario = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='preferencias',
+        verbose_name='usuario'
+    )
+    fuente = models.CharField(
+        'Fuente del Sistema',
+        max_length=50,
+        choices=FUENTES_DISPONIBLES,
+        default='Plus Jakarta Sans'
+    )
+    created_at = models.DateTimeField('Fecha de Creación', auto_now_add=True)
+    updated_at = models.DateTimeField('Última Actualización', auto_now=True)
+
+    def __str__(self):
+        return f'Preferencias de {self.usuario.username}'
+
+    class Meta:
+        verbose_name = 'Preferencia de Usuario'
+        verbose_name_plural = 'Preferencias de Usuarios'
 

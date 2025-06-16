@@ -187,6 +187,16 @@
                         <i class="fas fa-calendar"></i>Agendar Citas
                     </a>
                 </li>
+                <li>
+                    <a href="{% url 'tratamientos:lista_tratamientos' %}" class="{% if 'tratamientos' in request.path %}active{% endif %}">
+                        <i class="fas fa-tooth"></i>Tratamientos
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'pagos_tratamientos:lista_pagos' %}" class="{% if 'pagos_tratamientos' in request.path %}active{% endif %}">
+                        <i class="fas fa-money-bill-wave"></i>Pagos de Tratamientos
+                    </a>
+                </li>
                 
                 <!-- Gestión de Personas -->
                 <li class="menu-category">Gestión de Personas</li>
@@ -209,17 +219,22 @@
                     </a>
                 </li>
                 <li>
+                    <a href="{% url 'tratamientos:lista_tratamientos' %}" class="{% if 'tratamientos' in request.path %}active{% endif %}">
+                        <i class="fas fa-tooth"></i>Tratamientos
+                    </a>
+                </li>
+                <li>
                     <a href="{% url 'procedimientos:lista_procedimientos' %}" class="{% if 'procedimientos' in request.path %}active{% endif %}">
                         <i class="fas fa-procedures"></i>Procedimientos
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'core:home' %}" class="{% if 'tratamientos' in request.path and 'pagos' not in request.path %}active{% endif %}">
-                        <i class="fas fa-clipboard-list"></i>Tratamientos
+                    <a href="{% url 'tratamientos:lista_tratamientos' %}" class="{% if 'tratamientos' in request.path %}active{% endif %}">
+                        <i class="fas fa-tooth"></i>Tratamientos
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'core:home' %}" class="{% if 'pagos' in request.path %}active{% endif %}">
+                    <a href="{% url 'pagos_tratamientos:lista_pagos' %}" class="{% if 'pagos_tratamientos' in request.path %}active{% endif %}">
                         <i class="fas fa-money-bill-wave"></i>Pagos de Tratamientos
                     </a>
                 </li>
@@ -286,6 +301,36 @@
                         </ul>
                     </div>
                 </li>
+
+                <!-- Usuario -->
+                <li class="menu-category">Usuario</li>
+                <li>
+                    <a href="#" class="{% if 'usuario' in request.path %}active{% endif %}" data-bs-toggle="collapse" data-bs-target="#collapseUsuario">
+                        <i class="fas fa-user"></i>{{ user.username }}
+                        <i class="fas fa-chevron-down ms-auto"></i>
+                    </a>
+                    <div class="collapse {% if 'usuario' in request.path %}show{% endif %}" id="collapseUsuario">
+                        <ul class="nav flex-column ms-3 mt-2">
+                            <li>
+                                <a href="#" class="text-white-50">
+                                    <i class="fas fa-user-circle"></i>Perfil
+                                </a>
+                            </li>
+                            {% if user.is_staff %}
+                            <li>
+                                <a href="{% url 'admin:index' %}" class="text-white-50" target="_blank">
+                                    <i class="fas fa-tools"></i>Administración
+                                </a>
+                            </li>
+                            {% endif %}
+                            <li>
+                                <a href="{% url 'logout' %}" class="text-white-50">
+                                    <i class="fas fa-sign-out-alt"></i>Cerrar Sesión
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
             </ul>
         </nav>
 
@@ -294,28 +339,6 @@
             <!-- Top Bar -->
             <div id="topbar" class="d-flex justify-content-between align-items-center">
                 <h4 class="mb-0">{% block page_title %}{% endblock %}</h4>
-                {% if user.is_authenticated %}
-                <div class="dropdown">
-                    <a class="user-menu" href="#" role="button" data-bs-toggle="dropdown">
-                        <i class="fas fa-user-circle"></i>
-                        <span>{{ user.username }}</span>
-                        <i class="fas fa-chevron-down"></i>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
-                            <a class="dropdown-item" href="{% url 'admin:index' %}">
-                                <i class="fas fa-cog me-2"></i>Administración
-                            </a>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <a class="dropdown-item" href="{% url 'logout' %}">
-                                <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                {% endif %}
             </div>
 
             <!-- Main Content -->

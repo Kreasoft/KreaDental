@@ -34,7 +34,13 @@ INSTALLED_APPS = [
     'formas_pago',
     'cierres_caja.apps.CierresCajaConfig',
     'configuracion',
+    'lab_dental',
+    'usuarios',  # Aplicación de usuarios personalizados
+    'empresa',   # Aplicación de empresas
 ]
+
+# Configuración de autenticación personalizada
+AUTH_USER_MODEL = 'usuarios.Usuario'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

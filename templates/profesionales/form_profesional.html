@@ -4,538 +4,377 @@
 {% block title %}{{ accion }} Profesional{% endblock %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
 <style>
-    /* Estilos para labels del formulario de profesionales */
-    .form-label {
-        font-size: 0.9rem;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-        color: #000000 !important;
-        letter-spacing: 0.5px;
-        text-transform: uppercase;
-    }
-
-    .form-label .text-danger {
-        background: linear-gradient(135deg, #e74a3b 0%, #c23321 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
-
-    body {
-        background: linear-gradient(135deg, #f8f9fc 0%, #e3e6f0 100%);
-        min-height: 100vh;
-    }
-    .modal-content {
-        border: none;
+    .card {
+        border: 1px solid #AED6F1;
         border-radius: 15px;
-        box-shadow: 0 0 20px rgba(0,0,0,0.1);
-        background: rgba(255, 255, 255, 0.95);
-        -webkit-backdrop-filter: blur(10px);
-        backdrop-filter: blur(10px);
+        box-shadow: 0 0 20px rgba(0,0,0,0.05);
     }
-    .modal-header {
-        background: linear-gradient(135deg, #ffffff 0%, #f8f9fc 100%);
-        border-bottom: 1px solid rgba(0,0,0,0.05);
+
+    .card-header {
+        background-color: #E8F4FC;
+        border-bottom: 1px solid #AED6F1;
         border-radius: 15px 15px 0 0 !important;
-        padding: 1rem 1.5rem;
+        padding: 1.5rem;
     }
-    .modal-header h3 {
+
+    .card-header h3 {
+        color: #1A5276;
         font-size: 1.5rem;
         font-weight: 600;
         margin: 0;
-        background: linear-gradient(135deg, #0a8ea8 0%, #0dcaf0 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        text-fill-color: transparent;
+        font-family: 'Poppins', sans-serif;
     }
-    .modal-body {
-        padding: 1.5rem;
-        max-height: calc(100vh - 210px);
-        overflow-y: auto;
+
+    .card-body {
+        padding: 2rem;
     }
-    .modal-body::-webkit-scrollbar {
-        width: 8px;
+
+    .nav-tabs {
+        border-bottom: 1px solid #AED6F1;
     }
-    .modal-body::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 4px;
+
+    .nav-tabs .nav-link {
+        color: #2874A6;
+        border: none;
+        padding: 1rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
     }
-    .modal-body::-webkit-scrollbar-thumb {
-        background: #0dcaf0;
-        border-radius: 4px;
+
+    .nav-tabs .nav-link:hover {
+        color: #1A5276;
+        background-color: #E8F4FC;
+        border: none;
     }
-    .modal-body::-webkit-scrollbar-thumb:hover {
-        background: #0a8ea8;
+
+    .nav-tabs .nav-link.active {
+        color: #1A5276;
+        background-color: #E8F4FC;
+        border: none;
+        border-bottom: 2px solid #1A5276;
     }
+
+    .form-label {
+        color: #1A5276;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+
     .form-control, .form-select {
-        border-radius: 6px;
-        border: 1px solid rgba(0,0,0,0.1);
-        padding: 0.5rem 0.75rem;
-        transition: all 0.3s;
-        background: rgba(255, 255, 255, 0.9);
-        font-size: 0.875rem;
+        border: 1px solid #AED6F1;
+        border-radius: 8px;
+        padding: 0.75rem;
+        transition: all 0.3s ease;
     }
+
     .form-control:focus, .form-select:focus {
-        border-color: #0dcaf0;
-        box-shadow: 0 0 0 0.2rem rgba(13, 202, 240, 0.25);
-        background: #ffffff;
+        border-color: #2874A6;
+        box-shadow: 0 0 0 0.2rem rgba(26, 82, 118, 0.1);
     }
-    .input-group-text {
-        padding: 0.5rem 0.75rem;
-        font-size: 0.875rem;
-    }
-    .form-row {
-        display: grid;
-        grid-template-columns: repeat(12, 1fr);
-        gap: 0.5rem;
-        margin-bottom: 0.75rem;
-    }
-    .form-group {
-        position: relative;
-        margin-bottom: 1rem;
-    }
-    .form-group.col-12 {
-        grid-column: span 12;
-    }
-    .form-group.col-10 {
-        grid-column: span 10;
-    }
-    .form-group.col-8 {
-        grid-column: span 8;
-    }
-    .form-group.col-6 {
-        grid-column: span 6;
-    }
-    .form-group.col-4 {
-        grid-column: span 4;
-    }
-    .form-group.col-3 {
-        grid-column: span 3;
-    }
-    .form-group.col-2 {
-        grid-column: span 2;
-    }
-    .row.g-3 {
-        --bs-gutter-x: 0.5rem;
-        --bs-gutter-y: 0.5rem;
-    }
-    .section-title {
-        font-size: 1.2rem;
-        font-weight: 700;
-        margin-bottom: 1.25rem;
-        padding-bottom: 0.5rem;
-        background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        border-bottom: 2px solid rgba(78, 115, 223, 0.15);
-        letter-spacing: 0.5px;
-        text-transform: uppercase;
-    }
+
     .btn-primary {
-        background: linear-gradient(135deg, #0dcaf0 0%, #0a8ea8 100%);
-        border: none;
-        padding: 0.5rem 1rem;
-        font-size: 0.875rem;
+        background-color: #1A5276;
+        border-color: #1A5276;
+        padding: 0.75rem 1.5rem;
         font-weight: 500;
         border-radius: 8px;
-        box-shadow: 0 2px 5px rgba(13, 202, 240, 0.3);
-        transition: all 0.3s;
     }
+
     .btn-primary:hover {
-        background: linear-gradient(135deg, #0a8ea8 0%, #0dcaf0 100%);
-        box-shadow: 0 4px 8px rgba(13, 202, 240, 0.4);
-        transform: translateY(-2px);
+        background-color: #2874A6;
+        border-color: #2874A6;
     }
+
     .btn-secondary {
-        background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
-        border: none;
-        padding: 0.5rem 1rem;
-        font-size: 0.875rem;
+        background-color: #95a5a6;
+        border-color: #95a5a6;
+        padding: 0.75rem 1.5rem;
         font-weight: 500;
         border-radius: 8px;
-        box-shadow: 0 2px 5px rgba(108, 117, 125, 0.3);
-        transition: all 0.3s;
     }
+
     .btn-secondary:hover {
-        background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
-        box-shadow: 0 4px 8px rgba(108, 117, 125, 0.4);
-        transform: translateY(-2px);
+        background-color: #7f8c8d;
+        border-color: #7f8c8d;
     }
-    .errorlist {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        color: #dc3545;
-        font-size: 0.875rem;
-        font-weight: 500;
-    }
-    .errorlist li {
-        margin-top: 0.25rem;
-        padding: 0.25rem 0.5rem;
-        background-color: rgba(220, 53, 69, 0.1);
-        border-radius: 4px;
-    }
-    .errorlist li ul {
-        margin-top: 0.25rem;
-        padding-left: 0.5rem;
-    }
-    .errorlist li ul li {
-        background-color: transparent;
-        padding: 0;
-    }
-    .alert-danger {
-        background: rgba(220, 53, 69, 0.1);
-        border: none;
-        border-radius: 8px;
-        color: #dc3545;
-        padding: 1rem;
-        margin-bottom: 1.5rem;
-    }
-    .alert-danger ul {
-        margin-bottom: 0;
-    }
+
     .invalid-feedback {
-        font-size: 0.7rem;
-        margin-top: 0.25rem;
+        color: #e74c3c;
+        font-size: 0.85rem;
     }
-    @media (max-width: 768px) {
-        .modal-dialog {
-            max-width: 95%;
-            margin: 1rem auto;
-        }
-        .form-group {
-            grid-column: span 12 !important;
-        }
+
+    .required-field::after {
+        content: " *";
+        color: #e74c3c;
     }
-    .form-control.is-invalid, .form-select.is-invalid {
-        border-color: #dc3545;
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
-        background-repeat: no-repeat;
-        background-position: right calc(0.375em + 0.1875rem) center;
-        background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
-    }
-    .form-control.is-invalid:focus, .form-select.is-invalid:focus {
-        border-color: #dc3545;
-        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
-    }
-    .input-group.is-invalid .input-group-text {
-        border-color: #dc3545;
-    }
-    .error-message {
-        color: #dc3545;
-        font-size: 0.875rem;
-        margin-top: 0.25rem;
-        display: block;
+
+    .tab-pane {
+        padding: 1.5rem 0;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="modal fade" id="profesionalModal" tabindex="-1" aria-labelledby="profesionalModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title" id="profesionalModalLabel">{{ accion }} Profesional</h3>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                {% if messages %}
-                <div class="alert alert-danger">
-                    {% for message in messages %}
-                        {{ message }}
-                    {% endfor %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-user-md me-2"></i>{{ accion }} Profesional</h3>
                 </div>
-                {% endif %}
+                <div class="card-body">
+                    <!-- Mensajes manejados por SweetAlert -->
 
-                <form method="post" class="needs-validation profesional-form" novalidate>
-                    {% csrf_token %}
-                    
-                    <h4 class="section-title">Datos de Usuario</h4>
-                    <div class="form-row">
-                        <div class="form-group col-8">
-                            <label for="{{ user_form.username.id_for_label }}" class="form-label" style="color: #000000 !important; font-size: 0.7rem;">Nombre de Usuario del Sistema <span class="text-danger">*</span></label>
-                            <div class="input-group input-group-sm {% if user_form.username.errors %}is-invalid{% endif %}">
-                                <span class="input-group-text"><i class="fas fa-user"></i></span>
-                                <input type="text" 
-                                       name="{{ user_form.username.html_name }}" 
-                                       id="{{ user_form.username.id_for_label }}" 
-                                       class="form-control form-control-sm {% if user_form.username.errors %}is-invalid{% endif %}" 
-                                       value="{{ user_form.username.value|default:'' }}"
-                                       {% if accion == 'Editar' %}readonly{% endif %}
-                                       required>
-                            </div>
-                            {% if user_form.username.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {{ user_form.username.errors }}
-                                </div>
-                            {% endif %}
-                        </div>
-                        {% if not profesional.id %}
-                        <div class="form-group col-6">
-                            <label for="{{ user_form.password1.id_for_label }}" class="form-label">Contraseña <span class="text-danger">*</span></label>
-                            <div class="input-group input-group-sm {% if user_form.password1.errors %}is-invalid{% endif %}">
-                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                                <input type="password" 
-                                       name="{{ user_form.password1.html_name }}" 
-                                       id="{{ user_form.password1.id_for_label }}" 
-                                       class="form-control form-control-sm {% if user_form.password1.errors %}is-invalid{% endif %}"
-                                       required>
-                            </div>
-                            {% if user_form.password1.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {{ user_form.password1.errors }}
-                                </div>
-                            {% endif %}
-                        </div>
-                        <div class="form-group col-6">
-                            <label for="{{ user_form.password2.id_for_label }}" class="form-label">Confirmar Contraseña <span class="text-danger">*</span></label>
-                            <div class="input-group input-group-sm {% if user_form.password2.errors %}is-invalid{% endif %}">
-                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                                <input type="password" 
-                                       name="{{ user_form.password2.html_name }}" 
-                                       id="{{ user_form.password2.id_for_label }}" 
-                                       class="form-control form-control-sm {% if user_form.password2.errors %}is-invalid{% endif %}"
-                                       required>
-                            </div>
-                            {% if user_form.password2.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {{ user_form.password2.errors }}
-                                </div>
-                            {% endif %}
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            Por favor, corrija los siguientes errores:
+                            <ul class="mb-0 mt-2">
+                                {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
                         </div>
                         {% endif %}
-                    </div>
 
-                    <h4 class="section-title">Datos Personales</h4>
-                    <div class="form-row">
-                        <div class="form-group col-12">
-                            <div class="row g-3">
-                                <div class="col-md-4">
-                                    <label for="{{ form.rut.id_for_label }}" class="form-label" style="color: #000000 !important; font-size: 0.7rem;">RUT / Documento de Identidad</label>
-                                    <div class="input-group input-group-sm">
-                                        <span class="input-group-text"><i class="fas fa-id-card"></i></span>
-                                        <input type="text" 
-                                               name="{{ form.rut.html_name }}" 
-                                               id="{{ form.rut.id_for_label }}" 
-                                               class="form-control form-control-sm" 
-                                               value="{{ form.rut.value|default:'' }}">
-                                    </div>
-                                    {% if form.rut.errors %}
-                                        <div class="invalid-feedback d-block">
-                                            {{ form.rut.errors }}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-8">
-                                    <label for="{{ form.nombres.id_for_label }}" class="form-label" style="color: #000000 !important; font-size: 0.7rem;">Nombres Completos</label>
-                                    <div class="input-group input-group-sm">
-                                        <span class="input-group-text"><i class="fas fa-user"></i></span>
-                                        <input type="text" 
-                                               name="{{ form.nombres.html_name }}" 
-                                               id="{{ form.nombres.id_for_label }}" 
-                                               class="form-control form-control-sm" 
-                                               value="{{ form.nombres.value|default:'' }}">
-                                    </div>
-                                    {% if form.nombres.errors %}
-                                        <div class="invalid-feedback d-block">
-                                            {{ form.nombres.errors }}
-                                        </div>
-                                    {% endif %}
-                                </div>
+                        <div class="row">
+                            <!-- RUT -->
+                            <div class="col-md-6">
+                                <label for="{{ form.rut.id_for_label }}" class="form-label">RUT *</label>
+                                {{ form.rut }}
+                                {% if form.rut.errors %}
+                                <div class="invalid-feedback d-block">{{ form.rut.errors|join:", " }}</div>
+                                {% endif %}
                             </div>
-                        </div>
-                        <div class="form-group col-12">
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label for="{{ form.apellido_paterno.id_for_label }}" class="form-label" style="color: #000000 !important; font-size: 0.7rem;">Apellido Paterno</label>
-                                    <div class="input-group input-group-sm">
-                                        <span class="input-group-text"><i class="fas fa-user"></i></span>
-                                        <input type="text" 
-                                               name="{{ form.apellido_paterno.html_name }}" 
-                                               id="{{ form.apellido_paterno.id_for_label }}" 
-                                               class="form-control form-control-sm" 
-                                               value="{{ form.apellido_paterno.value|default:'' }}">
-                                    </div>
-                                    {% if form.apellido_paterno.errors %}
-                                        <div class="invalid-feedback d-block">
-                                            {{ form.apellido_paterno.errors }}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="{{ form.apellido_materno.id_for_label }}" class="form-label" style="color: #000000 !important; font-size: 0.7rem;">Apellido Materno</label>
-                                    <div class="input-group input-group-sm">
-                                        <span class="input-group-text"><i class="fas fa-user"></i></span>
-                                        <input type="text" 
-                                               name="{{ form.apellido_materno.html_name }}" 
-                                               id="{{ form.apellido_materno.id_for_label }}" 
-                                               class="form-control form-control-sm" 
-                                               value="{{ form.apellido_materno.value|default:'' }}">
-                                    </div>
-                                    {% if form.apellido_materno.errors %}
-                                        <div class="invalid-feedback d-block">
-                                            {{ form.apellido_materno.errors }}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group col-12">
-                            <label for="{{ form.direccion.id_for_label }}" class="form-label" style="color: #000000 !important; font-size: 0.7rem;">Dirección Completa</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
-                                <input type="text" 
-                                       name="{{ form.direccion.html_name }}" 
-                                       id="{{ form.direccion.id_for_label }}" 
-                                       class="form-control" 
-                                       value="{{ form.direccion.value|default:'' }}">
-                            </div>
-                            {% if form.direccion.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {{ form.direccion.errors }}
-                                </div>
-                            {% endif %}
-                        </div>
-                        <div class="form-group col-12">
-                            <div class="row g-3">
-                                <div class="col-md-4">
-                                    <label for="{{ form.fecha_nacimiento.id_for_label }}" class="form-label" style="color: #000000 !important; font-size: 0.7rem;">Fecha de Nacimiento (DD/MM/AAAA) <span class="text-danger">*</span></label>
-                                    <div class="input-group input-group-sm {% if form.fecha_nacimiento.errors %}is-invalid{% endif %}">
-                                        <span class="input-group-text"><i class="fas fa-calendar"></i></span>
-                                        <input type="date" 
-                                               name="{{ form.fecha_nacimiento.html_name }}" 
-                                               id="{{ form.fecha_nacimiento.id_for_label }}" 
-                                               class="form-control form-control-sm {% if form.fecha_nacimiento.errors %}is-invalid{% endif %}"
-                                               value="{{ form.fecha_nacimiento.value|date:'Y-m-d'|default:'' }}"
-                                               required>
-                                    </div>
-                                    {% if form.fecha_nacimiento.errors %}
-                                        <div class="invalid-feedback d-block">
-                                            {{ form.fecha_nacimiento.errors }}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-4">
-                                    <label for="{{ form.genero.id_for_label }}" class="form-label" style="color: #000000 !important; font-size: 0.7rem;">Género del Profesional</label>
-                                    <div class="input-group input-group-sm">
-                                        <span class="input-group-text"><i class="fas fa-venus-mars"></i></span>
-                                        <select name="{{ form.genero.html_name }}" 
-                                                id="{{ form.genero.id_for_label }}" 
-                                                class="form-select form-select-sm">
-                                            {% for value, label in form.genero.field.choices %}
-                                                <option value="{{ value }}" {% if form.genero.value == value %}selected{% endif %}>
-                                                    {{ label }}
-                                                </option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                                    {% if form.genero.errors %}
-                                        <div class="invalid-feedback d-block">
-                                            {{ form.genero.errors }}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-4">
-                                    <label for="{{ form.telefono.id_for_label }}" class="form-label" style="color: #000000 !important; font-size: 0.7rem;">Teléfono de Contacto</label>
-                                    <div class="input-group input-group-sm">
-                                        <span class="input-group-text"><i class="fas fa-phone"></i></span>
-                                        <input type="text" 
-                                               name="{{ form.telefono.html_name }}" 
-                                               id="{{ form.telefono.id_for_label }}" 
-                                               class="form-control form-control-sm" 
-                                               value="{{ form.telefono.value|default:'' }}">
-                                    </div>
-                                    {% if form.telefono.errors %}
-                                        <div class="invalid-feedback d-block">
-                                            {{ form.telefono.errors }}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group col-12">
-                            <div class="row g-3">
-                                <div class="col-md-8">
-                                    <label for="{{ form.email.id_for_label }}" class="form-label" style="color: #000000 !important; font-size: 0.7rem;">Correo Electrónico Profesional</label>
-                                    <div class="input-group input-group-sm">
-                                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                                        <input type="email" 
-                                               name="{{ form.email.html_name }}" 
-                                               id="{{ form.email.id_for_label }}" 
-                                               class="form-control form-control-sm" 
-                                               value="{{ form.email.value|default:'' }}">
-                                    </div>
-                                    {% if form.email.errors %}
-                                        <div class="invalid-feedback d-block">
-                                            {{ form.email.errors }}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-4">
-                                    <label for="{{ form.especialidad.id_for_label }}" class="form-label" style="color: #000000 !important; font-size: 0.7rem;">Especialidad Médica</label>
-                                    <div class="input-group input-group-sm">
-                                        <span class="input-group-text"><i class="fas fa-stethoscope"></i></span>
-                                        <select name="{{ form.especialidad.html_name }}" 
-                                                id="{{ form.especialidad.id_for_label }}" 
-                                                class="form-select form-select-sm">
-                                            {% for value, label in form.especialidad.field.choices %}
-                                                <option value="{{ value }}" {% if form.especialidad.value == value %}selected{% endif %}>
-                                                    {{ label }}
-                                                </option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                                    {% if form.especialidad.errors %}
-                                        <div class="invalid-feedback d-block">
-                                            {{ form.especialidad.errors }}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            <i class="fas fa-times me-2"></i>Cancelar
-                        </button>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save me-2"></i>Guardar
-                        </button>
-                    </div>
-                </form>
+                            <!-- Nombres -->
+                            <div class="col-md-6">
+                                <label for="{{ form.nombres.id_for_label }}" class="form-label">Nombres *</label>
+                                {{ form.nombres }}
+                                {% if form.nombres.errors %}
+                                <div class="invalid-feedback d-block">{{ form.nombres.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Apellido Paterno -->
+                            <div class="col-md-6">
+                                <label for="{{ form.apellido_paterno.id_for_label }}" class="form-label">Apellido Paterno *</label>
+                                {{ form.apellido_paterno }}
+                                {% if form.apellido_paterno.errors %}
+                                <div class="invalid-feedback d-block">{{ form.apellido_paterno.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Apellido Materno -->
+                            <div class="col-md-6">
+                                <label for="{{ form.apellido_materno.id_for_label }}" class="form-label">Apellido Materno *</label>
+                                {{ form.apellido_materno }}
+                                {% if form.apellido_materno.errors %}
+                                <div class="invalid-feedback d-block">{{ form.apellido_materno.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Fecha de Nacimiento -->
+                            <div class="col-md-6">
+                                <label for="{{ form.fecha_nacimiento.id_for_label }}" class="form-label">Fecha de Nacimiento *</label>
+                                {{ form.fecha_nacimiento }}
+                                {% if form.fecha_nacimiento.errors %}
+                                <div class="invalid-feedback d-block">{{ form.fecha_nacimiento.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Género -->
+                            <div class="col-md-6">
+                                <label for="{{ form.genero.id_for_label }}" class="form-label">Género *</label>
+                                {{ form.genero }}
+                                {% if form.genero.errors %}
+                                <div class="invalid-feedback d-block">{{ form.genero.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Teléfono -->
+                            <div class="col-md-6">
+                                <label for="{{ form.telefono.id_for_label }}" class="form-label">Teléfono *</label>
+                                {{ form.telefono }}
+                                {% if form.telefono.errors %}
+                                <div class="invalid-feedback d-block">{{ form.telefono.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Email -->
+                            <div class="col-md-6">
+                                <label for="{{ form.email.id_for_label }}" class="form-label">Email *</label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                <div class="invalid-feedback d-block">{{ form.email.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Dirección -->
+                            <div class="col-12">
+                                <label for="{{ form.direccion.id_for_label }}" class="form-label">Dirección *</label>
+                                {{ form.direccion }}
+                                {% if form.direccion.errors %}
+                                <div class="invalid-feedback d-block">{{ form.direccion.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Especialidad -->
+                            <div class="col-md-6">
+                                <label for="{{ form.especialidad.id_for_label }}" class="form-label">Especialidad *</label>
+                                {{ form.especialidad }}
+                                {% if form.especialidad.errors %}
+                                <div class="invalid-feedback d-block">{{ form.especialidad.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Activo -->
+                            <div class="col-md-6">
+                                <div class="form-check mt-4">
+                                    {{ form.activo }}
+                                    <label class="form-check-label" for="{{ form.activo.id_for_label }}">
+                                        Profesional Activo
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a href="{% url 'profesionales:lista_profesionales' %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>{{ accion }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+:root {
+    --dental-primary: #00A0B0;
+    --dental-secondary: #008C9A;
+    --dental-accent: #00B4C8;
+    --dental-light: #E6F7F9;
+    --dental-dark: #006D78;
+}
+
+.form-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--dental-primary);
+}
+
+.form-control, .form-select {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--dental-primary);
+    box-shadow: 0 0 0 0.25rem rgba(0, 160, 176, 0.25);
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+}
+
+.btn-dental-primary {
+    background-color: var(--dental-primary);
+    border-color: var(--dental-primary);
+    color: white;
+}
+
+.btn-dental-primary:hover {
+    background-color: var(--dental-secondary);
+    border-color: var(--dental-secondary);
+    color: white;
+}
+
+.bg-dental-primary {
+    background-color: var(--dental-primary) !important;
+}
+
+.form-check-input:checked {
+    background-color: var(--dental-primary);
+    border-color: var(--dental-primary);
+}
+
+.alert {
+    font-size: 0.9rem;
+}
+
+.invalid-feedback {
+    font-size: 0.8rem;
+}
+
+.card-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+</style>
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
 <script>
+    // Configuración base de Toast
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true
+    });
+
+    // Función para cerrar alerts automáticamente
     document.addEventListener('DOMContentLoaded', function() {
-        // Mostrar el modal automáticamente
-        var profesionalModal = new bootstrap.Modal(document.getElementById('profesionalModal'));
-        profesionalModal.show();
-
-        // Validación del formulario
-        var forms = document.querySelectorAll('.needs-validation');
-        Array.prototype.slice.call(forms).forEach(function(form) {
-            form.addEventListener('submit', function(event) {
-                if (!form.checkValidity()) {
-                    event.preventDefault();
-                    event.stopPropagation();
+        const alerts = document.querySelectorAll('.alert[data-auto-dismiss]');
+        alerts.forEach(function(alert) {
+            const delay = parseInt(alert.getAttribute('data-auto-dismiss'));
+            setTimeout(function() {
+                const closeButton = alert.querySelector('.btn-close');
+                if (closeButton) {
+                    closeButton.click();
                 }
-                form.classList.add('was-validated');
-            }, false);
-        });
-
-        // Cerrar modal y redirigir al hacer clic en Cancelar
-        document.querySelector('.btn-secondary').addEventListener('click', function() {
-            window.location.href = "{% url 'profesionales:lista_profesionales' %}";
+            }, delay);
         });
     });
+
+    // Mostrar mensajes de Django
+    {% if messages %}
+        {% for message in messages %}
+            Toast.fire({
+                icon: '{{ message.tags }}',
+                title: '{{ message }}'
+            });
+        {% endfor %}
+    {% endif %}
+
+    // Validación del formulario
+    (function () {
+        'use strict'
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+    })()
 </script>
 {% endblock %} 

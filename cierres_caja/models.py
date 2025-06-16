@@ -1,7 +1,11 @@
 from django.db import models
 from django.utils import timezone
-from django.contrib.auth.models import User
+from django.conf import settings
+from django.contrib.auth import get_user_model
 from pagos_tratamientos.models import PagoTratamiento
+
+# Obtener el modelo de usuario personalizado
+User = get_user_model()
 
 class CierreCaja(models.Model):
     fecha = models.DateField(default=timezone.now)
@@ -15,16 +19,18 @@ class CierreCaja(models.Model):
     diferencia = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     observaciones = models.TextField(blank=True)
     usuario_apertura = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT,
-        related_name='cierres_apertura'
+        related_name='cierres_apertura',
+        verbose_name='usuario de apertura'
     )
     usuario_cierre = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT,
         related_name='cierres_cierre',
         null=True,
-        blank=True
+        blank=True,
+        verbose_name='usuario de cierre'
     )
     estado = models.CharField(
         max_length=20,

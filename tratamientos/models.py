@@ -22,6 +22,7 @@ class Tratamiento(models.Model):
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='PENDIENTE')
     observaciones = models.TextField(blank=True)
     costo_total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    pagado = models.BooleanField(default=False)
     creado_por = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='tratamientos_creados')
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)

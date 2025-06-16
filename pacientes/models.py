@@ -3,6 +3,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from datetime import date
 from profesionales.models import Profesional
 from prevision.models import Prevision
+from empresa.models import Empresa
 
 class Paciente(models.Model):
     GENERO_CHOICES = [
@@ -24,6 +25,7 @@ class Paciente(models.Model):
     fecha_registro = models.DateTimeField(auto_now_add=True)
     activo = models.BooleanField(default=True)
     prevision = models.ForeignKey(Prevision, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Previsión')
+    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='pacientes', null=True, blank=True)
 
     def __str__(self):
         return f"{self.nombre} {self.apellidos}"

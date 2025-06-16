@@ -1,0 +1,157 @@
+:root {
+    /* Paleta Dental */
+    --dental-primary: #00A0B0;      /* Azul dental principal */
+    --dental-secondary: #6BB7C1;    /* Azul dental secundario */
+    --dental-accent: #B5E5E9;       /* Azul claro */
+    --dental-light: #E8F4F5;        /* Fondo claro */
+    --dental-dark: #006D77;         /* Azul oscuro */
+    --dental-success: #2A9D8F;      /* Verde */
+    --dental-warning: #E9C46A;      /* Amarillo */
+    --dental-danger: #E76F51;       /* Rojo */
+    --dental-text: #264653;         /* Texto principal */
+    --dental-text-light: #6C757D;   /* Texto secundario */
+}
+
+/* Estilos de tarjetas */
+.card {
+    border: 1px solid var(--dental-accent);
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.05);
+}
+
+.card-header {
+    background-color: var(--dental-light);
+    border-bottom: 1px solid var(--dental-accent);
+    border-radius: 15px 15px 0 0 !important;
+    padding: 1.5rem;
+}
+
+.card-header h6 {
+    color: var(--dental-primary);
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Estilos de formularios */
+.form-label {
+    color: var(--dental-text);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.form-control, .form-select {
+    border: 1px solid var(--dental-accent);
+    border-radius: 8px;
+    padding: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--dental-primary);
+    box-shadow: 0 0 0 0.2rem rgba(0, 160, 176, 0.1);
+}
+
+/* Botones */
+.btn-primary {
+    background-color: var(--dental-primary);
+    border-color: var(--dental-primary);
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    border-radius: 8px;
+}
+
+.btn-primary:hover {
+    background-color: var(--dental-dark);
+    border-color: var(--dental-dark);
+}
+
+.btn-outline-primary {
+    color: var(--dental-primary);
+    border-color: var(--dental-primary);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--dental-light);
+    color: var(--dental-dark);
+    border-color: var(--dental-dark);
+}
+
+/* Secciones */
+.section-title {
+    color: var(--dental-primary);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 1.5rem 0 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--dental-light);
+}
+
+/* Badges y estados */
+.badge-primary {
+    background-color: var(--dental-primary);
+}
+
+.badge-secondary {
+    background-color: var(--dental-secondary);
+}
+
+/* Alertas */
+.alert-primary {
+    background-color: var(--dental-light);
+    border-color: var(--dental-accent);
+    color: var(--dental-primary);
+}
+
+/* Tablas */
+.table thead th {
+    background-color: var(--dental-light);
+    color: var(--dental-primary);
+    border-bottom: 2px solid var(--dental-accent);
+}
+
+/* Navegación */
+.nav-link.active {
+    background-color: var(--dental-primary) !important;
+    color: white !important;
+}
+
+/* Sidebar */
+.sidebar {
+    background-color: var(--dental-light);
+    border-right: 1px solid var(--dental-accent);
+}
+
+.sidebar .nav-link {
+    color: var(--dental-text);
+}
+
+.sidebar .nav-link:hover {
+    background-color: var(--dental-accent);
+    color: var(--dental-primary);
+}
+
+/* Multiempresa */
+.empresa-selector {
+    background-color: var(--dental-light);
+    border: 1px solid var(--dental-accent);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.empresa-logo {
+    border: 2px solid var(--dental-accent);
+    border-radius: 8px;
+    padding: 0.5rem;
+    background-color: white;
+}
+
+/* Utilidades */
+.text-dental-primary { color: var(--dental-primary) !important; }
+.text-dental-secondary { color: var(--dental-secondary) !important; }
+.text-dental-dark { color: var(--dental-dark) !important; }
+
+.bg-dental-light { background-color: var(--dental-light) !important; }
+.bg-dental-accent { background-color: var(--dental-accent) !important; } 

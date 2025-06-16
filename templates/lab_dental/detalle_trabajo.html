@@ -1,0 +1,381 @@
+{% extends 'base.html' %}
+
+{% block title %}Trabajo de Laboratorio{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card {
+        border: 1px solid #AED6F1;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    }
+
+    .card-header {
+        background-color: #E8F4FC;
+        border-bottom: 1px solid #AED6F1;
+        border-radius: 15px 15px 0 0 !important;
+        padding: 1.5rem;
+    }
+
+    .card-header h5 {
+        color: #1A5276;
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    .badge {
+        padding: 0.5em 1em;
+        font-weight: 500;
+        border-radius: 0.5rem;
+    }
+    
+    .badge-pendiente {
+        background-color: #f6c23e;
+        color: #fff;
+    }
+    
+    .badge-enviado {
+        background-color: #36b9cc;
+        color: #fff;
+    }
+    
+    .badge-en_proceso {
+        background-color: #4e73df;
+        color: #fff;
+    }
+    
+    .badge-listo {
+        background-color: #1cc88a;
+        color: #fff;
+    }
+    
+    .badge-recibido {
+        background-color: #858796;
+        color: #fff;
+    }
+    
+    .badge-entregado {
+        background-color: #1cc88a;
+        color: #fff;
+    }
+    
+    .badge-cancelado {
+        background-color: #e74a3b;
+        color: #fff;
+    }
+
+    .timeline {
+        position: relative;
+        padding: 1rem 0;
+    }
+
+    .timeline-item {
+        position: relative;
+        padding-left: 2rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .timeline-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .timeline-marker {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1.5rem;
+        height: 1.5rem;
+        border-radius: 50%;
+        background-color: #E8F4FC;
+        border: 2px solid #AED6F1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .timeline-marker i {
+        color: #1A5276;
+        font-size: 0.75rem;
+    }
+
+    .timeline-content {
+        background-color: #fff;
+        border: 1px solid #AED6F1;
+        border-radius: 0.5rem;
+        padding: 1rem;
+    }
+
+    .timeline-content .badge {
+        font-size: 0.875rem;
+    }
+
+    .form-control:focus {
+        border-color: #AED6F1;
+        box-shadow: 0 0 0 0.2rem rgba(174, 214, 241, 0.25);
+    }
+
+    .btn-primary {
+        background-color: #1A5276;
+        border-color: #1A5276;
+    }
+
+    .btn-primary:hover {
+        background-color: #154360;
+        border-color: #154360;
+    }
+
+    dt {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-3">
+    <!-- Ícono de fondo -->
+    <div class="page-icon">
+        <i class="fas fa-teeth"></i>
+    </div>
+
+    <!-- Encabezado -->
+    <div class="mb-4">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <h1 class="page-title">{{ trabajo.tipo_trabajo }} - {{ trabajo.paciente }}</h1>
+                <p class="page-description text-muted">
+                    Detalles del trabajo y seguimiento
+                </p>
+            </div>
+            <div>
+                <span class="badge badge-{{ trabajo.estado|lower }} fs-6">
+                    {{ trabajo.get_estado_display }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Detalles del Trabajo -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Información del Trabajo
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Laboratorio</dt>
+                        <dd class="col-sm-8">{{ trabajo.laboratorio }}</dd>
+
+                        <dt class="col-sm-4">Paciente</dt>
+                        <dd class="col-sm-8">{{ trabajo.paciente }}</dd>
+
+                        <dt class="col-sm-4">Profesional</dt>
+                        <dd class="col-sm-8">{{ trabajo.profesional }}</dd>
+
+                        <dt class="col-sm-4">Tipo</dt>
+                        <dd class="col-sm-8">{{ trabajo.get_tipo_trabajo_display }}</dd>
+
+                        <dt class="col-sm-4">Fecha Envío</dt>
+                        <dd class="col-sm-8">{{ trabajo.fecha_envio|default:"-" }}</dd>
+
+                        <dt class="col-sm-4">Entrega Est.</dt>
+                        <dd class="col-sm-8">{{ trabajo.fecha_estimada_entrega }}</dd>
+
+                        <dt class="col-sm-4">Recepción</dt>
+                        <dd class="col-sm-8">{{ trabajo.fecha_recepcion|default:"-" }}</dd>
+
+                        <dt class="col-sm-4">Costo</dt>
+                        <dd class="col-sm-8">${{ trabajo.costo }}</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-file-alt me-2"></i>Descripción
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">{{ trabajo.descripcion|linebreaks }}</p>
+                </div>
+            </div>
+
+            {% if trabajo.notas %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-sticky-note me-2"></i>Notas
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">{{ trabajo.notas|linebreaks }}</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Seguimiento -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-history me-2"></i>Seguimiento del Trabajo
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Formulario de seguimiento -->
+                    <form method="post" class="mb-4">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="{{ form.estado.id_for_label }}" class="form-label">
+                                    Nuevo Estado
+                                </label>
+                                {{ form.estado }}
+                            </div>
+                            <div class="col-md-8">
+                                <label for="{{ form.notas.id_for_label }}" class="form-label">
+                                    Notas del Seguimiento
+                                </label>
+                                {{ form.notas }}
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
+                                    Agregar Seguimiento
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Historial de seguimientos -->
+                    <div class="timeline">
+                        {% for seguimiento in seguimientos %}
+                        <div class="timeline-item">
+                            <div class="timeline-marker">
+                                <i class="fas fa-circle"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="badge badge-{{ seguimiento.estado|lower }}">
+                                        {{ seguimiento.get_estado_display }}
+                                    </span>
+                                    <small class="text-muted">
+                                        {{ seguimiento.fecha_creacion|date:"d/m/Y H:i" }}
+                                    </small>
+                                </div>
+                                <p class="mb-0">{{ seguimiento.notas|linebreaks }}</p>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-info-circle me-2"></i>
+                            No hay registros de seguimiento
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Estilos específicos -->
+<style>
+    .page-icon {
+        position: absolute;
+        right: -2rem;
+        top: -2rem;
+        font-size: 15rem;
+        opacity: 0.03;
+        transform: rotate(15deg);
+        z-index: 0;
+    }
+
+    .page-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+
+    .page-description {
+        font-size: 1.1rem;
+        color: #6c757d;
+    }
+
+    .badge {
+        padding: 0.5em 1em;
+        font-weight: 500;
+        border-radius: 9999px;
+        color: white;
+    }
+
+    .badge-pendiente { background-color: #f6c23e; }
+    .badge-enviado { background-color: #36b9cc; }
+    .badge-en_proceso { background-color: #4e73df; }
+    .badge-listo { background-color: #1cc88a; }
+    .badge-recibido { background-color: #858796; }
+    .badge-entregado { background-color: #1cc88a; }
+    .badge-cancelado { background-color: #e74a3b; }
+
+    dt {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    /* Timeline */
+    .timeline {
+        position: relative;
+        padding-left: 3rem;
+    }
+
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 1rem;
+        top: 0;
+        height: 100%;
+        width: 2px;
+        background: #e3e6f0;
+    }
+
+    .timeline-item {
+        position: relative;
+        padding-bottom: 2rem;
+    }
+
+    .timeline-marker {
+        position: absolute;
+        left: -3rem;
+        width: 2rem;
+        height: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        border-radius: 50%;
+        color: #4e73df;
+    }
+
+    .timeline-marker i {
+        font-size: 0.5rem;
+    }
+
+    .timeline-content {
+        background: white;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+</style>
+{% endblock %}

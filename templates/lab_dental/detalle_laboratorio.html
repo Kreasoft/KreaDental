@@ -1,0 +1,268 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ laboratorio.nombre }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card {
+        border: 1px solid #AED6F1;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    }
+
+    .card-header {
+        background-color: #E8F4FC;
+        border-bottom: 1px solid #AED6F1;
+        border-radius: 15px 15px 0 0 !important;
+        padding: 1.5rem;
+    }
+
+    .card-header h5 {
+        color: #1A5276;
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    .page-icon {
+        position: absolute;
+        right: -2rem;
+        top: -2rem;
+        font-size: 15rem;
+        opacity: 0.03;
+        transform: rotate(15deg);
+        z-index: 0;
+        color: #1A5276;
+    }
+
+    .page-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1A5276;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .page-title i {
+        font-size: 2.2rem;
+        color: #1A5276;
+    }
+
+    .page-description {
+        font-size: 1.1rem;
+        color: #6c757d;
+        max-width: 600px;
+        line-height: 1.6;
+    }
+
+    .badge {
+        padding: 0.35em 0.65em;
+        font-size: 0.75em;
+        font-weight: 600;
+        border-radius: 9999px;
+        color: white;
+    }
+
+    .badge-success { background-color: #28a745; }
+    .badge-danger { background-color: #dc3545; }
+    .badge-pendiente { background-color: #f6c23e; }
+    .badge-enviado { background-color: #36b9cc; }
+    .badge-en_proceso { background-color: #4e73df; }
+    .badge-listo { background-color: #1cc88a; }
+    .badge-recibido { background-color: #858796; }
+    .badge-entregado { background-color: #1cc88a; }
+    .badge-cancelado { background-color: #e74a3b; }
+
+    .btn-icon {
+        padding: 0.5rem;
+        line-height: 1;
+    }
+
+    .btn-primary {
+        background-color: #1A5276;
+        border-color: #1A5276;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        border-radius: 8px;
+        font-size: 0.9rem;
+    }
+
+    .btn-primary:hover {
+        background-color: #2874A6;
+        border-color: #2874A6;
+    }
+
+    .btn-warning {
+        background-color: #f39c12;
+        border-color: #f39c12;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+    }
+
+    .btn-warning:hover {
+        background-color: #d35400;
+        border-color: #d35400;
+    }
+
+    dt {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    .table td, .table th {
+        padding: 1rem;
+    }
+
+    .table thead th {
+        background-color: #E8F4FC;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 0.5px;
+        color: #1A5276;
+        border-bottom: 1px solid #AED6F1;
+    }
+
+    .table thead {
+        background-color: #E8F4FC;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #F8F9FA;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-3">
+    <!-- Ícono de fondo -->
+    <div class="page-icon">
+        <i class="fas fa-flask"></i>
+    </div>
+
+    <!-- Encabezado -->
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+            <h1 class="page-title">
+                <i class="fas fa-flask"></i>
+                {{ laboratorio.nombre }}
+            </h1>
+            <p class="page-description text-muted">
+                Gestiona toda la información relacionada con este laboratorio dental, incluyendo sus datos de contacto, 
+                trabajos en proceso y el historial de trabajos realizados. Aquí podrás ver y actualizar el estado de 
+                los trabajos, así como mantener un registro detallado de todas las interacciones.
+            </p>
+        </div>
+        <div>
+            <a href="{% url 'lab_dental:editar_laboratorio' pk=laboratorio.pk %}" 
+               class="btn btn-warning">
+                <i class="fas fa-edit me-2"></i>Editar
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Información del Laboratorio -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Información General
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Contacto</dt>
+                        <dd class="col-sm-8">{{ laboratorio.contacto }}</dd>
+
+                        <dt class="col-sm-4">Teléfono</dt>
+                        <dd class="col-sm-8">{{ laboratorio.telefono }}</dd>
+
+                        <dt class="col-sm-4">Email</dt>
+                        <dd class="col-sm-8">{{ laboratorio.email|default:"-" }}</dd>
+
+                        <dt class="col-sm-4">Dirección</dt>
+                        <dd class="col-sm-8">{{ laboratorio.direccion }}</dd>
+
+                        <dt class="col-sm-4">Estado</dt>
+                        <dd class="col-sm-8">
+                            {% if laboratorio.activo %}
+                                <span class="badge badge-success">Activo</span>
+                            {% else %}
+                                <span class="badge badge-danger">Inactivo</span>
+                            {% endif %}
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trabajos Recientes -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-tasks me-2"></i>Trabajos Recientes
+                    </h5>
+                    <a href="{% url 'lab_dental:crear_trabajo' %}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus me-2"></i>Nuevo Trabajo
+                    </a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Paciente</th>
+                                    <th>Tipo</th>
+                                    <th>Estado</th>
+                                    <th>Fecha Envío</th>
+                                    <th class="text-end">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for trabajo in trabajos_recientes %}
+                                <tr>
+                                    <td>{{ trabajo.paciente }}</td>
+                                    <td>{{ trabajo.get_tipo_trabajo_display }}</td>
+                                    <td>
+                                        <span class="badge badge-{{ trabajo.estado|lower }}">
+                                            {{ trabajo.get_estado_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ trabajo.fecha_envio|default:"-" }}</td>
+                                    <td class="text-end">
+                                        <div class="btn-group">
+                                            <a href="{% url 'lab_dental:detalle_trabajo' pk=trabajo.pk %}" 
+                                               class="btn btn-icon btn-light" title="Ver detalles">
+                                                <i class="fas fa-eye text-primary"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-4">
+                                        <div class="text-muted">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            No hay trabajos registrados
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

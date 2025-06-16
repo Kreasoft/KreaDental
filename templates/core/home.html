@@ -1,235 +1,301 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Dashboard{% endblock %}
-{% block page_title %}Dashboard{% endblock %}
-
-{% block extra_css %}
-<style>
-    .stats-card {
-        position: relative;
-        padding: 1.75rem;
-        border-radius: 1rem;
-        overflow: hidden;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-        transition: all 0.3s ease;
-    }
-    
-    .stats-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-    }
-
-    .stats-icon {
-        position: absolute;
-        right: 1.5rem;
-        bottom: 1rem;
-        font-size: 4.5rem;
-        opacity: 0.15;
-        transform: rotate(-5deg);
-        transition: all 0.3s ease;
-    }
-
-    .stats-card:hover .stats-icon {
-        transform: rotate(0deg) scale(1.1);
-        opacity: 0.2;
-    }
-
-    .stats-number {
-        font-size: 2rem;
-        font-weight: 700;
-        margin-bottom: 0.75rem;
-        position: relative;
-        z-index: 1;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-    }
-
-    .stats-label {
-        font-size: 0.9rem;
-        font-weight: 500;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        position: relative;
-        z-index: 1;
-        opacity: 0.9;
-    }
-
-    .card-pacientes {
-        background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);
-        color: white;
-    }
-
-    .card-profesionales {
-        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-        color: white;
-    }
-
-    .card-citas-hoy {
-        background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
-        color: white;
-    }
-
-    .card-pendientes {
-        background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
-        color: white;
-    }
-
-    .content-card {
-        background: white;
-        border-radius: 1rem;
-        padding: 1.75rem;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        margin-bottom: 1.5rem;
-    }
-
-    .content-card .card-header {
-        background: none;
-        border: none;
-        padding: 0 0 1rem 0;
-    }
-
-    .content-card .card-title {
-        color: #2d3748;
-        font-size: 1.25rem;
-        font-weight: 600;
-        margin: 0;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
-
-    .content-card .card-title i {
-        color: #4a5568;
-        opacity: 0.7;
-    }
-
-    .table {
-        margin-bottom: 0;
-    }
-
-    .badge {
-        padding: 0.5em 1em;
-    }
-</style>
-{% endblock %}
 
 {% block content %}
-<div class="row">
-    <!-- Tarjetas de Estadísticas -->
-    <div class="col-xl-3 col-md-6">
-        <div class="stats-card card-pacientes">
-            <div class="stats-number">{{ total_pacientes }}</div>
-            <div class="stats-label">Total Pacientes</div>
-            <a href="{% url 'pacientes:lista_pacientes' %}" class="text-white text-decoration-none">Ver todos</a>
-            <i class="fas fa-users stats-icon"></i>
+<div class="container-fluid py-4">
+    <!-- Tarjetas de Resumen -->
+    <div class="row g-4 mb-4">
+        <!-- Total de Profesionales -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100 hover-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-dental-primary bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-user-md fa-2x text-dental-primary"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="text-muted mb-1">Profesionales</h6>
+                            <h3 class="mb-0 text-dental-primary">{{ total_profesionales }}</h3>
+                            <small class="text-success">
+                                <i class="fas fa-arrow-up"></i> {{ profesionales_activos }} activos
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total de Pacientes -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100 hover-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-dental-secondary bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-users fa-2x text-dental-secondary"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="text-muted mb-1">Pacientes</h6>
+                            <h3 class="mb-0 text-dental-secondary">{{ total_pacientes }}</h3>
+                            <small class="text-success">
+                                <i class="fas fa-arrow-up"></i> {{ pacientes_mes }} este mes
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Citas Hoy -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100 hover-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-dental-accent bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-calendar-check fa-2x text-dental-accent"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="text-muted mb-1">Citas Hoy</h6>
+                            <h3 class="mb-0 text-dental-accent">{{ citas_hoy }}</h3>
+                            <small class="text-warning">
+                                <i class="fas fa-clock"></i> {{ citas_pendientes }} pendientes
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Especialidades -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100 hover-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-dental-success bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-tooth fa-2x text-dental-success"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="text-muted mb-1">Especialidades</h6>
+                            <h3 class="mb-0 text-dental-success">{{ total_especialidades }}</h3>
+                            <small class="text-muted">
+                                <i class="fas fa-check-circle"></i> Disponibles
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    
-    <div class="col-xl-3 col-md-6">
-        <div class="stats-card card-profesionales">
-            <div class="stats-number">{{ total_profesionales }}</div>
-            <div class="stats-label">Profesionales</div>
-            <a href="{% url 'profesionales:lista_profesionales' %}" class="text-white text-decoration-none">Ver todos</a>
-            <i class="fas fa-user-md stats-icon"></i>
-        </div>
-    </div>
-    
-    <div class="col-xl-3 col-md-6">
-        <div class="stats-card card-citas-hoy">
-            <div class="stats-number">{{ total_citas_hoy }}</div>
-            <div class="stats-label">Citas Hoy</div>
-            <a href="{% url 'citas:calendario_citas' %}" class="text-white text-decoration-none">Ver calendario</a>
-            <i class="fas fa-calendar-check stats-icon"></i>
-        </div>
-    </div>
-    
-    <div class="col-xl-3 col-md-6">
-        <div class="stats-card card-pendientes">
-            <div class="stats-number">{{ citas_por_estado.PENDIENTE }}</div>
-            <div class="stats-label">Citas Pendientes</div>
-            <a href="{% url 'citas:lista_citas' %}" class="text-white text-decoration-none">Ver citas</a>
-            <i class="fas fa-clock stats-icon"></i>
+
+    <!-- Próximas Citas -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="card-title mb-0 text-dental-primary">
+                        <i class="fas fa-calendar-alt me-2"></i>
+                        Próximas Citas
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if proximas_citas %}
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="bg-dental-light">
+                                    <tr>
+                                        <th class="border-0">Paciente</th>
+                                        <th class="border-0">Profesional</th>
+                                        <th class="border-0">Fecha</th>
+                                        <th class="border-0">Hora</th>
+                                        <th class="border-0">Estado</th>
+                                        <th class="border-0 text-end">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for cita in proximas_citas %}
+                                        <tr class="cita-row">
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="flex-shrink-0">
+                                                        <div class="bg-dental-primary bg-opacity-10 rounded-circle p-2">
+                                                            <i class="fas fa-user text-dental-primary"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex-grow-1 ms-3">
+                                                        <h6 class="mb-0 text-dental-primary">{{ cita.paciente.nombre_completo }}</h6>
+                                                        <small class="text-muted">{{ cita.paciente.rut }}</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="flex-shrink-0">
+                                                        <div class="bg-dental-secondary bg-opacity-10 rounded-circle p-2">
+                                                            <i class="fas fa-user-md text-dental-secondary"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex-grow-1 ms-3">
+                                                        <h6 class="mb-0 text-dental-secondary">{{ cita.profesional.nombre_completo }}</h6>
+                                                        <small class="text-muted">{{ cita.profesional.especialidad.nombre }}</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-dental-light text-dental-primary">
+                                                    <i class="far fa-calendar-alt me-1"></i>
+                                                    {{ cita.fecha|date:"d/m/Y" }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-dental-light text-dental-secondary">
+                                                    <i class="far fa-clock me-1"></i>
+                                                    {{ cita.hora|time:"H:i" }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-dental-success">
+                                                    <i class="fas fa-check-circle me-1"></i>
+                                                    Confirmada
+                                                </span>
+                                            </td>
+                                            <td class="text-end">
+                                                <div class="btn-group">
+                                                    <a href="#" class="btn btn-sm btn-dental-primary" title="Ver detalles">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a href="#" class="btn btn-sm btn-dental-secondary" title="Editar cita">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <div class="mb-3">
+                                <i class="fas fa-calendar-times fa-4x text-dental-light"></i>
+                            </div>
+                            <h5 class="text-dental-primary">No hay citas programadas</h5>
+                            <p class="text-muted">No hay citas próximas para mostrar.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<div class="row">
-    <!-- Citas Próximas -->
-    <div class="col-md-8 mb-4">
-        <div class="content-card">
-            <div class="card-header">
-                <h5 class="card-title">
-                    <i class="fas fa-calendar-alt"></i>
-                    Citas Próximas (7 días)
-                </h5>
-            </div>
-            <div class="card-body">
-                {% if citas_proximas %}
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Fecha</th>
-                                <th>Hora</th>
-                                <th>Paciente</th>
-                                <th>Profesional</th>
-                                <th>Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for cita in citas_proximas %}
-                            <tr>
-                                <td>{{ cita.fecha|date:"d/m/Y" }}</td>
-                                <td>{{ cita.hora|time:"H:i" }}</td>
-                                <td>{{ cita.paciente.nombre_completo }}</td>
-                                <td>{{ cita.profesional.nombre_completo }}</td>
-                                <td>
-                                    <span class="badge bg-{{ cita.estado|lower }}">
-                                        {{ cita.get_estado_display }}
-                                    </span>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                {% else %}
-                <p class="text-muted">No hay citas programadas para los próximos 7 días.</p>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-    
-    <!-- Estadísticas de Citas -->
-    <div class="col-md-4 mb-4">
-        <div class="content-card">
-            <div class="card-header">
-                <h5 class="card-title">
-                    <i class="fas fa-chart-pie"></i>
-                    Estadísticas de Citas
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="list-group">
-                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                        Pendientes
-                        <span class="badge bg-primary rounded-pill">{{ citas_por_estado.PENDIENTE }}</span>
-                    </div>
-                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                        Confirmadas
-                        <span class="badge bg-success rounded-pill">{{ citas_por_estado.CONFIRMADA }}</span>
-                    </div>
-                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                        Completadas
-                        <span class="badge bg-info rounded-pill">{{ citas_por_estado.COMPLETADA }}</span>
-                    </div>
-                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                        Canceladas
-                        <span class="badge bg-danger rounded-pill">{{ citas_por_estado.CANCELADA }}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %} 
+<style>
+.hover-card {
+    transition: all 0.3s ease;
+}
+
+.hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 160, 176, 0.1) !important;
+}
+
+.bg-dental-primary {
+    background-color: var(--dental-primary) !important;
+}
+
+.bg-dental-secondary {
+    background-color: var(--dental-secondary) !important;
+}
+
+.bg-dental-accent {
+    background-color: var(--dental-accent) !important;
+}
+
+.bg-dental-success {
+    background-color: var(--dental-success) !important;
+}
+
+.bg-dental-light {
+    background-color: var(--dental-light) !important;
+}
+
+.text-dental-primary {
+    color: var(--dental-primary) !important;
+}
+
+.text-dental-secondary {
+    color: var(--dental-secondary) !important;
+}
+
+.text-dental-accent {
+    color: var(--dental-accent) !important;
+}
+
+.text-dental-success {
+    color: var(--dental-success) !important;
+}
+
+.bg-opacity-10 {
+    opacity: 0.1;
+}
+
+.btn-dental-primary {
+    background-color: var(--dental-primary);
+    border-color: var(--dental-primary);
+    color: white;
+}
+
+.btn-dental-primary:hover {
+    background-color: var(--dental-secondary);
+    border-color: var(--dental-secondary);
+    color: white;
+}
+
+.table > :not(caption) > * > * {
+    padding: 1.25rem 1rem;
+}
+
+.table thead th {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+.badge {
+    padding: 0.5em 0.75em;
+    font-weight: 500;
+    font-size: 0.85rem;
+}
+
+.btn-group .btn {
+    padding: 0.5rem;
+    margin: 0 0.25rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn-group .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 160, 176, 0.2);
+}
+
+/* Estilos para la tabla de citas */
+.cita-row {
+    transition: all 0.3s ease;
+}
+
+.cita-row:hover {
+    background-color: var(--dental-light) !important;
+    transform: translateX(5px);
+}
+</style>
+{% endblock %}

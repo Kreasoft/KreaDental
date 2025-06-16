@@ -31,6 +31,9 @@ ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 # Application definition
 
+# Configuración de autenticación personalizada
+AUTH_USER_MODEL = 'usuarios.Usuario'
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -55,6 +58,7 @@ INSTALLED_APPS = [
     'formas_pago',
     'pagos_tratamientos',
     'cierres_caja',
+    'empresa.apps.EmpresaConfig',  # Aplicación empresa
 ]
 
 MIDDLEWARE = [
@@ -65,6 +69,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'configuracion.middleware.ConfiguracionMiddleware',
 ]
 
 # Configuración de seguridad
@@ -86,6 +91,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'configuracion.context_processors.configuracion_empresa',
+                'empresa.context_processors.empresa_actual',
             ],
         },
     },

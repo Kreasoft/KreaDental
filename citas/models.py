@@ -3,6 +3,7 @@ from django.utils import timezone
 from datetime import datetime, timedelta
 from pacientes.models import Paciente
 from profesionales.models import Profesional
+from empresa.models import Empresa
 
 class Cita(models.Model):
     ESTADOS = [
@@ -14,6 +15,7 @@ class Cita(models.Model):
 
     paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE)
     profesional = models.ForeignKey(Profesional, on_delete=models.CASCADE)
+    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='citas', null=True, blank=True)
     fecha = models.DateField()
     hora = models.TimeField()
     duracion = models.IntegerField(default=30)

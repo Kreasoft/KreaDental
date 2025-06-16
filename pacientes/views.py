@@ -17,8 +17,16 @@ import json
 
 @login_required
 def lista_pacientes(request):
-    # Obtener todos los pacientes ordenados
-    pacientes = Paciente.objects.all().order_by('apellidos', 'nombre')
+    # Obtener la empresa actual del usuario a través de UsuarioEmpresa
+    usuario_empresa = request.user.usuarioempresa_set.filter(activo=True).first()
+    empresa_actual = usuario_empresa.empresa if usuario_empresa else None
+    
+    if not empresa_actual:
+        messages.error(request, 'No tienes una empresa asignada.')
+        return redirect('home')
+    
+    # Obtener pacientes de la empresa actual
+    pacientes = Paciente.objects.filter(empresa=empresa_actual).order_by('apellidos', 'nombre')
     
     # Estadísticas
     total_pacientes = pacientes.count()
@@ -46,17 +54,28 @@ def lista_pacientes(request):
         'pacientes_nuevos': pacientes_nuevos,
         'citas_pendientes': citas_pendientes,
         'previsiones': previsiones,
+        'empresa_actual': empresa_actual,
     }
     
     return render(request, 'pacientes/lista_pacientes.html', context)
 
 @login_required
 def nuevo_paciente(request):
+    # Obtener la empresa actual del usuario
+    usuario_empresa = request.user.usuarioempresa_set.filter(activo=True).first()
+    empresa_actual = usuario_empresa.empresa if usuario_empresa else None
+    
+    if not empresa_actual:
+        messages.error(request, 'No tienes una empresa asignada.')
+        return redirect('home')
+
     if request.method == 'POST':
         form = PacienteForm(request.POST)
         if form.is_valid():
             try:
-                paciente = form.save()
+                paciente = form.save(commit=False)
+                paciente.empresa = empresa_actual
+                paciente.save()
                 messages.success(request, 'Paciente creado correctamente.')
                 return redirect('pacientes:lista_pacientes')
             except Exception as e:
@@ -66,14 +85,28 @@ def nuevo_paciente(request):
     else:
         form = PacienteForm()
     
+    # Obtener todas las previsiónes para el select
+    from prevision.models import Prevision
+    previsiones = Prevision.objects.all().order_by('nombre')
+    
     return render(request, 'pacientes/form_paciente.html', {
         'form': form,
-        'accion': 'Nuevo'
+        'accion': 'Nuevo',
+        'previsiones': previsiones
     })
 
 @login_required
 def editar_paciente(request, pk):
-    paciente = get_object_or_404(Paciente, pk=pk)
+    # Obtener la empresa actual del usuario
+    usuario_empresa = request.user.usuarioempresa_set.filter(activo=True).first()
+    empresa_actual = usuario_empresa.empresa if usuario_empresa else None
+    
+    if not empresa_actual:
+        messages.error(request, 'No tienes una empresa asignada.')
+        return redirect('home')
+
+    paciente = get_object_or_404(Paciente, pk=pk, empresa=empresa_actual)
+    
     if request.method == 'POST':
         form = PacienteForm(request.POST, instance=paciente)
         if form.is_valid():
@@ -88,10 +121,15 @@ def editar_paciente(request, pk):
     else:
         form = PacienteForm(instance=paciente)
     
+    # Obtener todas las previsiónes para el select
+    from prevision.models import Prevision
+    previsiones = Prevision.objects.all().order_by('nombre')
+    
     return render(request, 'pacientes/form_paciente.html', {
         'form': form,
         'paciente': paciente,
-        'accion': 'Editar'
+        'accion': 'Editar',
+        'previsiones': previsiones
     })
 
 @login_required

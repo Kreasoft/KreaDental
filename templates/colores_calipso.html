@@ -1,0 +1,540 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Paleta de Colores - KreaDental Cloud{% endblock %}
+
+{% block extra_css %}
+<style>
+    .color-card {
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+    }
+
+    .color-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .color-preview {
+        width: 100%;
+        height: 100px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+
+    .color-info {
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .color-name {
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    .color-code {
+        font-family: monospace;
+        color: #666;
+    }
+
+    .page-header {
+        background-color: #E0F7FA;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+    }
+
+    .page-title {
+        color: #2C3E50;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+    }
+
+    .section-title {
+        color: #2C3E50;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+        margin: 3rem 0 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #E0F7FA;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="page-header">
+        <h1 class="page-title">Paleta de Colores</h1>
+        <p class="text-muted">Una colección de tonos calipso y cian para tu aplicación</p>
+    </div>
+
+    <!-- Sección Calipso -->
+    <h2 class="section-title">Paleta Calipso</h2>
+    <div class="row">
+        <!-- Calipso Muy Suave -->
+        <div class="col-md-4 col-lg-3">
+            <div class="color-card">
+                <div class="color-preview" style="background-color: #E0F7FA;"></div>
+                <div class="color-info">
+                    <div class="color-name">Calipso Muy Suave</div>
+                    <div class="color-code">#E0F7FA</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calipso Suave -->
+        <div class="col-md-4 col-lg-3">
+            <div class="color-card">
+                <div class="color-preview" style="background-color: #B2EBF2;"></div>
+                <div class="color-info">
+                    <div class="color-name">Calipso Suave</div>
+                    <div class="color-code">#B2EBF2</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calipso Medio -->
+        <div class="col-md-4 col-lg-3">
+            <div class="color-card">
+                <div class="color-preview" style="background-color: #80DEEA;"></div>
+                <div class="color-info">
+                    <div class="color-name">Calipso Medio</div>
+                    <div class="color-code">#80DEEA</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calipso -->
+        <div class="col-md-4 col-lg-3">
+            <div class="color-card">
+                <div class="color-preview" style="background-color: #4DD0E1;"></div>
+                <div class="color-info">
+                    <div class="color-name">Calipso</div>
+                    <div class="color-code">#4DD0E1</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calipso Intenso -->
+        <div class="col-md-4 col-lg-3">
+            <div class="color-card">
+                <div class="color-preview" style="background-color: #26C6DA;"></div>
+                <div class="color-info">
+                    <div class="color-name">Calipso Intenso</div>
+                    <div class="color-code">#26C6DA</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calipso Profundo -->
+        <div class="col-md-4 col-lg-3">
+            <div class="color-card">
+                <div class="color-preview" style="background-color: #00BCD4;"></div>
+                <div class="color-info">
+                    <div class="color-name">Calipso Profundo</div>
+                    <div class="color-code">#00BCD4</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calipso Oscuro -->
+        <div class="col-md-4 col-lg-3">
+            <div class="color-card">
+                <div class="color-preview" style="background-color: #00ACC1;"></div>
+                <div class="color-info">
+                    <div class="color-name">Calipso Oscuro</div>
+                    <div class="color-code">#00ACC1</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calipso Muy Oscuro -->
+        <div class="col-md-4 col-lg-3">
+            <div class="color-card">
+                <div class="color-preview" style="background-color: #0097A7;"></div>
+                <div class="color-info">
+                    <div class="color-name">Calipso Muy Oscuro</div>
+                    <div class="color-code">#0097A7</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección Cian -->
+    <h2 class="section-title">Paleta Cian</h2>
+    <div class="row">
+        <!-- Cian Muy Suave -->
+        <div class="col-md-4 col-lg-3">
+            <div class="color-card">
+                <div class="color-preview" style="background-color: #E0FFFF;"></div>
+                <div class="color-info">
+                    <div class="color-name">Cian Muy Suave</div>
+                    <div class="color-code">#E0FFFF</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cian Suave -->
+        <div class="col-md-4 col-lg-3">
+            <div class="color-card">
+                <div class="color-preview" style="background-color: #B2FFFF;"></div>
+                <div class="color-info">
+                    <div class="color-name">Cian Suave</div>
+                    <div class="color-code">#B2FFFF</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cian Medio -->
+        <div class="col-md-4 col-lg-3">
+            <div class="color-card">
+                <div class="color-preview" style="background-color: #80FFFF;"></div>
+                <div class="color-info">
+                    <div class="color-name">Cian Medio</div>
+                    <div class="color-code">#80FFFF</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cian -->
+        <div class="col-md-4 col-lg-3">
+            <div class="color-card">
+                <div class="color-preview" style="background-color: #00FFFF;"></div>
+                <div class="color-info">
+                    <div class="color-name">Cian</div>
+                    <div class="color-code">#00FFFF</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cian Intenso -->
+        <div class="col-md-4 col-lg-3">
+            <div class="color-card">
+                <div class="color-preview" style="background-color: #00E0E0;"></div>
+                <div class="color-info">
+                    <div class="color-name">Cian Intenso</div>
+                    <div class="color-code">#00E0E0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cian Profundo -->
+        <div class="col-md-4 col-lg-3">
+            <div class="color-card">
+                <div class="color-preview" style="background-color: #00B2B2;"></div>
+                <div class="color-info">
+                    <div class="color-name">Cian Profundo</div>
+                    <div class="color-code">#00B2B2</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cian Oscuro -->
+        <div class="col-md-4 col-lg-3">
+            <div class="color-card">
+                <div class="color-preview" style="background-color: #008080;"></div>
+                <div class="color-info">
+                    <div class="color-name">Cian Oscuro</div>
+                    <div class="color-code">#008080</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cian Muy Oscuro -->
+        <div class="col-md-4 col-lg-3">
+            <div class="color-card">
+                <div class="color-preview" style="background-color: #004D4D;"></div>
+                <div class="color-info">
+                    <div class="color-name">Cian Muy Oscuro</div>
+                    <div class="color-code">#004D4D</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección Teal -->
+    <h2 class="section-title">Paleta Teal</h2>
+    <div class="row">
+        <!-- Teal Base -->
+        <div class="col-md-4 col-lg-3">
+            <div class="color-card">
+                <div class="color-preview" style="background-color: #008080;"></div>
+                <div class="color-info">
+                    <div class="color-name">Teal Base</div>
+                    <div class="color-code">#008080</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teal Suave -->
+        <div class="col-md-4 col-lg-3">
+            <div class="color-card">
+                <div class="color-preview" style="background-color: #20B2AA;"></div>
+                <div class="color-info">
+                    <div class="color-name">Teal Suave</div>
+                    <div class="color-code">#20B2AA</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teal Medio -->
+        <div class="col-md-4 col-lg-3">
+            <div class="color-card">
+                <div class="color-preview" style="background-color: #40E0D0;"></div>
+                <div class="color-info">
+                    <div class="color-name">Teal Medio</div>
+                    <div class="color-code">#40E0D0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teal Intenso -->
+        <div class="col-md-4 col-lg-3">
+            <div class="color-card">
+                <div class="color-preview" style="background-color: #48D1CC;"></div>
+                <div class="color-info">
+                    <div class="color-name">Teal Intenso</div>
+                    <div class="color-code">#48D1CC</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teal Profundo -->
+        <div class="col-md-4 col-lg-3">
+            <div class="color-card">
+                <div class="color-preview" style="background-color: #008B8B;"></div>
+                <div class="color-info">
+                    <div class="color-name">Teal Profundo</div>
+                    <div class="color-code">#008B8B</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teal Claro -->
+        <div class="col-md-4 col-lg-3">
+            <div class="color-card">
+                <div class="color-preview" style="background-color: #7FFFD4;"></div>
+                <div class="color-info">
+                    <div class="color-name">Teal Claro</div>
+                    <div class="color-code">#7FFFD4</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teal Muy Claro -->
+        <div class="col-md-4 col-lg-3">
+            <div class="color-card">
+                <div class="color-preview" style="background-color: #AFEEEE;"></div>
+                <div class="color-info">
+                    <div class="color-name">Teal Muy Claro</div>
+                    <div class="color-code">#AFEEEE</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teal Muy Oscuro -->
+        <div class="col-md-4 col-lg-3">
+            <div class="color-card">
+                <div class="color-preview" style="background-color: #004D4D;"></div>
+                <div class="color-info">
+                    <div class="color-name">Teal Muy Oscuro</div>
+                    <div class="color-code">#004D4D</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección Azul Profesional -->
+    <h2 class="section-title">Paleta Azul Profesional</h2>
+    <div class="row">
+        <!-- Azul Base -->
+        <div class="col-md-4 col-lg-3">
+            <div class="color-card">
+                <div class="color-preview" style="background-color: #2C3E50;"></div>
+                <div class="color-info">
+                    <div class="color-name">Azul Base</div>
+                    <div class="color-code">#2C3E50</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Azul Suave -->
+        <div class="col-md-4 col-lg-3">
+            <div class="color-card">
+                <div class="color-preview" style="background-color: #34495E;"></div>
+                <div class="color-info">
+                    <div class="color-name">Azul Suave</div>
+                    <div class="color-code">#34495E</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Azul Medio -->
+        <div class="col-md-4 col-lg-3">
+            <div class="color-card">
+                <div class="color-preview" style="background-color: #3498DB;"></div>
+                <div class="color-info">
+                    <div class="color-name">Azul Medio</div>
+                    <div class="color-code">#3498DB</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Azul Claro -->
+        <div class="col-md-4 col-lg-3">
+            <div class="color-card">
+                <div class="color-preview" style="background-color: #5DADE2;"></div>
+                <div class="color-info">
+                    <div class="color-name">Azul Claro</div>
+                    <div class="color-code">#5DADE2</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección Verde Profesional -->
+    <h2 class="section-title">Paleta Verde Profesional</h2>
+    <div class="row">
+        <!-- Verde Base -->
+        <div class="col-md-4 col-lg-3">
+            <div class="color-card">
+                <div class="color-preview" style="background-color: #27AE60;"></div>
+                <div class="color-info">
+                    <div class="color-name">Verde Base</div>
+                    <div class="color-code">#27AE60</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Verde Suave -->
+        <div class="col-md-4 col-lg-3">
+            <div class="color-card">
+                <div class="color-preview" style="background-color: #2ECC71;"></div>
+                <div class="color-info">
+                    <div class="color-name">Verde Suave</div>
+                    <div class="color-code">#2ECC71</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Verde Medio -->
+        <div class="col-md-4 col-lg-3">
+            <div class="color-card">
+                <div class="color-preview" style="background-color: #1ABC9C;"></div>
+                <div class="color-info">
+                    <div class="color-name">Verde Medio</div>
+                    <div class="color-code">#1ABC9C</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Verde Claro -->
+        <div class="col-md-4 col-lg-3">
+            <div class="color-card">
+                <div class="color-preview" style="background-color: #82E0AA;"></div>
+                <div class="color-info">
+                    <div class="color-name">Verde Claro</div>
+                    <div class="color-code">#82E0AA</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección Azul Médico -->
+    <h2 class="section-title">Paleta Azul Médico</h2>
+    <div class="row">
+        <!-- Azul Médico Base -->
+        <div class="col-md-4 col-lg-3">
+            <div class="color-card">
+                <div class="color-preview" style="background-color: #2980B9;"></div>
+                <div class="color-info">
+                    <div class="color-name">Azul Médico Base</div>
+                    <div class="color-code">#2980B9</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Azul Médico Suave -->
+        <div class="col-md-4 col-lg-3">
+            <div class="color-card">
+                <div class="color-preview" style="background-color: #3498DB;"></div>
+                <div class="color-info">
+                    <div class="color-name">Azul Médico Suave</div>
+                    <div class="color-code">#3498DB</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Azul Médico Medio -->
+        <div class="col-md-4 col-lg-3">
+            <div class="color-card">
+                <div class="color-preview" style="background-color: #5DADE2;"></div>
+                <div class="color-info">
+                    <div class="color-name">Azul Médico Medio</div>
+                    <div class="color-code">#5DADE2</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Azul Médico Claro -->
+        <div class="col-md-4 col-lg-3">
+            <div class="color-card">
+                <div class="color-preview" style="background-color: #85C1E9;"></div>
+                <div class="color-info">
+                    <div class="color-name">Azul Médico Claro</div>
+                    <div class="color-code">#85C1E9</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección Azul Dental -->
+    <h2 class="section-title">Paleta Azul Dental</h2>
+    <div class="row">
+        <!-- Azul Dental Base -->
+        <div class="col-md-4 col-lg-3">
+            <div class="color-card">
+                <div class="color-preview" style="background-color: #1A5276;"></div>
+                <div class="color-info">
+                    <div class="color-name">Azul Dental Base</div>
+                    <div class="color-code">#1A5276</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Azul Dental Suave -->
+        <div class="col-md-4 col-lg-3">
+            <div class="color-card">
+                <div class="color-preview" style="background-color: #2874A6;"></div>
+                <div class="color-info">
+                    <div class="color-name">Azul Dental Suave</div>
+                    <div class="color-code">#2874A6</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Azul Dental Medio -->
+        <div class="col-md-4 col-lg-3">
+            <div class="color-card">
+                <div class="color-preview" style="background-color: #3498DB;"></div>
+                <div class="color-info">
+                    <div class="color-name">Azul Dental Medio</div>
+                    <div class="color-code">#3498DB</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Azul Dental Claro -->
+        <div class="col-md-4 col-lg-3">
+            <div class="color-card">
+                <div class="color-preview" style="background-color: #AED6F1;"></div>
+                <div class="color-info">
+                    <div class="color-name">Azul Dental Claro</div>
+                    <div class="color-code">#AED6F1</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

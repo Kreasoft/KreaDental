@@ -3,18 +3,56 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.db import models
+from django.db.models import Sum, Count
 from decimal import Decimal
+from datetime import timedelta
 from .models import CierreCaja
 from .forms import CierreCajaForm, CerrarCajaForm
 from pagos_tratamientos.models import PagoTratamiento
+from formas_pago.models import FormaPago
 
 @login_required
 def lista_cierres(request):
-    cierres = CierreCaja.objects.all().order_by('-fecha', '-hora_apertura')
+    # Obtener fechas para filtrado
+    hoy = timezone.now().date()
+    inicio_semana = hoy - timedelta(days=hoy.weekday())
+    fin_semana = inicio_semana + timedelta(days=6)
+
+    # Obtener parámetros de filtrado
+    fecha_inicio = request.GET.get('fecha_inicio', inicio_semana.strftime('%Y-%m-%d'))
+    fecha_fin = request.GET.get('fecha_fin', fin_semana.strftime('%Y-%m-%d'))
+    estado = request.GET.get('estado', '')
+
+    # Filtrar cierres
+    cierres = CierreCaja.objects.all()
+    
+    if fecha_inicio:
+        cierres = cierres.filter(fecha__gte=fecha_inicio)
+    if fecha_fin:
+        cierres = cierres.filter(fecha__lte=fecha_fin)
+    if estado:
+        cierres = cierres.filter(estado=estado)
+
+    # Ordenar por fecha y hora
+    cierres = cierres.order_by('-fecha', '-hora_apertura')
+
+    # Calcular resumen de la semana
+    resumen_semana = cierres.aggregate(
+        total_efectivo=Sum('total_efectivo'),
+        total_tarjeta=Sum('total_tarjeta'),
+        total_transferencia=Sum('total_transferencia'),
+        cantidad_cierres=Count('id')
+    )
+
     hay_caja_abierta = CierreCaja.objects.filter(estado='ABIERTO').exists()
+
     return render(request, 'cierres_caja/lista_cierres.html', {
         'cierres': cierres,
-        'hay_caja_abierta': hay_caja_abierta
+        'hay_caja_abierta': hay_caja_abierta,
+        'fecha_inicio': fecha_inicio,
+        'fecha_fin': fecha_fin,
+        'estado_filtro': estado,
+        'resumen_semana': resumen_semana
     })
 
 @login_required
@@ -45,32 +83,47 @@ def abrir_caja(request):
 def cerrar_caja(request, cierre_id):
     cierre = get_object_or_404(CierreCaja, id=cierre_id, estado='ABIERTO')
     
+    # Obtener todas las formas de pago activas
+    formas_pago = FormaPago.objects.filter(estado=True)
+    
+    # Obtener los pagos del día
+    pagos_dia = PagoTratamiento.objects.filter(
+        fecha_pago__date=cierre.fecha,
+        estado='COMPLETADO'
+    )
+    
+    # Calcular totales por forma de pago
+    totales_por_forma = {}
+    total_sistema = Decimal('0')
+    
+    for forma in formas_pago:
+        total = pagos_dia.filter(forma_pago=forma).aggregate(
+            total=Sum('monto')
+        )['total'] or Decimal('0')
+        totales_por_forma[forma.nombre] = total
+        total_sistema += total
+    
+    # Agrupar pagos por forma de pago para el resumen
+    resumen_pagos = pagos_dia.values('forma_pago__nombre').annotate(
+        total=Sum('monto'),
+        cantidad=Count('id')
+    ).order_by('forma_pago__nombre')
+    
     if request.method == 'POST':
         form = CerrarCajaForm(request.POST, instance=cierre)
         if form.is_valid():
             cierre = form.save(commit=False)
             
-            # Obtener los pagos del día
-            pagos_dia = PagoTratamiento.objects.filter(
-                fecha_pago__date=cierre.fecha,
-                estado='COMPLETADO'
-            )
-            
-            # Calcular totales por método de pago
-            cierre.total_efectivo = pagos_dia.filter(forma_pago__nombre='EFECTIVO').aggregate(
-                total=models.Sum('monto')
-            )['total'] or Decimal('0')
-            
-            cierre.total_tarjeta = pagos_dia.filter(forma_pago__nombre='TARJETA').aggregate(
-                total=models.Sum('monto')
-            )['total'] or Decimal('0')
-            
-            cierre.total_transferencia = pagos_dia.filter(forma_pago__nombre='TRANSFERENCIA').aggregate(
-                total=models.Sum('monto')
-            )['total'] or Decimal('0')
+            # Guardar los totales por forma de pago
+            for nombre, total in totales_por_forma.items():
+                if nombre == 'EFECTIVO':
+                    cierre.total_efectivo = total
+                elif nombre == 'TARJETA':
+                    cierre.total_tarjeta = total
+                elif nombre == 'TRANSFERENCIA':
+                    cierre.total_transferencia = total
             
             # Calcular diferencia
-            total_sistema = cierre.total_efectivo + cierre.total_tarjeta + cierre.total_transferencia
             cierre.diferencia = cierre.monto_final - (cierre.monto_inicial + total_sistema)
             
             # Actualizar estado y usuario
@@ -90,12 +143,36 @@ def cerrar_caja(request, cierre_id):
     return render(request, 'cierres_caja/form_cierre.html', {
         'form': form,
         'accion': 'Cerrar',
-        'cierre': cierre
+        'cierre': cierre,
+        'pagos_dia': pagos_dia,
+        'resumen_pagos': resumen_pagos,
+        'total_sistema': total_sistema,
+        'formas_pago': formas_pago
     })
 
 @login_required
 def detalle_cierre(request, cierre_id):
     cierre = get_object_or_404(CierreCaja, id=cierre_id)
+    
+    # Obtener los pagos del día
+    pagos_dia = cierre.pagos.filter(estado='COMPLETADO')
+    
+    # Calcular totales por forma de pago
+    total_sistema = Decimal('0')
+    
+    # Agrupar pagos por forma de pago para el resumen
+    resumen_pagos = pagos_dia.values('forma_pago__nombre').annotate(
+        total=Sum('monto'),
+        cantidad=Count('id')
+    ).order_by('forma_pago__nombre')
+    
+    # Calcular total del sistema
+    for resumen in resumen_pagos:
+        total_sistema += resumen['total']
+    
     return render(request, 'cierres_caja/detalle_cierre.html', {
-        'cierre': cierre
+        'cierre': cierre,
+        'pagos_dia': pagos_dia,
+        'resumen_pagos': resumen_pagos,
+        'total_sistema': total_sistema
     })

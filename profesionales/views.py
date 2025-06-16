@@ -3,45 +3,47 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
 from django.template.loader import render_to_string
-from .models import Profesional
-from especialidades.models import Especialidad
-from .forms import ProfesionalForm, UserForm, EspecialidadForm
-from django.contrib.auth.models import User
+from .models import Profesional, Especialidad
+from .forms import ProfesionalForm, EspecialidadForm
+from usuarios.models import Usuario
+from django.db import transaction
+from django.core.exceptions import ValidationError
+from django.utils import timezone
+from django.db.models import Q
+import re
+from django.db.models import Count
+from empresa.utils import get_empresa_actual
+from citas.models import Cita
 
 @login_required
 def lista_profesionales(request):
-    # Obtener todos los profesionales ordenados
-    profesionales = Profesional.objects.all().order_by('apellido_paterno', 'apellido_materno', 'nombres')
+    # Obtener la empresa actual del usuario
+    empresa_actual = get_empresa_actual(request)
+    
+    # Obtener todos los profesionales de la empresa actual
+    profesionales = Profesional.objects.filter(empresa=empresa_actual).select_related('especialidad')
     
     # Estadísticas
     total_profesionales = profesionales.count()
     profesionales_activos = profesionales.filter(activo=True).count()
-    
-    # Profesionales por especialidad
-    especialidades = Especialidad.objects.filter(estado=True).order_by('nombre')
-    profesionales_por_especialidad = {}
-    for especialidad in especialidades:
-        count = profesionales.filter(especialidad=especialidad, activo=True).count()
-        if count > 0:
-            profesionales_por_especialidad[especialidad.nombre] = count
-    
-    # Citas asignadas este mes
-    from django.utils import timezone
-    from tratamientos.models import Tratamiento
-    primer_dia_mes = timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-    citas_mes = Tratamiento.objects.filter(
+    profesionales_por_especialidad = profesionales.values('especialidad__nombre').annotate(total=Count('id'))
+    citas_mes = Cita.objects.filter(
         profesional__in=profesionales,
-        fecha_inicio__gte=primer_dia_mes,
-        estado='PENDIENTE'
+        fecha__month=timezone.now().month,
+        fecha__year=timezone.now().year
     ).count()
+    
+    # Obtener todas las especialidades
+    especialidades = Especialidad.objects.all()
     
     context = {
         'profesionales': profesionales,
         'total_profesionales': total_profesionales,
         'profesionales_activos': profesionales_activos,
-        'profesionales_por_especialidad': profesionales_por_especialidad,
+        'profesionales_por_especialidad': dict(profesionales_por_especialidad.values_list('especialidad__nombre', 'total')),
         'citas_mes': citas_mes,
         'especialidades': especialidades,
+        'empresa_actual': empresa_actual,
     }
     
     return render(request, 'profesionales/lista_profesionales.html', context)
@@ -49,50 +51,37 @@ def lista_profesionales(request):
 @login_required
 def nuevo_profesional(request):
     if request.method == 'POST':
-        print("Iniciando proceso de creación de profesional...")
-        user_form = UserForm(request.POST)
-        profesional_form = ProfesionalForm(request.POST)
-        
-        print("Validando formularios...")
-        print("User form errors:", user_form.errors if not user_form.is_valid() else "Válido")
-        print("Profesional form errors:", profesional_form.errors if not profesional_form.is_valid() else "Válido")
-        
-        if user_form.is_valid() and profesional_form.is_valid():
+        form = ProfesionalForm(request.POST)
+        if form.is_valid():
             try:
-                print("Guardando usuario...")
-                user = user_form.save()
-                print(f"Usuario creado: {user.username}")
-                
-                print("Guardando profesional...")
-                profesional = profesional_form.save(commit=False)
-                profesional.usuario = user
-                profesional.save()
-                print(f"Profesional creado: {profesional.nombre_completo()}")
-                
-                messages.success(request, 'Profesional creado exitosamente.')
-                return redirect('profesionales:lista_profesionales')
+                with transaction.atomic():
+                    profesional = form.save(commit=False)
+                    profesional.empresa = get_empresa_actual(request)
+                    profesional.save()
+                    messages.success(request, 'Profesional agregado exitosamente.')
+                    return redirect('profesionales:lista_profesionales')
             except Exception as e:
-                print(f"Error al guardar: {str(e)}")
                 messages.error(request, f'Error al crear el profesional: {str(e)}')
         else:
-            print("Formularios inválidos")
-            messages.error(request, 'Por favor corrija los errores en el formulario.')
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f'{field}: {error}')
     else:
-        print("Cargando formularios vacíos...")
-        user_form = UserForm()
-        profesional_form = ProfesionalForm()
-        especialidades = Especialidad.objects.filter(estado=True).order_by('nombre')
-        print("Especialidades disponibles:", [f"{e.id}: {e.nombre} (Estado: {e.estado})" for e in especialidades])
+        form = ProfesionalForm()
     
-    return render(request, 'profesionales/form_profesional.html', {
-        'user_form': user_form,
-        'form': profesional_form,
-        'accion': 'Nuevo'
-    })
+    especialidades = Especialidad.objects.all()
+    context = {
+        'form': form,
+        'accion': 'Nuevo',
+        'especialidades': especialidades,
+        'empresa_actual': get_empresa_actual(request),
+    }
+    return render(request, 'profesionales/form_profesional.html', context)
 
 @login_required
 def editar_profesional(request, pk):
-    profesional = get_object_or_404(Profesional, pk=pk)
+    profesional = get_object_or_404(Profesional, id=pk)
+    
     if request.method == 'POST':
         form = ProfesionalForm(request.POST, instance=profesional)
         if form.is_valid():
@@ -102,11 +91,14 @@ def editar_profesional(request, pk):
     else:
         form = ProfesionalForm(instance=profesional)
     
-    return render(request, 'profesionales/form_profesional.html', {
+    especialidades = Especialidad.objects.all()
+    context = {
         'form': form,
-        'profesional': profesional,
-        'accion': 'Editar'
-    })
+        'accion': 'Editar',
+        'especialidades': especialidades,
+        'empresa_actual': get_empresa_actual(request),  # Agregar empresa actual al contexto
+    }
+    return render(request, 'profesionales/form_profesional.html', context)
 
 @login_required
 def eliminar_profesional(request, pk):

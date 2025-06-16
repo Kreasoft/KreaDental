@@ -1,10 +1,9 @@
 from django import forms
 from .models import Profesional
 from especialidades.models import Especialidad
-from django.contrib.auth.models import User
-from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+import re
 
 class ProfesionalForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -15,7 +14,7 @@ class ProfesionalForm(forms.ModelForm):
         
         # Hacer todos los campos requeridos excepto los que pueden ser nulos
         for field_name, field in self.fields.items():
-            if field_name not in ['telefono', 'email', 'direccion']:
+            if field_name not in ['telefono', 'email', 'direccion', 'activo']:
                 field.required = True
                 field.widget.attrs['required'] = 'required'
         
@@ -32,44 +31,61 @@ class ProfesionalForm(forms.ModelForm):
 
     class Meta:
         model = Profesional
-        fields = [
-            'rut', 'nombres', 'apellido_paterno', 'apellido_materno',
-            'fecha_nacimiento', 'genero', 'telefono', 'email',
-            'direccion', 'especialidad'
-        ]
+        fields = ['rut', 'nombres', 'apellido_paterno', 'apellido_materno', 
+                 'fecha_nacimiento', 'genero', 'telefono', 'email', 
+                 'direccion', 'especialidad', 'activo']
+        
+        # Especificar el formato de fecha para el input
+        input_formats = {
+            'fecha_nacimiento': ['%Y-%m-%d'],
+        }
         widgets = {
             'rut': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Ej: 12345678-9',
-                'required': 'required'
+                'placeholder': 'Ej: 11.111.111-1',
+                'pattern': '[0-9]{1,2}\.[0-9]{3}\.[0-9]{3}-[0-9kK]{1}',
+                'title': 'Formato: 11.111.111-1'
             }),
             'nombres': forms.TextInput(attrs={
                 'class': 'form-control',
-                'style': 'text-transform: uppercase;',
-                'required': 'required'
+                'placeholder': 'Nombres'
             }),
             'apellido_paterno': forms.TextInput(attrs={
                 'class': 'form-control',
-                'style': 'text-transform: uppercase;',
-                'required': 'required'
+                'placeholder': 'Apellido Paterno'
             }),
             'apellido_materno': forms.TextInput(attrs={
                 'class': 'form-control',
-                'style': 'text-transform: uppercase;',
-                'required': 'required'
+                'placeholder': 'Apellido Materno'
             }),
-            'fecha_nacimiento': forms.DateInput(attrs={
-                'class': 'form-control',
-                'type': 'date',
-                'required': 'required'
-            }),
+            'fecha_nacimiento': forms.DateInput(
+                format='%Y-%m-%d',
+                attrs={
+                    'class': 'form-control',
+                    'type': 'date'
+                }
+            ),
             'genero': forms.Select(attrs={
-                'class': 'form-select',
-                'required': 'required'
+                'class': 'form-select'
             }),
-            'telefono': forms.TextInput(attrs={'class': 'form-control'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control'}),
-            'direccion': forms.TextInput(attrs={'class': 'form-control'}),
+            'telefono': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '+56 9 1234 5678'
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'correo@ejemplo.com'
+            }),
+            'direccion': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Dirección completa'
+            }),
+            'especialidad': forms.Select(attrs={
+                'class': 'form-select'
+            }),
+            'activo': forms.CheckboxInput(attrs={
+                'class': 'form-check-input'
+            })
         }
         labels = {
             'rut': 'RUT',
@@ -81,61 +97,66 @@ class ProfesionalForm(forms.ModelForm):
             'telefono': 'Teléfono',
             'email': 'Correo Electrónico',
             'direccion': 'Dirección',
-            'especialidad': 'Especialidad'
+            'especialidad': 'Especialidad',
+            'activo': 'Activo'
         }
 
     def clean_rut(self):
-        rut = self.cleaned_data.get('rut')
-        if not rut:
-            raise ValidationError(_('El RUT es obligatorio.'))
-        if rut:
-            # Verificar si el RUT ya existe
-            if Profesional.objects.filter(rut=rut).exclude(pk=self.instance.pk if self.instance else None).exists():
-                raise ValidationError(_('Este RUT ya está registrado en el sistema.'))
+        rut = self.cleaned_data['rut']
+        # Eliminar puntos y guión
+        rut = rut.replace('.', '').replace('-', '')
+        
+        # Validar formato
+        if not re.match(r'^[0-9]{8,9}[0-9kK]$', rut):
+            raise forms.ValidationError('El RUT debe tener el formato correcto (ej: 11.111.111-1)')
+        
+        # Validar dígito verificador
+        cuerpo = rut[:-1]
+        dv = rut[-1].upper()
+        
+        # Calcular dígito verificador
+        suma = 0
+        multiplicador = 2
+        
+        for r in reversed(cuerpo):
+            suma += int(r) * multiplicador
+            multiplicador = multiplicador + 1 if multiplicador < 7 else 2
+        
+        dvr = 11 - (suma % 11)
+        if dvr == 11:
+            dvr = '0'
+        elif dvr == 10:
+            dvr = 'K'
+        else:
+            dvr = str(dvr)
+        
+        if dv != dvr:
+            raise forms.ValidationError('El RUT ingresado no es válido')
+        
+        # Formatear RUT
+        rut = f"{cuerpo[:-6]}.{cuerpo[-6:-3]}.{cuerpo[-3:]}-{dv}"
         return rut
 
-    def clean_nombres(self):
-        nombres = self.cleaned_data.get('nombres')
-        if not nombres:
-            raise ValidationError(_('Los nombres son obligatorios.'))
-        return nombres.upper()
-
-    def clean_apellido_paterno(self):
-        apellido = self.cleaned_data.get('apellido_paterno')
-        if not apellido:
-            raise ValidationError(_('El apellido paterno es obligatorio.'))
-        return apellido.upper()
-
-    def clean_apellido_materno(self):
-        apellido = self.cleaned_data.get('apellido_materno')
-        if not apellido:
-            raise ValidationError(_('El apellido materno es obligatorio.'))
-        return apellido.upper()
-
-    def clean_fecha_nacimiento(self):
-        fecha = self.cleaned_data.get('fecha_nacimiento')
-        if not fecha:
-            raise ValidationError(_('La fecha de nacimiento es obligatoria.'))
-        return fecha
-
-    def clean_genero(self):
-        genero = self.cleaned_data.get('genero')
-        if not genero:
-            raise ValidationError(_('El género es obligatorio.'))
-        return genero
-
-    def clean_especialidad(self):
-        especialidad = self.cleaned_data.get('especialidad')
-        if not especialidad:
-            raise ValidationError(_('La especialidad es obligatoria.'))
-        return especialidad
+    def clean_telefono(self):
+        telefono = self.cleaned_data['telefono']
+        # Eliminar espacios y caracteres especiales
+        telefono = re.sub(r'[^0-9+]', '', telefono)
+        
+        # Validar formato
+        if not re.match(r'^\+?[0-9]{8,12}$', telefono):
+            raise forms.ValidationError('El teléfono debe tener un formato válido')
+        
+        return telefono
 
     def clean_email(self):
-        email = self.cleaned_data.get('email')
-        if email:
-            # Verificar si el email ya existe
-            if Profesional.objects.filter(email=email).exclude(pk=self.instance.pk if self.instance else None).exists():
-                raise ValidationError(_('Este correo electrónico ya está registrado en el sistema.'))
+        email = self.cleaned_data['email']
+        # Si estamos editando un profesional, excluirlo de la búsqueda
+        if self.instance and self.instance.pk:
+            if Profesional.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
+                raise forms.ValidationError('Este correo electrónico ya está registrado')
+        # Si es un nuevo registro, verificar si el correo ya existe
+        elif Profesional.objects.filter(email=email).exists():
+            raise forms.ValidationError('Este correo electrónico ya está registrado')
         return email
 
     def save(self, commit=True):
@@ -147,25 +168,6 @@ class ProfesionalForm(forms.ModelForm):
         except Exception as e:
             print(f"Error al guardar profesional: {str(e)}")
             raise ValidationError(_(f'Error al guardar el profesional: {str(e)}'))
-
-class UserForm(UserCreationForm):
-    class Meta:
-        model = User
-        fields = ['username', 'password1', 'password2']
-        widgets = {
-            'username': forms.TextInput(attrs={
-                'class': 'form-control',
-                'required': 'required'
-            }),
-            'password1': forms.PasswordInput(attrs={
-                'class': 'form-control',
-                'required': 'required'
-            }),
-            'password2': forms.PasswordInput(attrs={
-                'class': 'form-control',
-                'required': 'required'
-            }),
-        }
 
 class EspecialidadForm(forms.ModelForm):
     class Meta:

@@ -98,69 +98,60 @@
                                     <label class="form-label">Procedimiento *</label>
                                     <select name="{{ form.prefix }}-procedimiento" 
                                             class="form-select procedimiento-select {% if form.procedimiento.errors %}is-invalid{% endif %}" 
+                                            data-valores='{{ procedimientos_valores|safe }}'
                                             required title="Seleccione un procedimiento">
                                         <option value="">Seleccione un procedimiento...</option>
                                         {% for procedimiento in procedimientos %}
                                         <option value="{{ procedimiento.id }}" 
+                                                data-valor="{{ procedimiento.valor }}"
                                                 {% if form.procedimiento.value|stringformat:"s" == procedimiento.id|stringformat:"s" %}selected{% endif %}>
-                                            <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="{{ form.procedimiento.id_for_label }}">Procedimiento</label>
-                                            {{ form.procedimiento }}
-                                            {% if form.procedimiento.errors %}
-                                            <div class="invalid-feedback d-block">{{ form.procedimiento.errors|join:", " }}</div>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="{{ form.profesional.id_for_label }}">Profesional</label>
-                                            {{ form.profesional }}
-                                            {% if form.profesional.errors %}
-                                            <div class="invalid-feedback d-block">{{ form.profesional.errors|join:", " }}</div>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="{{ form.cantidad.id_for_label }}">Cantidad</label>
-                                            {{ form.cantidad }}
-                                            {% if form.cantidad.errors %}
-                                            <div class="invalid-feedback d-block">{{ form.cantidad.errors|join:", " }}</div>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="valor">Valor</label>
-                                            <input type="text" class="form-control" id="valor" readonly>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="{{ form.descuento.id_for_label }}">Descuento (%)</label>
-                                            {{ form.descuento }}
-                                            {% if form.descuento.errors %}
-                                            <div class="invalid-feedback d-block">{{ form.descuento.errors|join:", " }}</div>
-                                            {% endif %}
-                                        </div>
-                                    </div>{% endif %}
+                                            {{ procedimiento.nombre }} - ${{ procedimiento.valor|floatformat:0 }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                    {% if form.procedimiento.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.procedimiento.errors|join:", " }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Cantidad *</label>
+                                    <input type="number" name="{{ form.prefix }}-cantidad" 
+                                           class="form-control cantidad-input {% if form.cantidad.errors %}is-invalid{% endif %}" 
+                                           value="1" 
+                                           min="1" required title="Ingrese la cantidad">
+                                    {% if form.cantidad.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.cantidad.errors|join:", " }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Valor Total</label>
+                                    <input type="text" class="form-control valor-input" readonly>
+                                </div>
+                                <div class="col-md-1">
+                                    <label class="form-label">Desc. %</label>
+                                    <input type="number" name="{{ form.prefix }}-descuento" 
+                                           class="form-control descuento-input {% if form.descuento.errors %}is-invalid{% endif %}" 
+                                           value="0" 
+                                           min="0" max="100" step="0.01" required title="Ingrese el descuento">
+                                    {% if form.descuento.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.descuento.errors|join:", " }}</div>
+                                    {% endif %}
                                 </div>
                                 <div class="col-md-3">
                                     <label class="form-label">Profesional *</label>
                                     <select name="{{ form.prefix }}-profesional" 
-                                        class="form-select profesional-select {% if form.profesional.errors %}is-invalid{% endif %}" 
-                                        required title="Seleccione un profesional">
-                                    <option value="">Seleccione un profesional...</option>
-                                    {% for profesional in profesionales %}
-                                    {% if profesional.activo %}
-                                    <option value="{{ profesional.id }}" 
-                                            {% if form.profesional.value == profesional.id|stringformat:"s" %}selected{% endif %}>
-                                        {{ profesional.nombres }} {{ profesional.apellido_paterno }} {{ profesional.apellido_materno }}
-                                    </option>
-                                    {% endif %}
-                                    {% endfor %}
-                                </select>
+                                            class="form-select profesional-select {% if form.profesional.errors %}is-invalid{% endif %}" 
+                                            required title="Seleccione un profesional">
+                                        <option value="">Seleccione un profesional...</option>
+                                        {% for profesional in profesionales %}
+                                        {% if profesional.activo %}
+                                        <option value="{{ profesional.id }}" 
+                                                {% if form.profesional.value|stringformat:"s" == profesional.id|stringformat:"s" %}selected{% endif %}>
+                                            {{ profesional.nombres }} {{ profesional.apellido_paterno }} {{ profesional.apellido_materno }}
+                                        </option>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </select>
                                     {% if form.profesional.errors %}
                                     <div class="invalid-feedback">
                                         {{ form.profesional.errors.0 }}
@@ -177,27 +168,112 @@
                             {% endfor %}
                         </div>
 
-                        <div class="row mt-4">
-                            <div class="col-12">
-                                <button type="button" class="btn btn-success" id="add-procedimiento" onclick="agregarProcedimiento()">
+                        <div class="row mt-3">
+                            <div class="col-md-8">
+                                <button type="button" class="btn btn-success" onclick="agregarProcedimiento()">
                                     <i class="fas fa-plus"></i> Agregar Procedimiento
                                 </button>
-                                <button type="submit" class="btn btn-primary">Grabar</button>
-                                <a href="{% url 'tratamientos:lista_tratamientos' %}" class="btn btn-secondary">Cancelar</a>
+                                <button type="submit" class="btn btn-primary" id="btnGuardar">
+                                    <i class="fas fa-save"></i> Guardar Tratamiento
+                                </button>
+                                <a href="{% url 'tratamientos:lista_tratamientos' %}" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </a>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <h4>Total: $<span id="total-tratamiento">0</span></h4>
                             </div>
                         </div>
-                    </form>
-                </div>
             </div>
         </div>
     </div>
 </div>
+</div>
+{% endblock content %}
 
 {% block extra_js %}
 <script src="{% static 'js/patient-search.js' %}"></script>
 <script>
     // Configurar el token CSRF para todas las peticiones AJAX
     const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
+    // Función para calcular el valor total de un procedimiento
+    function calcularValorProcedimiento(row) {
+        const procedimientoSelect = row.querySelector('.procedimiento-select');
+        const cantidadInput = row.querySelector('.cantidad-input');
+        const descuentoInput = row.querySelector('.descuento-input');
+        const valorInput = row.querySelector('.valor-input');
+        
+        if (!procedimientoSelect || !cantidadInput || !descuentoInput || !valorInput) return;
+        
+        const selectedOption = procedimientoSelect.options[procedimientoSelect.selectedIndex];
+        if (!selectedOption || !selectedOption.value) {
+            valorInput.value = '$0';
+            actualizarTotalTratamiento();
+            return;
+        }
+        
+        const valorBase = parseFloat(selectedOption.dataset.valor) || 0;
+        const cantidad = parseInt(cantidadInput.value) || 1;
+        const descuento = parseFloat(descuentoInput.value) || 0;
+        
+        const valorTotal = valorBase * cantidad * (1 - descuento/100);
+        valorInput.value = '$' + valorTotal.toLocaleString('es-CL');
+        
+        actualizarTotalTratamiento();
+    }
+    
+    // Función para actualizar el total del tratamiento
+    function actualizarTotalTratamiento() {
+        const rows = document.querySelectorAll('.formset-row');
+        let total = 0;
+        
+        rows.forEach(row => {
+            const valorStr = row.querySelector('.valor-input').value.replace('$', '').replace(/\./g, '').replace(',', '.');
+            const valor = parseFloat(valorStr) || 0;
+            total += valor;
+        });
+        
+        document.getElementById('total-tratamiento').textContent = total.toLocaleString('es-CL');
+    }
+    
+    // Calcular totales iniciales al cargar la página
+    document.querySelectorAll('.formset-row').forEach(row => {
+        calcularValorProcedimiento(row);
+    });
+    
+    // Agregar event listeners para calcular valores
+    document.addEventListener('change', function(e) {
+        if (e.target.matches('.procedimiento-select') || 
+            e.target.matches('.cantidad-input') || 
+            e.target.matches('.descuento-input')) {
+            calcularValorProcedimiento(e.target.closest('.formset-row'));
+        }
+    });
+    
+    // Validar que haya al menos un procedimiento antes de guardar
+    document.getElementById('btnGuardar').addEventListener('click', function(e) {
+        const rows = document.querySelectorAll('.formset-row');
+        if (rows.length === 0) {
+            e.preventDefault();
+            alert('Debe agregar al menos un procedimiento al tratamiento.');
+            return;
+        }
+        
+        let isValid = true;
+        rows.forEach(row => {
+            const procedimiento = row.querySelector('.procedimiento-select').value;
+            const profesional = row.querySelector('.profesional-select').value;
+            if (!procedimiento || !profesional) {
+                isValid = false;
+            }
+        });
+        
+        if (!isValid) {
+            e.preventDefault();
+            alert('Por favor complete todos los campos requeridos en los procedimientos.');
+        }
+    });
     
     document.addEventListener('DOMContentLoaded', function() {
         // Agregar el token CSRF a todas las peticiones AJAX
@@ -230,26 +306,22 @@
         newForm.innerHTML = `
             <div class="col-md-4">
                 <label class="form-label">Procedimiento *</label>
-                <select name="${formsetPrefix}-${formNum}-procedimiento" class="form-select procedimiento-select" required title="Seleccione un procedimiento">
+                <select name="${formsetPrefix}-${formNum}-procedimiento" 
+                        class="form-select procedimiento-select" 
+                        required title="Seleccione un procedimiento">
                     <option value="">Seleccione un procedimiento...</option>
                     {% for procedimiento in procedimientos %}
-                    <option value="{{ procedimiento.id }}">{{ procedimiento.nombre }}</option>
+                    <option value="{{ procedimiento.id }}" data-valor="{{ procedimiento.valor }}">
+                        {{ procedimiento.nombre }} - ${{ procedimiento.valor|floatformat:0 }}
+                    </option>
                     {% endfor %}
                 </select>
             </div>
-            <div class="col-md-2">
-                <label class="form-label">Cantidad *</label>
-                <input type="number" name="${formsetPrefix}-${formNum}-cantidad" class="form-control" 
-                       value="1" min="1" required title="Ingrese la cantidad" placeholder="Cantidad">
-            </div>
-            <div class="col-md-2">
-                <label class="form-label">Descuento %</label>
-                <input type="number" name="${formsetPrefix}-${formNum}-descuento" class="form-control" 
-                       value="0" min="0" max="100" step="0.01" title="Ingrese el descuento" placeholder="Descuento">
-            </div>
             <div class="col-md-3">
                 <label class="form-label">Profesional *</label>
-                <select name="${formsetPrefix}-${formNum}-profesional" class="form-select profesional-select" required title="Seleccione un profesional">
+                <select name="${formsetPrefix}-${formNum}-profesional" 
+                        class="form-select profesional-select" 
+                        required title="Seleccione un profesional">
                     <option value="">Seleccione un profesional...</option>
                     {% for profesional in profesionales %}
                     {% if profesional.activo %}
@@ -259,6 +331,22 @@
                     {% endif %}
                     {% endfor %}
                 </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Cantidad *</label>
+                <input type="number" name="${formsetPrefix}-${formNum}-cantidad" 
+                       class="form-control cantidad-input" 
+                       value="1" min="1" required title="Ingrese la cantidad">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Valor Total</label>
+                <input type="text" class="form-control valor-input" readonly>
+            </div>
+            <div class="col-md-1">
+                <label class="form-label">Desc. %</label>
+                <input type="number" name="${formsetPrefix}-${formNum}-descuento" 
+                       class="form-control descuento-input" 
+                       value="0" min="0" max="100" step="0.01" required title="Ingrese el descuento">
             </div>
             <div class="col-md-1">
                 <label class="form-label">&nbsp;</label>
@@ -271,12 +359,17 @@
         formsetContainer.appendChild(newForm);
         totalForms.value = formNum + 1;
         
-        // Agregar evento de clic al nuevo botón de eliminar
-        const deleteButton = newForm.querySelector('.eliminar-procedimiento');
-        deleteButton.addEventListener('click', function(e) {
-            e.stopPropagation();
-            eliminarProcedimiento(e);
-        });
+        // Calcular valor inicial
+        calcularValorProcedimiento(newForm);
+        
+        // Agregar event listeners para cálculos
+        const procedimientoSelect = newForm.querySelector('.procedimiento-select');
+        const cantidadInput = newForm.querySelector('.cantidad-input');
+        const descuentoInput = newForm.querySelector('.descuento-input');
+        
+        procedimientoSelect.addEventListener('change', () => calcularValorProcedimiento(newForm));
+        cantidadInput.addEventListener('change', () => calcularValorProcedimiento(newForm));
+        descuentoInput.addEventListener('change', () => calcularValorProcedimiento(newForm));
         
         console.log('Nuevo formulario agregado correctamente');
     }
@@ -296,5 +389,4 @@
         }
     }
 </script>
-{% endblock %}
-{% endblock content %} 
+{% endblock extra_js %}
