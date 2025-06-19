@@ -3,8 +3,75 @@
 {% load humanize %}
 
 {% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/dental-theme.css' %}">
 <link href="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.css" rel="stylesheet">
 <style>
+    body, .container-fluid, .dental-title, .dental-subtitle, .dental-header, .dental-btn, .dental-stats-card, .dental-stats-number, .dental-stats-label, .dental-table, .dental-chart-container, .breadcrumb, .breadcrumb-item {
+        font-family: 'Poppins', sans-serif !important;
+    }
+
+    /* Nombre de la empresa activa */
+    .empresa-activa {
+        background: linear-gradient(135deg, var(--dental-primary) 0%, var(--dental-secondary) 100%);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.75rem;
+        margin-bottom: 1rem;
+        text-align: center;
+        font-weight: 600;
+        font-size: 1.1rem;
+        box-shadow: 0 4px 6px rgba(26, 82, 118, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+    }
+
+    .empresa-activa i {
+        font-size: 1.2rem;
+    }
+
+    /* Título del informe con tema dental */
+    .dental-informe-title {
+        color: var(--dental-primary);
+        font-family: 'Poppins', sans-serif;
+        font-weight: 700;
+        font-size: 2.25rem;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 4px rgba(26, 82, 118, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .dental-informe-title i {
+        color: var(--dental-primary);
+        font-size: 2rem;
+        background: linear-gradient(135deg, var(--dental-primary) 0%, var(--dental-secondary) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .dental-informe-subtitle {
+        color: var(--dental-text-light);
+        font-family: 'Poppins', sans-serif;
+        font-weight: 400;
+        font-size: 1.1rem;
+        opacity: 0.8;
+        margin-bottom: 2rem;
+    }
+
+    .dental-header-container {
+        background: linear-gradient(135deg, var(--dental-light) 0%, rgba(255, 255, 255, 0.9) 100%);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border: 1px solid var(--dental-accent);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+    }
+
     .stats-container {
         background: white;
         padding: 20px;
@@ -29,12 +96,12 @@
     .stats-number {
         font-size: 2.5rem;
         font-weight: bold;
-        color: #4e73df;
+        color: var(--dental-primary);
         margin-bottom: 0.5rem;
     }
 
     .stats-label {
-        color: #5a5c69;
+        color: var(--dental-text-light);
         font-size: 0.9rem;
         text-transform: uppercase;
     }
@@ -48,36 +115,36 @@
     }
 
     .filtros-container label {
-        color: #4a5568;
+        color: var(--dental-text);
         font-weight: 500;
         margin-bottom: 0.5rem;
     }
 
     .filtros-container .form-control {
         border-radius: 0.5rem;
-        border: 1px solid #e2e8f0;
+        border: 1px solid var(--dental-accent);
         padding: 0.75rem 1rem;
         font-size: 0.875rem;
     }
 
     .filtros-container .form-control:focus {
-        border-color: #4299e1;
-        box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
+        border-color: var(--dental-primary);
+        box-shadow: 0 0 0 3px rgba(26, 82, 118, 0.15);
     }
 
     .filtros-container .btn-primary {
         padding: 0.75rem 1.5rem;
         font-weight: 500;
         border-radius: 0.5rem;
-        background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+        background: linear-gradient(135deg, var(--dental-primary) 0%, var(--dental-secondary) 100%);
         border: none;
-        box-shadow: 0 4px 6px rgba(49, 130, 206, 0.1);
+        box-shadow: 0 4px 6px rgba(26, 82, 118, 0.1);
         transition: all 0.2s;
     }
 
     .filtros-container .btn-primary:hover {
         transform: translateY(-1px);
-        box-shadow: 0 6px 8px rgba(49, 130, 206, 0.15);
+        box-shadow: 0 6px 8px rgba(26, 82, 118, 0.15);
     }
 
     .chart-container {
@@ -92,16 +159,16 @@
     }
 
     .table-stats th {
-        background-color: #4e73df;
+        background-color: var(--dental-primary);
         color: white;
     }
 
     .nav-tabs .nav-link {
-        color: #5a5c69;
+        color: var(--dental-text-light);
     }
 
     .nav-tabs .nav-link.active {
-        color: #4e73df;
+        color: var(--dental-primary);
         font-weight: bold;
     }
 </style>
@@ -109,11 +176,28 @@
 
 {% block content %}
 <div class="container-fluid">
+    <!-- Nombre de la empresa activa -->
+    {% if empresa_actual %}
+    <div class="empresa-activa">
+        <i class="fas fa-building"></i>
+        <span>{{ empresa_actual.nombre_fantasia|default:empresa_actual.razon_social }}</span>
+    </div>
+    {% endif %}
+
     <!-- Encabezado -->
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">{% block informe_titulo %}{% endblock %}</h1>
-        <div>
-            {% block acciones_encabezado %}{% endblock %}
+    <div class="dental-header-container">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <div>
+                <h1 class="dental-informe-title">
+                    {% block informe_titulo %}{% endblock %}
+                </h1>
+                <p class="dental-informe-subtitle">
+                    {% block informe_subtitulo %}Análisis detallado y reportes del sistema{% endblock %}
+                </p>
+            </div>
+            <div>
+                {% block acciones_encabezado %}{% endblock %}
+            </div>
         </div>
     </div>
 

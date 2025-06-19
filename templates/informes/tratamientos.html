@@ -1,6 +1,14 @@
 {% extends 'informes/base_informes.html' %}
+{% load static %}
 
-{% block informe_titulo %}Informe de Tratamientos{% endblock %}
+{% block informe_titulo %}
+<i class="fas fa-tooth"></i>
+Informe de Tratamientos
+{% endblock %}
+
+{% block informe_subtitulo %}
+Análisis detallado de tratamientos y rendimiento profesional
+{% endblock %}
 
 {% block acciones_encabezado %}
 <a href="?{{ request.GET.urlencode }}&export=excel" class="btn btn-success">
@@ -12,7 +20,7 @@
 <div class="col-md-4">
     <div class="form-group">
         <label>Profesional:</label>
-        <select name="profesional" class="form-control">
+        <select name="profesional" class="form-control" aria-label="Seleccionar profesional">
             <option value="">Todos los profesionales</option>
             {% for prof in profesionales %}
             <option value="{{ prof.id }}" {% if prof.id|stringformat:"s" == profesional_id %}selected{% endif %}>
@@ -29,14 +37,28 @@
 <div class="row">
     <div class="col-xl-6 col-md-6">
         <div class="stats-card">
-            <div class="stats-number">{{ total_tratamientos }}</div>
-            <div class="stats-label">Total Tratamientos</div>
+            <div class="d-flex align-items-center">
+                <div class="stats-icon me-3">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+                <div>
+                    <div class="stats-number">{{ total_tratamientos }}</div>
+                    <div class="stats-label">Total Tratamientos</div>
+                </div>
+            </div>
         </div>
     </div>
     <div class="col-xl-6 col-md-6">
         <div class="stats-card">
-            <div class="stats-number">${{ total_ingresos|floatformat:0|intcomma }}</div>
-            <div class="stats-label">Total Ingresos</div>
+            <div class="d-flex align-items-center">
+                <div class="stats-icon me-3">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div>
+                    <div class="stats-number">${{ total_ingresos|floatformat:0 }}</div>
+                    <div class="stats-label">Total Ingresos</div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -45,7 +67,10 @@
 <div class="row">
     <div class="col-lg-6">
         <div class="stats-container">
-            <h4>Tratamientos por Estado</h4>
+            <h4 class="dental-title">
+                <i class="fas fa-chart-pie"></i>
+                Tratamientos por Estado
+            </h4>
             <div class="chart-container">
                 {{ grafico_estados|safe }}
             </div>
@@ -53,7 +78,10 @@
     </div>
     <div class="col-lg-6">
         <div class="stats-container">
-            <h4>Ingresos por Profesional</h4>
+            <h4 class="dental-title">
+                <i class="fas fa-chart-bar"></i>
+                Ingresos por Profesional
+            </h4>
             <div class="chart-container">
                 {{ grafico_ingresos|safe }}
             </div>
@@ -63,7 +91,10 @@
 
 <!-- Tabla de tratamientos -->
 <div class="stats-container">
-    <h4>Listado de Tratamientos</h4>
+    <h4 class="dental-title">
+        <i class="fas fa-list"></i>
+        Listado de Tratamientos
+    </h4>
     <div class="table-responsive">
         <table class="table table-bordered table-sm table-stats">
             <thead>
@@ -81,12 +112,100 @@
                     <td>{{ tratamiento.fecha_inicio }}</td>
                     <td>{{ tratamiento.paciente.nombre }} {{ tratamiento.paciente.apellidos }}</td>
                     <td>{{ tratamiento.profesional.nombres }} {{ tratamiento.profesional.apellido_paterno }}</td>
-                    <td>{{ tratamiento.get_estado_display }}</td>
-                    <td>${{ tratamiento.costo_total|floatformat:0|intcomma }}</td>
+                    <td>
+                        <span class="estado-badge estado-{{ tratamiento.estado|lower }}">
+                            {{ tratamiento.get_estado_display }}
+                        </span>
+                    </td>
+                    <td class="text-end">${{ tratamiento.costo_total|floatformat:0 }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 </div>
+
+<style>
+/* Estilos específicos para el informe de tratamientos */
+.stats-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--dental-primary), var(--dental-secondary));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.dental-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--dental-primary);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.estado-badge {
+    padding: 0.4rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.estado-pendiente {
+    background-color: var(--dental-light);
+    color: var(--dental-warning);
+}
+
+.estado-en_proceso {
+    background-color: var(--dental-light);
+    color: var(--dental-secondary);
+}
+
+.estado-completado {
+    background-color: var(--dental-light);
+    color: var(--dental-success);
+}
+
+.estado-cancelado {
+    background-color: var(--dental-light);
+    color: var(--dental-danger);
+}
+
+.text-end {
+    text-align: right;
+    font-weight: 600;
+    color: var(--dental-primary);
+}
+
+/* Mejorar el contenedor de gráficos */
+.chart-container {
+    position: relative;
+    height: 350px;
+    margin-bottom: 20px;
+    background: white;
+    border-radius: 8px;
+    padding: 1rem;
+    border: 1px solid var(--dental-accent);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .stats-card {
+        margin-bottom: 1rem;
+    }
+    
+    .chart-container {
+        height: 300px;
+    }
+}
+</style>
 {% endblock %}

@@ -5,28 +5,49 @@
 {% block title %}Pagos de Tratamientos{% endblock %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dental-theme.css' %}">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css"/>
 <style>
     .card {
-        border: 1px solid #AED6F1;
+        border: 1px solid var(--dental-accent);
         border-radius: 15px;
-        box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+    }
+
+    .card:hover {
+        box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        transform: translateY(-2px);
     }
 
     .card-header {
-        background-color: #E8F4FC;
-        border-bottom: 1px solid #AED6F1;
+        background: linear-gradient(135deg, var(--dental-light), var(--dental-accent));
+        border-bottom: 2px solid var(--dental-accent);
         border-radius: 15px 15px 0 0 !important;
-        padding: 1.5rem;
+        padding: 1.75rem;
     }
 
     .card-header h3 {
-        color: #1A5276;
-        font-size: 1.5rem;
+        color: var(--dental-primary);
+        font-size: 1.6rem;
         font-weight: 600;
         margin: 0;
         font-family: 'Poppins', sans-serif;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .card-header h3 i {
+        color: var(--dental-secondary);
+        font-size: 1.4rem;
+    }
+
+    .card-header p {
+        color: var(--dental-text-light);
+        font-size: 0.95rem;
+        margin: 0.5rem 0 0;
     }
 
     .card-body {
@@ -34,87 +55,242 @@
     }
 
     .table {
-        border: 1px solid #AED6F1;
-        border-radius: 8px;
+        border: 1px solid var(--dental-accent);
+        border-radius: 12px;
+        overflow: hidden;
     }
 
     .table th {
-        background-color: #E8F4FC;
-        color: #1A5276;
+        background: linear-gradient(135deg, var(--dental-light), var(--dental-accent));
+        color: var(--dental-primary);
         font-weight: 600;
-        border-bottom: 1px solid #AED6F1;
+        border-bottom: 2px solid var(--dental-accent);
         text-transform: uppercase;
         letter-spacing: 0.5px;
         font-size: 0.85rem;
-        padding: 0.5rem;
+        padding: 1rem 0.75rem;
+        font-family: 'Poppins', sans-serif;
     }
 
     .table td {
-        border-bottom: 1px solid #E8F4FC;
+        border-bottom: 1px solid var(--dental-light);
         vertical-align: middle;
         font-size: 0.9rem;
-        padding: 0.5rem;
+        padding: 1rem 0.75rem;
+        color: var(--dental-text);
+    }
+
+    .table tbody tr:hover {
+        background-color: var(--dental-light);
+        transform: scale(1.01);
+        transition: all 0.3s ease;
     }
 
     .btn-primary {
-        background-color: #1A5276;
-        border-color: #1A5276;
-        padding: 0.5rem 1rem;
+        background: linear-gradient(135deg, var(--dental-primary), var(--dental-secondary));
+        border: none;
+        padding: 0.75rem 1.5rem;
         font-weight: 500;
-        border-radius: 8px;
+        border-radius: 25px;
         font-size: 0.9rem;
+        box-shadow: 0 2px 8px rgba(26, 82, 118, 0.3);
+        transition: all 0.3s ease;
     }
 
     .btn-primary:hover {
-        background-color: #2874A6;
-        border-color: #2874A6;
+        background: linear-gradient(135deg, var(--dental-secondary), var(--dental-primary));
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(26, 82, 118, 0.4);
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, var(--dental-success), #27ae60);
+        border: none;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        border-radius: 25px;
+        font-size: 0.9rem;
+        box-shadow: 0 2px 8px rgba(46, 204, 113, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .btn-success:hover {
+        background: linear-gradient(135deg, #27ae60, var(--dental-success));
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
     }
 
     .btn-warning {
-        background-color: #f39c12;
-        border-color: #f39c12;
-        padding: 0.4rem 0.8rem;
+        background: linear-gradient(135deg, var(--dental-warning), #f39c12);
+        border: none;
+        padding: 0.5rem 1rem;
         font-size: 0.85rem;
+        border-radius: 20px;
+        box-shadow: 0 2px 6px rgba(243, 156, 18, 0.3);
+        transition: all 0.3s ease;
     }
 
     .btn-warning:hover {
-        background-color: #d35400;
-        border-color: #d35400;
+        background: linear-gradient(135deg, #f39c12, var(--dental-warning));
+        transform: translateY(-1px);
+        box-shadow: 0 3px 10px rgba(243, 156, 18, 0.4);
     }
 
     .btn-danger {
-        background-color: #e74c3c;
-        border-color: #e74c3c;
-        padding: 0.4rem 0.8rem;
+        background: linear-gradient(135deg, var(--dental-danger), #c0392b);
+        border: none;
+        padding: 0.5rem 1rem;
         font-size: 0.85rem;
+        border-radius: 20px;
+        box-shadow: 0 2px 6px rgba(231, 76, 60, 0.3);
+        transition: all 0.3s ease;
     }
 
     .btn-danger:hover {
-        background-color: #c0392b;
-        border-color: #c0392b;
+        background: linear-gradient(135deg, #c0392b, var(--dental-danger));
+        transform: translateY(-1px);
+        box-shadow: 0 3px 10px rgba(231, 76, 60, 0.4);
     }
 
     .estado-badge {
-        padding: 0.25rem 0.5rem;
-        border-radius: 4px;
-        font-size: 0.85rem;
-        font-weight: 500;
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .badge-pendiente {
+        background: linear-gradient(135deg, var(--dental-warning), #f39c12);
+        color: white;
+    }
+
+    .badge-completado {
+        background: linear-gradient(135deg, var(--dental-success), #27ae60);
+        color: white;
+    }
+
+    .badge-anulado {
+        background: linear-gradient(135deg, var(--dental-danger), #c0392b);
+        color: white;
     }
     
     .pagination .page-item .page-link {
-        color: #1A5276;
-        border: 1px solid #AED6F1;
+        color: var(--dental-primary);
+        border: 1px solid var(--dental-accent);
         margin: 0 2px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    
+    .pagination .page-item .page-link:hover {
+        background-color: var(--dental-light);
+        border-color: var(--dental-secondary);
     }
     
     .pagination .page-item.active .page-link {
-        background-color: #1A5276;
-        border-color: #1A5276;
+        background: linear-gradient(135deg, var(--dental-primary), var(--dental-secondary));
+        border-color: var(--dental-primary);
+        box-shadow: 0 2px 8px rgba(26, 82, 118, 0.3);
     }
 
-    .content-card .card-title i {
-        color: #4a5568;
+    .stats-card {
+        background: white;
+        border: 1px solid var(--dental-accent);
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stats-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(135deg, var(--dental-primary), var(--dental-secondary));
+    }
+
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+
+    .stats-card.primary::before {
+        background: linear-gradient(135deg, var(--dental-primary), var(--dental-secondary));
+    }
+
+    .stats-card.success::before {
+        background: linear-gradient(135deg, var(--dental-success), #27ae60);
+    }
+
+    .stats-card.warning::before {
+        background: linear-gradient(135deg, var(--dental-warning), #f39c12);
+    }
+
+    .stats-card.danger::before {
+        background: linear-gradient(135deg, var(--dental-danger), #c0392b);
+    }
+
+    .stats-title {
+        color: var(--dental-text-light);
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+    }
+
+    .stats-value {
+        color: var(--dental-primary);
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .stats-icon {
+        color: var(--dental-accent);
+        font-size: 2rem;
         opacity: 0.7;
+    }
+
+    .action-buttons .btn {
+        margin: 0.25rem;
+        transition: all 0.3s ease;
+    }
+
+    .amount-highlight {
+        font-weight: 600;
+        color: var(--dental-primary);
+        font-size: 1.1rem;
+    }
+
+    .modal-header {
+        background: linear-gradient(135deg, var(--dental-light), var(--dental-accent));
+        border-bottom: 2px solid var(--dental-accent);
+        border-radius: 15px 15px 0 0;
+    }
+
+    .modal-title {
+        color: var(--dental-primary);
+        font-weight: 600;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .modal-body {
+        padding: 2rem;
+    }
+
+    .modal-footer {
+        border-top: 1px solid var(--dental-light);
+        padding: 1.5rem;
     }
 
     @media (max-width: 768px) {
@@ -123,12 +299,21 @@
         }
         
         .table-responsive {
-            border-radius: 8px;
-            border: 1px solid #dee2e6;
+            border-radius: 12px;
+            border: 1px solid var(--dental-accent);
         }
         
         .action-buttons .btn {
             margin-bottom: 0.25rem;
+            width: 100%;
+        }
+
+        .card-header {
+            padding: 1rem;
+        }
+
+        .card-header h3 {
+            font-size: 1.3rem;
         }
     }
 </style>
@@ -146,9 +331,9 @@
                             <p class="mb-0 text-muted">Gestión de pagos de tratamientos dentales</p>
                         </div>
                         <div>
-                            <a href="{% url 'pagos_tratamientos:crear_pago' %}" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#seleccionarTratamientoModal">
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#seleccionarTratamientoModal">
                                 <i class="fas fa-plus-circle me-2"></i>Agregar Pago
-                            </a>
+                            </button>
                             <a href="{% url 'pagos_tratamientos:exportar_pagos' %}" class="btn btn-success">
                                 <i class="fas fa-file-excel me-2"></i>Exportar a Excel
                             </a>
@@ -159,65 +344,53 @@
                     <!-- Tarjetas de estadísticas -->
                     <div class="row mb-4">
                         <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card border-left-primary shadow h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                                Total Pagado</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">S/ {{ total_pagado|default:0|intcomma }}</div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
-                                        </div>
+                            <div class="stats-card primary">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="stats-title">Total Pagado</div>
+                                        <div class="stats-value">S/ {{ total_pagado|default:0|intcomma }}</div>
+                                    </div>
+                                    <div class="stats-icon">
+                                        <i class="fas fa-dollar-sign"></i>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card border-left-success shadow h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                                Pagos Completados</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ pagos_completados|default:0 }}</div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
-                                        </div>
+                            <div class="stats-card success">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="stats-title">Pagos Completados</div>
+                                        <div class="stats-value">{{ pagos_completados|default:0 }}</div>
+                                    </div>
+                                    <div class="stats-icon">
+                                        <i class="fas fa-check-circle"></i>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card border-left-warning shadow h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                                Pagos Pendientes</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ pagos_pendientes|default:0 }}</div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-clock fa-2x text-gray-300"></i>
-                                        </div>
+                            <div class="stats-card warning">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="stats-title">Pagos Pendientes</div>
+                                        <div class="stats-value">{{ pagos_pendientes|default:0 }}</div>
+                                    </div>
+                                    <div class="stats-icon">
+                                        <i class="fas fa-clock"></i>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card border-left-danger shadow h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
-                                                Pagos Anulados</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ pagos_anulados|default:0 }}</div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-ban fa-2x text-gray-300"></i>
-                                        </div>
+                            <div class="stats-card danger">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="stats-title">Pagos Anulados</div>
+                                        <div class="stats-value">{{ pagos_anulados|default:0 }}</div>
+                                    </div>
+                                    <div class="stats-icon">
+                                        <i class="fas fa-ban"></i>
                                     </div>
                                 </div>
                             </div>
@@ -230,7 +403,7 @@
                             <h5 class="mb-0">
                                 <i class="fas fa-money-bill-wave me-2"></i>
                                 {% if tratamiento %}
-                                    Pagos del Tratamiento #{{ tratamiento.id }} - {{ tratamiento.paciente.get_full_name|default:tratamiento.paciente.username }}
+                                    Pagos del Tratamiento #{{ tratamiento.id }} - {{ tratamiento.paciente.nombre_completo }}
                                 {% else %}
                                     Todos los Pagos
                                 {% endif %}
@@ -262,20 +435,20 @@
                                         <tr>
                                             <td>#{{ pago.id }}</td>
                                             <td>{{ pago.fecha_pago|date:"d/m/Y H:i" }}</td>
-                                            <td>{{ pago.tratamiento.paciente.get_full_name|default:pago.tratamiento.paciente.username }}</td>
-                                            <td>{{ pago.tratamiento.get_tipo_display }}</td>
-                                            <td>{{ pago.get_metodo_pago_display }}</td>
-                                            <td>S/ {{ pago.monto|intcomma }}</td>
+                                            <td>{{ pago.tratamiento.paciente.nombre_completo }}</td>
+                                            <td>{{ pago.tratamiento.get_estado_display }}</td>
+                                            <td>{{ pago.forma_pago.nombre }}</td>
+                                            <td class="amount-highlight">S/ {{ pago.monto|intcomma }}</td>
                                             <td>
                                                 {% if pago.estado == 'COMPLETADO' %}
-                                                    <span class="badge bg-success">Completado</span>
+                                                    <span class="badge badge-completado">Completado</span>
                                                 {% elif pago.estado == 'PENDIENTE' %}
-                                                    <span class="badge bg-warning text-dark">Pendiente</span>
+                                                    <span class="badge badge-pendiente">Pendiente</span>
                                                 {% elif pago.estado == 'ANULADO' %}
-                                                    <span class="badge bg-danger">Anulado</span>
+                                                    <span class="badge badge-anulado">Anulado</span>
                                                 {% endif %}
                                             </td>
-                                            <td class="text-nowrap">
+                                            <td class="text-nowrap action-buttons">
                                                 <a href="{% url 'pagos_tratamientos:detalle_pago' pago.id %}" class="btn btn-sm btn-info" title="Ver detalles">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
@@ -352,11 +525,11 @@
 <div class="modal fade" id="seleccionarTratamientoModal" tabindex="-1" aria-labelledby="seleccionarTratamientoModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
+            <div class="modal-header">
                 <h5 class="modal-title" id="seleccionarTratamientoModalLabel">
                     <i class="fas fa-tooth me-2"></i>Seleccionar Tratamiento
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body">
                 <div class="table-responsive">
@@ -375,10 +548,10 @@
                             {% for tratamiento in tratamientos_disponibles %}
                             <tr>
                                 <td>{{ tratamiento.id }}</td>
-                                <td>{{ tratamiento.paciente.get_full_name|default:tratamiento.paciente.username }}</td>
-                                <td>{{ tratamiento.get_tipo_display }}</td>
-                                <td>S/ {{ tratamiento.costo_total|floatformat:2 }}</td>
-                                <td>S/ {{ tratamiento.saldo_pendiente|floatformat:2 }}</td>
+                                <td>{{ tratamiento.paciente.nombre_completo }}</td>
+                                <td>{{ tratamiento.get_estado_display }}</td>
+                                <td class="amount-highlight">S/ {{ tratamiento.costo_total|floatformat:2 }}</td>
+                                <td class="amount-highlight">S/ {{ tratamiento.saldo_pendiente|floatformat:2 }}</td>
                                 <td>
                                     <a href="{% url 'pagos_tratamientos:crear_pago' tratamiento.id %}" class="btn btn-sm btn-primary">
                                         <i class="fas fa-plus me-1"></i> Seleccionar

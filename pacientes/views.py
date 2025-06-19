@@ -14,6 +14,7 @@ from .forms import PacienteForm, HistorialClinicoForm
 from prevision.models import Prevision
 from tratamientos.models import Tratamiento
 import json
+import logging
 
 @login_required
 def lista_pacientes(request):
@@ -276,27 +277,49 @@ def eliminar_historial(request, pk):
 @login_required
 def buscar_pacientes(request):
     """Vista para búsqueda de pacientes con Select2"""
+    logger = logging.getLogger(__name__)
+    
     query = request.GET.get('q', '')
     page = request.GET.get('page', 1)
+    
+    logger.info(f"Búsqueda de pacientes - Query: '{query}', Page: {page}")
     
     try:
         page = int(page)
     except ValueError:
         page = 1
     
+    # Obtener la empresa actual del usuario
+    usuario_empresa = request.user.usuarioempresa_set.filter(activo=True).first()
+    empresa_actual = usuario_empresa.empresa if usuario_empresa else None
+    
+    logger.info(f"Empresa actual: {empresa_actual}")
+    
+    if not empresa_actual:
+        logger.warning("No se encontró empresa para el usuario")
+        return JsonResponse({
+            'results': [],
+            'pagination': {'more': False}
+        })
+    
     # Número de resultados por página
     page_size = 10
     offset = (page - 1) * page_size
     
-    # Realizar la búsqueda
+    # Realizar la búsqueda filtrando por empresa
     if query:
         pacientes = Paciente.objects.filter(
             Q(nombre__icontains=query) |
             Q(apellidos__icontains=query) |
-            Q(documento__icontains=query)
+            Q(documento__icontains=query),
+            empresa=empresa_actual
         ).order_by('apellidos', 'nombre')[offset:offset + page_size]
     else:
-        pacientes = Paciente.objects.all().order_by('apellidos', 'nombre')[offset:offset + page_size]
+        pacientes = Paciente.objects.filter(
+            empresa=empresa_actual
+        ).order_by('apellidos', 'nombre')[offset:offset + page_size]
+    
+    logger.info(f"Pacientes encontrados: {pacientes.count()}")
     
     # Formatear resultados para Select2
     results = [{
@@ -306,12 +329,16 @@ def buscar_pacientes(request):
         'documento': paciente.documento
     } for paciente in pacientes]
     
-    return JsonResponse({
+    response_data = {
         'results': results,
         'pagination': {
             'more': len(results) == page_size
         }
-    })
+    }
+    
+    logger.info(f"Respuesta: {response_data}")
+    
+    return JsonResponse(response_data)
 
 @login_required
 def detalle_paciente(request, pk):

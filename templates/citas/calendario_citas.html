@@ -5,165 +5,288 @@
 {% block page_title %}Calendario de Citas{% endblock %}
 
 {% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/dental-theme.css' %}">
 <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
 <link href='https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css' rel='stylesheet' />
 <style>
-    /* Estilos específicos para Select2 */
-    .select2 {
-        width: 100% !important;
+    body, .container-fluid, .dental-title, .dental-subtitle, .dental-header, .dental-btn, .dental-stats-card, .dental-stats-number, .dental-stats-label, .dental-table, .dental-chart-container, .breadcrumb, .breadcrumb-item {
+        font-family: 'Poppins', sans-serif !important;
     }
-</style>
-<style>
-    /* Estilos generales del calendario */
+
+    /* Header del calendario */
+    .calendar-header {
+        background: linear-gradient(135deg, rgba(26, 82, 118, 0.1), rgba(255, 255, 255, 0.9));
+        color: var(--dental-primary);
+        padding: 1.5rem 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        text-align: left;
+        border: 1px solid var(--dental-accent);
+    }
+
+    .calendar-title {
+        font-family: 'Poppins', sans-serif;
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin: 0;
+        color: var(--dental-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+    }
+
+    .calendar-subtitle {
+        font-family: 'Poppins', sans-serif;
+        font-size: 1rem;
+        margin: 0.3rem 0 0 0;
+        color: var(--dental-text-light);
+        font-weight: 400;
+    }
+
+    /* Filtros integrados en el header */
+    .calendar-header .form-label {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 500;
+        color: var(--dental-text-dark);
+        margin-bottom: 0.3rem;
+        font-size: 0.85rem;
+    }
+
+    .calendar-header .form-select {
+        font-family: 'Poppins', sans-serif;
+        border-radius: 8px;
+        border: 2px solid #e9ecef;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+        background-color: white;
+    }
+
+    .calendar-header .form-select:focus {
+        border-color: var(--dental-primary);
+        box-shadow: 0 0 0 3px rgba(26, 82, 118, 0.1);
+    }
+
+    /* Mejoras para los filtros en el header */
+    .calendar-header .form-group {
+        margin-bottom: 0.5rem;
+    }
+
+    .calendar-header .form-label i {
+        color: var(--dental-primary);
+        margin-right: 0.3rem;
+    }
+
+    .calendar-header .btn-nueva-cita {
+        margin-top: 0.5rem;
+    }
+
+    /* Responsive para el header con filtros */
+    @media (max-width: 768px) {
+        .calendar-header .row {
+            flex-direction: column;
+        }
+        
+        .calendar-header .col-md-6 {
+            margin-bottom: 1rem;
+        }
+        
+        .calendar-header .text-end {
+            text-align: center !important;
+        }
+    }
+
+    /* Contenedor principal del calendario */
     #calendar {
-        background: linear-gradient(135deg, rgba(0, 206, 209, 0.05) 0%, rgba(0, 139, 139, 0.05) 100%);
-        padding: 1.5rem;
+        background: linear-gradient(135deg, var(--dental-light), rgba(255, 255, 255, 0.95));
+        padding: 2rem;
         min-height: 700px;
         border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0, 206, 209, 0.1);
-        border: 1px solid rgba(0, 206, 209, 0.1);
+        box-shadow: 0 10px 30px rgba(26, 82, 118, 0.1);
+        border: 1px solid var(--dental-accent);
+        font-family: 'Poppins', sans-serif;
     }
 
     /* Estilos para los eventos del calendario */
     .fc-event {
         cursor: pointer;
         border: none;
-        border-radius: 12px;
+        border-radius: 8px;
         padding: 0;
         font-weight: 500;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        margin: 2px 0;
-        min-height: 80px;
-        background: rgba(0, 206, 209, 0.1) !important;
+        margin: 1px 0;
+        min-height: 60px;
         overflow: hidden;
-        color: #000;
+        color: #1a1a1a !important;
+        font-family: 'Poppins', sans-serif;
     }
 
     .fc-event:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
     }
 
     .cita-evento {
         height: 100%;
         display: flex;
         flex-direction: column;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 8px;
     }
 
     .cita-header {
-        padding: 4px 8px;
+        padding: 3px 6px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background: rgba(0, 139, 139, 0.15);
-        border-bottom: 1px solid rgba(0,0,0,0.2);
+        background: rgba(0, 0, 0, 0.1);
+        border-bottom: 1px solid rgba(0,0,0,0.1);
+        border-radius: 8px 8px 0 0;
     }
 
     .cita-time {
-        font-size: 0.85em;
+        font-size: 0.75em;
         font-weight: 600;
-        color: #000;
+        color: #1a1a1a;
+        font-family: 'Poppins', sans-serif;
     }
 
     .cita-status .badge {
-        font-size: 0.75em;
-        padding: 0.35em 0.65em;
+        font-size: 0.65em;
+        padding: 0.25em 0.5em;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+        background: rgba(255, 255, 255, 0.95);
+        color: #1a1a1a;
+        border-radius: 4px;
+        border: 1px solid rgba(0,0,0,0.1);
     }
 
     .cita-body {
-        padding: 8px;
+        padding: 4px 6px;
         flex-grow: 1;
         display: flex;
         flex-direction: column;
-        gap: 6px;
+        gap: 2px;
         background: rgba(255, 255, 255, 0.95);
+        border-radius: 0 0 8px 8px;
     }
 
     .cita-title {
         font-weight: 600;
-        color: #2c3e50;
-        font-size: 1em;
-        line-height: 1.3;
-        margin-bottom: 4px;
-        padding: 6px;
+        color: #1a1a1a;
+        font-size: 0.85em;
+        line-height: 1.2;
+        margin-bottom: 2px;
+        padding: 3px 4px;
         background: rgba(255,255,255,0.95);
-        border-radius: 4px;
-        border: 1px solid rgba(0,0,0,0.1);
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        border-radius: 3px;
+        border: 1px solid rgba(0,0,0,0.05);
+        font-family: 'Poppins', sans-serif;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .cita-details {
         display: flex;
         flex-direction: column;
-        font-size: 0.9em;
-        color: #000000;
-        margin: 4px 0;
-        gap: 4px;
+        font-size: 0.75em;
+        color: #1a1a1a;
+        margin: 1px 0;
+        gap: 1px;
     }
 
     .cita-details > div {
-        padding: 6px;
+        padding: 2px 4px;
         font-weight: 500;
-        font-size: 0.9em;
-        color: #34495e;
+        font-size: 0.75em;
+        color: #1a1a1a;
         background: rgba(255,255,255,0.95);
-        border-radius: 4px;
-        margin-bottom: 2px;
-        border: 1px solid rgba(0,0,0,0.1);
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    }
-
-    .cita-motivo {
-        font-size: 0.85em;
-        color: #576574;
-        line-height: 1.2;
+        border-radius: 3px;
+        margin-bottom: 1px;
+        border: 1px solid rgba(0,0,0,0.05);
+        font-family: 'Poppins', sans-serif;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        padding: 6px;
-        margin-top: 2px;
+    }
+
+    .cita-motivo {
+        font-size: 0.7em;
+        color: #1a1a1a;
+        line-height: 1.1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        padding: 2px 4px;
+        margin-top: 1px;
         background: rgba(255,255,255,0.95);
-        border-radius: 4px;
-        border: 1px solid rgba(0,0,0,0.1);
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        border-radius: 3px;
+        border: 1px solid rgba(0,0,0,0.05);
+        font-family: 'Poppins', sans-serif;
     }
 
-    /* Nueva paleta de colores para estados de citas */
+    /* Paleta de colores suaves del tema dental para estados de citas */
+    /* 
+    Colores exactos utilizados:
+    - PENDIENTE: #FFE5B4 → #FFD700 (Dorado suave)
+    - CONFIRMADA: #E8F5E8 → #90EE90 (Verde claro)
+    - COMPLETADA: #E6F3FF → #87CEEB (Azul claro)
+    - CANCELADA: #FFE6E6 → #FFB6C1 (Rosa claro)
+    
+    Estos colores deben coincidir exactamente con los mostrados en el modal de ayuda
+    */
+    #calendar .fc-event[data-status="PENDIENTE"],
     .fc-event[data-status="PENDIENTE"] {
-        background: linear-gradient(135deg, #00CED1 0%, #20B2AA 100%);
-        box-shadow: 0 4px 6px rgba(0, 206, 209, 0.3);
+        background: linear-gradient(135deg, #FFE5B4 0%, #FFD700 100%) !important;
+        box-shadow: 0 2px 6px rgba(255, 215, 0, 0.3) !important;
+        color: #8B4513 !important;
     }
 
+    #calendar .fc-event[data-status="CONFIRMADA"],
     .fc-event[data-status="CONFIRMADA"] {
-        background: linear-gradient(135deg, #008B8B 0%, #006666 100%);
-        box-shadow: 0 4px 6px rgba(0, 139, 139, 0.3);
+        background: linear-gradient(135deg, #E8F5E8 0%, #90EE90 100%) !important;
+        box-shadow: 0 2px 6px rgba(144, 238, 144, 0.3) !important;
+        color: #2E8B57 !important;
     }
 
+    #calendar .fc-event[data-status="COMPLETADA"],
     .fc-event[data-status="COMPLETADA"] {
-        background: linear-gradient(135deg, #5F9EA0 0%, #4A777A 100%);
-        box-shadow: 0 4px 6px rgba(95, 158, 160, 0.3);
+        background: linear-gradient(135deg, #E6F3FF 0%, #87CEEB 100%) !important;
+        box-shadow: 0 2px 6px rgba(135, 206, 235, 0.3) !important;
+        color: #4682B4 !important;
     }
 
+    #calendar .fc-event[data-status="CANCELADA"],
     .fc-event[data-status="CANCELADA"] {
-        background: linear-gradient(135deg, #B0C4DE 0%, #778899 100%);
-        box-shadow: 0 4px 6px rgba(176, 196, 222, 0.3);
+        background: linear-gradient(135deg, #FFE6E6 0%, #FFB6C1 100%) !important;
+        box-shadow: 0 2px 6px rgba(255, 182, 193, 0.3) !important;
+        color: #CD5C5C !important;
     }
 
+    #calendar .fc-event[data-status="PENDIENTE"]:hover,
     .fc-event[data-status="PENDIENTE"]:hover {
-        box-shadow: 0 6px 12px rgba(0, 206, 209, 0.4);
+        box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4) !important;
     }
 
+    #calendar .fc-event[data-status="CONFIRMADA"]:hover,
     .fc-event[data-status="CONFIRMADA"]:hover {
-        box-shadow: 0 6px 12px rgba(102, 187, 106, 0.4);
+        box-shadow: 0 4px 12px rgba(144, 238, 144, 0.4) !important;
     }
 
+    #calendar .fc-event[data-status="COMPLETADA"]:hover,
     .fc-event[data-status="COMPLETADA"]:hover {
-        box-shadow: 0 6px 12px rgba(66, 165, 245, 0.4);
+        box-shadow: 0 4px 12px rgba(135, 206, 235, 0.4) !important;
     }
 
+    #calendar .fc-event[data-status="CANCELADA"]:hover,
     .fc-event[data-status="CANCELADA"]:hover {
-        box-shadow: 0 6px 12px rgba(239, 83, 80, 0.4);
+        box-shadow: 0 4px 12px rgba(255, 182, 193, 0.4) !important;
     }
 
     /* Estilos para la cabecera del calendario */
@@ -174,537 +297,884 @@
 
     .fc .fc-toolbar-title {
         font-size: 1.75em;
-        color: #2c3e50;
+        color: var(--dental-primary);
         font-weight: 700;
         text-transform: capitalize;
+        font-family: 'Poppins', sans-serif;
     }
 
     .fc .fc-button-primary {
-        background: #f8f9fa;
-        border: 1px solid #dfe6e9;
-        color: #2d3436;
+        background: linear-gradient(135deg, var(--dental-primary), var(--dental-secondary));
+        border: none;
+        color: white;
         font-weight: 500;
         text-transform: capitalize;
         padding: 0.6rem 1.2rem;
         border-radius: 12px;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        box-shadow: 0 2px 4px rgba(26, 82, 118, 0.2);
+        font-family: 'Poppins', sans-serif;
     }
 
     .fc .fc-button-primary:hover {
-        background: #e9ecef;
-        border-color: #b2bec3;
+        background: linear-gradient(135deg, var(--dental-secondary), var(--dental-primary));
         transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 8px rgba(26, 82, 118, 0.3);
     }
 
-    .fc .fc-button-primary:not(:disabled):active,
-    .fc .fc-button-primary:not(:disabled).fc-button-active {
-        background: #e9ecef;
-        border-color: #b2bec3;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    .fc .fc-button-primary:focus {
+        box-shadow: 0 0 0 3px rgba(26, 82, 118, 0.2);
     }
 
-    /* Estilos para el día actual */
-    .fc-daygrid-day.fc-day-today {
-        background: rgba(0, 206, 209, 0.1);
-    }
-
-    .fc-daygrid-day.fc-day-today .fc-daygrid-day-number {
-        background: #00CED1;
+    /* Botones de acción */
+    .btn-nueva-cita {
+        background: linear-gradient(135deg, var(--dental-primary), var(--dental-secondary));
+        border: none;
         color: white;
-        border-radius: 50%;
-        width: 28px;
-        height: 28px;
+        padding: 12px 24px;
+        border-radius: 25px;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(26, 82, 118, 0.3);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-nueva-cita:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(26, 82, 118, 0.4);
+        background: linear-gradient(135deg, var(--dental-secondary), var(--dental-primary));
+        color: white;
+        text-decoration: none;
+    }
+
+    /* Controles de filtro */
+    .filtros-container {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+        border: 1px solid var(--dental-accent);
+    }
+
+    .filtros-container label {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 500;
+        color: var(--dental-text-dark);
+        margin-bottom: 0.5rem;
+    }
+
+    .filtros-container .form-control,
+    .filtros-container .form-select {
+        font-family: 'Poppins', sans-serif;
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+
+    .filtros-container .form-control:focus,
+    .filtros-container .form-select:focus {
+        border-color: var(--dental-primary);
+        box-shadow: 0 0 0 3px rgba(26, 82, 118, 0.1);
+    }
+
+    /* Select2 personalizado */
+    .select2 {
+        width: 100% !important;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .select2-container--default .select2-selection--single {
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 0.75rem 1rem;
+        font-family: 'Poppins', sans-serif;
+        transition: all 0.3s ease;
+    }
+
+    .select2-container--default.select2-container--focus .select2-selection--single {
+        border-color: var(--dental-primary);
+        box-shadow: 0 0 0 3px rgba(26, 82, 118, 0.1);
+    }
+
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background-color: var(--dental-primary);
+        color: white;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .calendar-title {
+            font-size: 2rem;
+        }
+        
+        #calendar {
+            padding: 1rem;
+        }
+        
+        .filtros-container {
+            padding: 1rem;
+        }
+    }
+
+    /* Modal de cita mejorado */
+    .modal-content {
+        border-radius: 15px;
+        border: none;
+        box-shadow: 0 10px 30px rgba(26, 82, 118, 0.2);
+        overflow: hidden;
+    }
+
+    .modal-header {
+        background: var(--dental-primary);
+        color: white;
+        padding: 1.5rem 2rem;
+        border-bottom: none;
+    }
+
+    .modal-title {
+        font-family: 'Poppins', sans-serif;
+        font-size: 1.4rem;
+        font-weight: 700;
         display: flex;
         align-items: center;
-        justify-content: center;
-        margin: 4px;
-        font-weight: 600;
-        box-shadow: 0 2px 4px rgba(0, 206, 209, 0.3);
+        gap: 0.8rem;
+        color: white;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
 
-    /* Estilos para las celdas del calendario */
+    .modal-title i {
+        font-size: 1.3rem;
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .btn-close-white {
+        filter: brightness(0) invert(1);
+    }
+
+    .modal-body {
+        padding: 2rem;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 249, 250, 0.95));
+    }
+
+    .modal-footer {
+        padding: 1.5rem 2rem;
+        background: linear-gradient(135deg, rgba(26, 82, 118, 0.02), rgba(255, 255, 255, 0.9));
+        border-top: 1px solid var(--dental-accent);
+    }
+
+    /* Controles del formulario con iconos */
+    .form-group {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group .form-label {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 500;
+        color: var(--dental-text-dark);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-group .form-label i {
+        color: var(--dental-primary);
+        font-size: 0.9rem;
+    }
+
+    .form-control, .form-select {
+        font-family: 'Poppins', sans-serif;
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        background-color: white;
+        position: relative;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--dental-primary);
+        box-shadow: 0 0 0 3px rgba(26, 82, 118, 0.1);
+        background-color: white;
+    }
+
+    .form-control.is-valid {
+        border-color: #28a745;
+        background-color: #f8fff9;
+    }
+
+    .form-control.is-invalid {
+        border-color: #dc3545;
+        background-color: #fff8f8;
+    }
+
+    /* Iconos en los controles */
+    .input-icon {
+        position: absolute;
+        left: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--dental-primary);
+        font-size: 0.9rem;
+        z-index: 2;
+        pointer-events: none;
+    }
+
+    .form-control:focus + .input-icon,
+    .form-select:focus + .input-icon {
+        color: var(--dental-secondary);
+    }
+
+    /* Botones del modal mejorados */
+    .modal-footer .btn {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: 25px;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        text-transform: none;
+        letter-spacing: 0.5px;
+        border: 2px solid transparent;
+    }
+
+    .modal-footer .btn-primary {
+        background: linear-gradient(135deg, #28a745, #20c997);
+        border-color: #28a745;
+        color: white;
+        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+    }
+
+    .modal-footer .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        background: linear-gradient(135deg, #20c997, #28a745);
+        border-color: #20c997;
+        color: white;
+    }
+
+    .modal-footer .btn-secondary {
+        background: linear-gradient(135deg, #6c757d, #5a6268);
+        border-color: #6c757d;
+        color: white;
+        box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+    }
+
+    .modal-footer .btn-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
+        background: linear-gradient(135deg, #5a6268, #6c757d);
+        border-color: #5a6268;
+        color: white;
+    }
+
+    .modal-footer .btn-danger {
+        background: linear-gradient(135deg, #dc3545, #c82333);
+        border-color: #dc3545;
+        color: white;
+        box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+    }
+
+    .modal-footer .btn-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+        background: linear-gradient(135deg, #c82333, #dc3545);
+        border-color: #c82333;
+        color: white;
+    }
+
+    /* Textarea con icono */
+    .textarea-group {
+        position: relative;
+    }
+
+    .textarea-group .form-control {
+        padding-left: 2.5rem;
+        min-height: 80px;
+        resize: vertical;
+    }
+
+    .textarea-group .input-icon {
+        top: 1.5rem;
+        transform: none;
+    }
+
+    /* Select2 personalizado para el modal */
+    .modal .select2-container--default .select2-selection--single {
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        font-family: 'Poppins', sans-serif;
+        transition: all 0.3s ease;
+        background-color: white;
+        height: auto;
+        min-height: 45px;
+    }
+
+    .modal .select2-container--default.select2-container--focus .select2-selection--single {
+        border-color: var(--dental-primary);
+        box-shadow: 0 0 0 3px rgba(26, 82, 118, 0.1);
+    }
+
+    .modal .select2-container--default .select2-selection--single .select2-selection__rendered {
+        padding-left: 0;
+        color: var(--dental-text-dark);
+        line-height: 1.5;
+    }
+
+    .modal .select2-container--default .select2-selection--single .select2-selection__arrow {
+        right: 0.75rem;
+        height: 100%;
+    }
+
+    .modal .select2-container--default .select2-selection--single .select2-selection__placeholder {
+        color: #6c757d;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .modal .select2-dropdown {
+        border: 2px solid var(--dental-primary);
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(26, 82, 118, 0.15);
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .modal .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background-color: var(--dental-primary);
+        color: white;
+    }
+
+    .modal .select2-container--default .select2-results__option[aria-selected=true] {
+        background-color: rgba(26, 82, 118, 0.1);
+        color: var(--dental-primary);
+    }
+
+    .modal .select2-search__field {
+        border: 1px solid #e9ecef;
+        border-radius: 5px;
+        padding: 0.5rem;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .modal .select2-search__field:focus {
+        border-color: var(--dental-primary);
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(26, 82, 118, 0.1);
+    }
+
+    /* Responsive para el modal */
+    @media (max-width: 768px) {
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .modal-footer {
+            padding: 1rem 1.5rem;
+        }
+        
+        .form-control, .form-select {
+            padding-left: 2rem;
+        }
+        
+        .input-icon {
+            left: 0.5rem;
+        }
+    }
+
+    /* Botones con estados de carga mejorados */
+    .modal-footer .btn:disabled {
+        opacity: 0.7;
+        transform: none !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .modal-footer .btn .fa-spinner {
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Estilos para los días del calendario */
     .fc-daygrid-day {
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        border-radius: 8px;
-        margin: 2px;
+        background: var(--dental-primary);
+        border: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+        color: white;
     }
 
     .fc-daygrid-day:hover {
-        background-color: rgba(0,0,0,0.03);
-        transform: translateY(-1px);
+        background: var(--dental-secondary);
+        transform: scale(1.02);
+        box-shadow: 0 4px 8px rgba(26, 82, 118, 0.3);
     }
 
-    .fc-daygrid-day-number {
-        color: #2d3436;
-        font-weight: 500;
-        padding: 8px;
-        font-size: 1.1em;
-    }
-
-    /* Estilos para la hora actual */
-    .fc-timegrid-now-indicator-line {
-        border-color: #FF9F43;
-        border-width: 2px;
-        opacity: 0.8;
-    }
-
-    .fc-timegrid-now-indicator-arrow {
-        border-color: #FF9F43;
-    }
-
-    /* Estilos para los encabezados de día */
-    .fc-col-header-cell {
-        background: #f8f9fa;
-        padding: 0.75rem 0;
-    }
-
-    .fc-col-header-cell-cushion {
-        color: #2d3436;
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.9em;
-        padding: 0.5rem;
-    }
-
-    /* Estilos para las horas */
-    .fc-timegrid-slot {
-        height: 4em;
-    }
-
-    .fc-timegrid-slot-minor {
-        height: 2em;
-    }
-
-    /* Estilos para el selector de vista */
-    .fc .fc-button-group {
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
-
-    .fc .fc-button-group .fc-button {
-        border-radius: 0;
-        margin: 0;
-    }
-
-    .fc .fc-button-group .fc-button:first-child {
-        border-top-left-radius: 12px;
-        border-bottom-left-radius: 12px;
-    }
-
-    .fc .fc-button-group .fc-button:last-child {
-        border-top-right-radius: 12px;
-        border-bottom-right-radius: 12px;
-    }
-
-    /* Estilos para el filtro de profesionales */
-    #profesional {
-        background: white;
-        border: 1px solid #dfe6e9;
-        border-radius: 12px;
-        padding: 0.6rem 1.2rem;
-        color: #2d3436;
-        font-weight: 500;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    #profesional:hover {
-        border-color: #b2bec3;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
-
-    #profesional:focus {
-        border-color: #FF9F43;
-        box-shadow: 0 0 0 0.2rem rgba(0, 206, 209, 0.25);
-    }
-
-    .modal-dialog {
-        max-width: 800px;
-        margin: 1.75rem auto;
-    }
-    .modal-content {
-        border-radius: 15px;
-        box-shadow: 0 0 20px rgba(0, 206, 209, 0.15);
-        background: white;
-        border: 1px solid rgba(0, 206, 209, 0.1);
-    }
-    .modal-header {
-        padding: 1.5rem;
-        background: linear-gradient(135deg, #00CED1 0%, #008B8B 100%);
-        border-bottom: 1px solid rgba(0, 206, 209, 0.1);
-        border-radius: 15px 15px 0 0 !important;
+    .fc-daygrid-day.fc-day-today {
+        background: var(--dental-primary);
         color: white;
+        font-weight: 700;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 2px 4px rgba(26, 82, 118, 0.2);
     }
-    .modal-header .modal-title {
+
+    .fc-daygrid-day.fc-day-today .fc-daygrid-day-number {
+        background: rgba(255, 255, 255, 0.2);
         color: white;
-        font-weight: 500;
-    }
-    .modal-header .btn-close {
-        color: white;
-        opacity: 0.8;
-    }
-    .modal-body {
-        padding: 2rem;
-        background: rgba(255, 255, 255, 0.9);
-    }
-    .modal-footer {
-        padding: 1.5rem;
-        border-top: 1px solid rgba(0, 206, 209, 0.1);
-        background: linear-gradient(135deg, rgba(0, 206, 209, 0.02) 0%, rgba(0, 139, 139, 0.02) 100%);
-        border-radius: 0 0 15px 15px;
-    }
-    .form-label {
-        font-weight: 500;
-        margin-bottom: 0.5rem;
-        color: #495057;
-    }
-    .form-control, .form-select {
-        padding: 0.75rem 1rem;
-        border-radius: 8px;
-        border: 1px solid #ced4da;
-        transition: all 0.2s ease-in-out;
-    }
-    .form-control:focus, .form-select:focus {
-        border-color: #0dcaf0;
-        box-shadow: 0 0 0 0.25rem rgba(13, 202, 240, 0.25);
-    }
-    textarea.form-control {
-        min-height: 120px;
-    }
-    .btn {
-        padding: 0.75rem 1.5rem;
-        border-radius: 8px;
-        font-weight: 500;
-        transition: all 0.2s ease-in-out;
-    }
-    .btn-primary {
-        background: linear-gradient(135deg, #00CED1 0%, #008B8B 100%);
-        border: none;
-    }
-    .btn-primary:hover {
-        background: linear-gradient(135deg, #008B8B 0%, #00CED1 100%);
-        transform: translateY(-1px);
-    }
-    .btn-secondary {
-        background: #6c757d;
-        border: none;
-    }
-    .btn-secondary:hover {
-    
-    /* Estilos para las notificaciones */
-    .toast-container {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 1050;
-    }
-    
-    .toast {
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        border-left: 4px solid;
-        animation: slideIn 0.3s ease-out;
-    }
-    
-    .toast-success {
-        border-left-color: #198754;
-    }
-    
-    .toast-error {
-        border-left-color: #dc3545;
-    }
-    
-    .toast-header {
-        background: transparent;
-        border-bottom: 1px solid rgba(0,0,0,0.05);
-        padding: 0.75rem 1rem;
-    }
-    
-    .toast-body {
-        padding: 1rem;
-    }
-    
-    @keyframes slideIn {
-        from {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
-    }
-    
-    /* Estilos para el modal de confirmación */
-    .modal-confirm {
-        color: #636363;
-    }
-    
-    .modal-confirm .modal-content {
-        padding: 20px;
-        border-radius: 15px;
-        border: none;
-    }
-    
-    .modal-confirm .modal-header {
-        border-bottom: none;
-        position: relative;
-        text-align: center;
-        padding: 20px 20px 0;
-    }
-    
-    .modal-confirm .modal-header .icon-box {
-        color: #f15e5e;
-        width: 80px;
-        height: 80px;
-        margin: 0 auto;
         border-radius: 50%;
-        z-index: 9;
-        text-align: center;
-        border: 3px solid #f15e5e;
+        width: 30px;
+        height: 30px;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-bottom: 20px;
+        font-weight: 700;
+        border: 2px solid rgba(255, 255, 255, 0.5);
     }
-    
-    .modal-confirm .modal-header .icon-box i {
-        font-size: 46px;
+
+    .fc-daygrid-day-number {
+        color: white;
+        font-weight: 600;
+        font-family: 'Poppins', sans-serif;
     }
-    
-    .modal-confirm .modal-title {
-        text-align: center;
-        font-size: 26px;
-        margin: 0;
-        color: #0a8ea8;
+
+    .fc-daygrid-day.fc-day-past {
+        background: var(--dental-primary);
+        opacity: 0.8;
     }
-    
-    .modal-confirm .modal-body {
-        text-align: center;
-        padding: 20px;
+
+    .fc-daygrid-day.fc-day-future {
+        background: var(--dental-primary);
     }
-    
-    .modal-confirm .modal-body p {
-        font-size: 16px;
-        margin-bottom: 20px;
+
+    .fc-daygrid-day.fc-day-other {
+        background: var(--dental-primary);
+        opacity: 0.6;
     }
-    
-    .modal-confirm .modal-footer {
-        border: none;
-        text-align: center;
-        border-radius: 5px;
-        font-size: 13px;
-        padding: 20px;
+
+    /* Botón de ayuda para colores */
+    .btn-ayuda-colores {
+        background: linear-gradient(135deg, var(--dental-light), var(--dental-accent));
+        border: 2px solid var(--dental-accent);
+        color: var(--dental-primary);
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 500;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(26, 82, 118, 0.15);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-left: 10px;
     }
-    
-    .modal-confirm .modal-footer a {
-        color: #999;
-    }
-    
-    .modal-confirm .btn {
-        color: #fff;
-        border-radius: 8px;
-        background: #0dcaf0;
+
+    .btn-ayuda-colores:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(26, 82, 118, 0.25);
+        background: linear-gradient(135deg, var(--dental-accent), var(--dental-light));
+        color: var(--dental-primary);
         text-decoration: none;
-        transition: all 0.4s;
-        line-height: normal;
-        min-width: 120px;
+        border-color: var(--dental-secondary);
+    }
+
+    /* Modal de ayuda para colores */
+    .modal-ayuda-colores .modal-content {
+        border-radius: 15px;
         border: none;
-        min-height: 40px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+
+    .modal-ayuda-colores .modal-header {
+        background: linear-gradient(135deg, var(--dental-primary), var(--dental-secondary));
+        color: white;
+        border-bottom: 2px solid var(--dental-accent);
+    }
+
+    .modal-ayuda-colores .modal-title {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+    }
+
+    .color-legend {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .color-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        border-radius: 10px;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .color-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .color-item.pendiente {
+        background: linear-gradient(135deg, #FFE5B4 0%, #FFD700 100%);
+        color: #8B4513;
+        border-color: #FFD700;
+    }
+
+    .color-item.confirmada {
+        background: linear-gradient(135deg, #E8F5E8 0%, #90EE90 100%);
+        color: #2E8B57;
+        border-color: #90EE90;
+    }
+
+    .color-item.completada {
+        background: linear-gradient(135deg, #E6F3FF 0%, #87CEEB 100%);
+        color: #4682B4;
+        border-color: #87CEEB;
+    }
+
+    .color-item.cancelada {
+        background: linear-gradient(135deg, #FFE6E6 0%, #FFB6C1 100%);
+        color: #CD5C5C;
+        border-color: #FFB6C1;
+    }
+
+    .color-icon {
+        width: 40px;
+        height: 40px;
         border-radius: 8px;
-        margin: 0 5px;
-    }
-    
-    .modal-confirm .btn-danger {
-        background: #f15e5e;
-    }
-    
-    .modal-confirm .btn-danger:hover,
-    .modal-confirm .btn-danger:focus {
-        background: #ee3535;
-    }
-    
-    .modal-confirm .btn-secondary {
-        background: #6c757d;
-    }
-    
-    .modal-confirm .btn-secondary:hover,
-    .modal-confirm .btn-secondary:focus {
-        background: #5a6268;
-    }
-    
-    .modal-confirm .btn i {
-        margin-right: 5px;
+        margin-right: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
 
-    /* Ajustes para la vista de día */
-    .fc-daygrid-day-events {
-        margin-bottom: 1px;
+    .color-info h5 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 1rem;
     }
 
-    .fc-daygrid-event {
-        margin-bottom: 2px;
+    .color-info p {
+        margin: 0.25rem 0 0 0;
+        font-size: 0.85rem;
+        opacity: 0.8;
     }
 
-    /* Ajustes para la vista de semana */
-    .fc-timegrid-event {
-        margin: 1px 2px;
+    /* Estilos para mejorar la visibilidad del texto en eventos */
+    .fc-event-title {
+        color: #1a1a1a !important;
+        font-weight: 600 !important;
     }
 
-    /* Ajustes para la vista de mes */
-    .fc-daygrid-day-frame {
-        min-height: 100px;
+    .fc-event-time {
+        color: #1a1a1a !important;
+        font-weight: 600 !important;
     }
 
-    /* Color personalizado para el header del calendario */
-    .custom-header {
-        background-color: #008B8B !important;
+    /* Asegurar que el texto dentro de los eventos sea visible */
+    .fc-event-main {
+        color: #1a1a1a !important;
+    }
+
+    .fc-event-main-frame {
+        color: #1a1a1a !important;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid p-0">
-    <div class="row g-0">
-        <div class="col-md-12">
-            <div class="card shadow">
-                <div class="card-header d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #00CED1 0%, #008B8B 100%); color: white; box-shadow: 0 2px 4px rgba(0, 206, 209, 0.15);">
-                    <h5 class="card-title mb-0">Calendario de Citas</h5>
-                    <div>
-                        <select id="profesional" class="form-select" title="Filtrar por profesional">
-                            <option value="">Todos los profesionales</option>
-                            {% for profesional in profesionales %}
-                            <option value="{{ profesional.id }}">{{ profesional.nombre_completo }}</option>
-                            {% endfor %}
-                        </select>
+<div class="container-fluid">
+    <div class="calendar-header mb-4">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h1 class="calendar-title">
+                    <i class="fas fa-calendar-alt"></i>
+                    Calendario de Citas
+                </h1>
+                <p class="calendar-subtitle">Gestiona y visualiza todas las citas de tu clínica dental</p>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-2">
+                            <label for="filtro_profesional" class="form-label small mb-1">
+                                <i class="fas fa-user-md"></i>
+                                Profesional
+                            </label>
+                            <select id="filtro_profesional" class="form-select form-select-sm">
+                                <option value="">Todos</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-2">
+                            <label for="filtro_estado" class="form-label small mb-1">
+                                <i class="fas fa-filter"></i>
+                                Estado
+                            </label>
+                            <select id="filtro_estado" class="form-select form-select-sm">
+                                <option value="">Todos</option>
+                                <option value="PENDIENTE">Pendiente</option>
+                                <option value="CONFIRMADA">Confirmada</option>
+                                <option value="COMPLETADA">Completada</option>
+                                <option value="CANCELADA">Cancelada</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
-                <div class="card-body">
-                    <div id="calendar"></div>
+                <div class="text-end">
+                    <button type="button" class="btn btn-ayuda-colores" data-bs-toggle="modal" data-bs-target="#modalAyudaColores">
+                        <i class="fas fa-palette"></i>
+                        Ayuda Colores
+                    </button>
+                    <button type="button" class="btn btn-nueva-cita" onclick="abrirModalNuevaCitaManual()">
+                        <i class="fas fa-plus"></i>
+                        Nueva Cita
+                    </button>
                 </div>
             </div>
         </div>
     </div>
+    <div id="calendar"></div>
 </div>
 
-<!-- Contenedor de notificaciones -->
-<div class="toast-container"></div>
-
 <!-- Modal para crear/editar cita -->
-<div class="modal fade" id="citaModal" tabindex="-1" aria-labelledby="citaModalLabel" aria-hidden="true">
+<div class="modal fade" id="modalCita" tabindex="-1" aria-labelledby="modalCitaLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="citaModalLabel">Nueva Cita</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title" id="modalCitaLabel">
+                    <i class="fas fa-calendar-plus"></i>
+                    <span id="modalTitle">Crear Nueva Cita</span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="citaForm" method="POST">
+                <form id="formCita" method="post">
                     {% csrf_token %}
                     <input type="hidden" id="cita_id" name="cita_id">
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="id_fecha" class="form-label">Fecha</label>
-                                <input type="date" class="form-control" id="id_fecha" name="fecha" required>
+                            <div class="form-group">
+                                <label for="id_paciente" class="form-label">
+                                    <i class="fas fa-user"></i>
+                                    Paciente *
+                                </label>
+                                <div class="position-relative">
+                                    <i class="fas fa-user input-icon"></i>
+                                    <select id="id_paciente" name="paciente" class="form-select" required>
+                                        <option value="">Seleccionar paciente...</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="id_hora" class="form-label">Hora</label>
-                                <input type="time" class="form-control" id="id_hora" name="hora" required>
+                            <div class="form-group">
+                                <label for="profesional" class="form-label">
+                                    <i class="fas fa-user-md"></i>
+                                    Profesional *
+                                </label>
+                                <div class="position-relative">
+                                    <i class="fas fa-user-md input-icon"></i>
+                                    <select id="profesional" name="profesional" class="form-select" required>
+                                        <option value="">Seleccionar profesional...</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>
+
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="id_paciente" class="form-label">Paciente</label>
-                                <select class="form-control" id="id_paciente" name="paciente" required data-allow-clear="true" data-placeholder="Buscar paciente...">
-                                    <option></option>
-                                </select>
+                            <div class="form-group">
+                                <label for="fecha" class="form-label">
+                                    <i class="fas fa-calendar"></i>
+                                    Fecha *
+                                </label>
+                                <div class="position-relative">
+                                    <i class="fas fa-calendar input-icon"></i>
+                                    <input type="date" id="fecha" name="fecha" class="form-control" required>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="id_profesional" class="form-label">Profesional</label>
-                                <select class="form-select" id="id_profesional" name="profesional" required>
-                                    <option value="">Seleccione un profesional</option>
-                                    {% for profesional in profesionales %}
-                                    <option value="{{ profesional.id }}">{{ profesional.nombre_completo }}</option>
-                                    {% endfor %}
-                                </select>
+                            <div class="form-group">
+                                <label for="hora" class="form-label">
+                                    <i class="fas fa-clock"></i>
+                                    Hora *
+                                </label>
+                                <div class="position-relative">
+                                    <i class="fas fa-clock input-icon"></i>
+                                    <input type="time" id="hora" name="hora" class="form-control" required>
+                                </div>
                             </div>
                         </div>
                     </div>
+
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="id_duracion" class="form-label">Duración (minutos)</label>
-                                <select class="form-select" id="id_duracion" name="duracion" required>
-                                    <option value="15">15 minutos</option>
-                                    <option value="30" selected>30 minutos</option>
-                                    <option value="45">45 minutos</option>
-                                    <option value="60">1 hora</option>
-                                </select>
+                            <div class="form-group">
+                                <label for="duracion" class="form-label">
+                                    <i class="fas fa-hourglass-half"></i>
+                                    Duración (minutos) *
+                                </label>
+                                <div class="position-relative">
+                                    <i class="fas fa-hourglass-half input-icon"></i>
+                                    <select id="duracion" name="duracion" class="form-select" required>
+                                        <option value="30">30 minutos</option>
+                                        <option value="60" selected>1 hora</option>
+                                        <option value="90">1.5 horas</option>
+                                        <option value="120">2 horas</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="id_estado" class="form-label">Estado</label>
-                                <select class="form-select" id="id_estado" name="estado" required>
-                                    <option value="PENDIENTE">Pendiente</option>
-                                    <option value="CONFIRMADA">Confirmada</option>
-                                    <option value="COMPLETADA">Completada</option>
-                                    <option value="CANCELADA">Cancelada</option>
-                                </select>
+                            <div class="form-group">
+                                <label for="estado" class="form-label">
+                                    <i class="fas fa-info-circle"></i>
+                                    Estado *
+                                </label>
+                                <div class="position-relative">
+                                    <i class="fas fa-info-circle input-icon"></i>
+                                    <select id="estado" name="estado" class="form-select" required>
+                                        <option value="PENDIENTE">Pendiente</option>
+                                        <option value="CONFIRMADA">Confirmada</option>
+                                        <option value="COMPLETADA">Completada</option>
+                                        <option value="CANCELADA">Cancelada</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="id_motivo" class="form-label">Motivo</label>
-                        <textarea class="form-control" id="id_motivo" name="motivo" rows="3" required></textarea>
+
+                    <div class="form-group">
+                        <label for="motivo" class="form-label">
+                            <i class="fas fa-sticky-note"></i>
+                            Motivo de la cita
+                        </label>
+                        <div class="textarea-group">
+                            <i class="fas fa-sticky-note input-icon"></i>
+                            <textarea id="motivo" name="motivo" class="form-control" rows="3" placeholder="Descripción del motivo de la cita..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="observaciones" class="form-label">
+                            <i class="fas fa-comment"></i>
+                            Observaciones
+                        </label>
+                        <div class="textarea-group">
+                            <i class="fas fa-comment input-icon"></i>
+                            <textarea id="observaciones" name="observaciones" class="form-control" rows="2" placeholder="Observaciones adicionales..."></textarea>
+                        </div>
                     </div>
                 </form>
-            </div>
-            <div class="modal-footer">
-                <div class="me-auto">
-                    <button type="button" class="btn btn-danger" id="btnEliminarCita" style="display: none;">
-                        <i class="fas fa-trash me-2"></i>Eliminar
-                    </button>
-                </div>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="submit" class="btn btn-primary" id="btnGuardarCita" form="citaForm">
-                    <i class="fas fa-save me-2"></i>Guardar
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal de confirmación para eliminar -->
-<div class="modal fade modal-confirm" id="confirmarEliminarModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="icon-box">
-                    <i class="fas fa-trash"></i>
-                </div>
-                <h4 class="modal-title">¿Está seguro?</h4>
-            </div>
-            <div class="modal-body">
-                <p>Esta acción no se puede deshacer. ¿Desea continuar con la eliminación de la cita?</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times"></i> Cancelar
                 </button>
-                <button type="button" class="btn btn-danger" id="btnConfirmarEliminar">
-                    <i class="fas fa-trash"></i> Eliminar
+                <button type="button" class="btn btn-primary" id="btnGuardarCita">
+                    <i class="fas fa-save"></i> Guardar Cita
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de ayuda para colores -->
+<div class="modal fade modal-ayuda-colores" id="modalAyudaColores" tabindex="-1" aria-labelledby="modalAyudaColoresLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalAyudaColoresLabel">
+                    <i class="fas fa-palette"></i>
+                    Guía de Colores del Calendario
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-3">
+                    <strong>Los colores en el calendario representan el estado de cada cita:</strong>
+                </p>
+                
+                <div class="color-legend">
+                    <div class="color-item pendiente">
+                        <div class="color-icon" style="background: linear-gradient(135deg, #FFE5B4 0%, #FFD700 100%); color: #8B4513;">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="color-info">
+                            <h5>Pendiente</h5>
+                            <p>Citas que están programadas pero aún no confirmadas</p>
+                        </div>
+                    </div>
+                    
+                    <div class="color-item confirmada">
+                        <div class="color-icon" style="background: linear-gradient(135deg, #E8F5E8 0%, #90EE90 100%); color: #2E8B57;">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="color-info">
+                            <h5>Confirmada</h5>
+                            <p>Citas que han sido confirmadas por el paciente</p>
+                        </div>
+                    </div>
+                    
+                    <div class="color-item completada">
+                        <div class="color-icon" style="background: linear-gradient(135deg, #E6F3FF 0%, #87CEEB 100%); color: #4682B4;">
+                            <i class="fas fa-check-double"></i>
+                        </div>
+                        <div class="color-info">
+                            <h5>Completada</h5>
+                            <p>Citas que ya han sido atendidas exitosamente</p>
+                        </div>
+                    </div>
+                    
+                    <div class="color-item cancelada">
+                        <div class="color-icon" style="background: linear-gradient(135deg, #FFE6E6 0%, #FFB6C1 100%); color: #CD5C5C;">
+                            <i class="fas fa-times-circle"></i>
+                        </div>
+                        <div class="color-info">
+                            <h5>Cancelada</h5>
+                            <p>Citas que han sido canceladas por el paciente o la clínica</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4 p-3" style="background: var(--dental-light); border-radius: 10px; border-left: 4px solid var(--dental-primary);">
+                    <h6 class="mb-2" style="color: var(--dental-primary);">
+                        <i class="fas fa-lightbulb"></i>
+                        Consejo
+                    </h6>
+                    <p class="mb-0" style="color: var(--dental-text-light); font-size: 0.9rem;">
+                        Puedes hacer clic en cualquier cita del calendario para ver sus detalles o editarla. 
+                        También puedes usar los filtros en la parte superior para mostrar solo ciertos tipos de citas.
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i>
+                    Cerrar
                 </button>
             </div>
         </div>
@@ -713,17 +1183,123 @@
 {% endblock %}
 
 {% block extra_js %}
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<!-- FullCalendar -->
-<script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
-<!-- Select2 -->
-<script src='https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js'></script>
-<script src='https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/es.js'></script>
-<!-- Patient Search -->
-<script src='{% static "js/cita-patient-search.js" %}'></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM cargado, configurando calendario...');
+    
+    // Verificar que jQuery esté disponible
+    if (typeof $ === 'undefined') {
+        console.error('jQuery no está disponible');
+        return;
+    }
+    
+    // Verificar que Select2 esté disponible
+    if (typeof $.fn.select2 === 'undefined') {
+        console.error('Select2 no está disponible');
+        return;
+    }
+    
+    console.log('jQuery y Select2 disponibles, configurando...');
+    
+    // Función para inicializar Select2
+    function inicializarSelect2() {
+        console.log('Inicializando Select2...');
+        
+        // Destruir instancias previas si existen
+        if ($('#id_paciente').data('select2')) {
+            $('#id_paciente').select2('destroy');
+        }
+        if ($('#profesional').data('select2')) {
+            $('#profesional').select2('destroy');
+        }
+        
+        // Inicializar Select2 para pacientes
+        try {
+            $('#id_paciente').select2({
+                language: 'es',
+                dropdownParent: $('#modalCita'),
+                placeholder: 'Buscar paciente...',
+                allowClear: true,
+                minimumInputLength: 2,
+                ajax: {
+                    url: '{% url "pacientes:buscar_pacientes" %}',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        console.log('Buscando pacientes con query:', params.term);
+                        return {
+                            q: params.term,
+                            page: params.page || 1
+                        };
+                    },
+                    processResults: function(data) {
+                        console.log('Resultados de pacientes recibidos:', data);
+                        return {
+                            results: data.results.map(function(patient) {
+                                return {
+                                    id: patient.id,
+                                    text: patient.nombre + ' ' + patient.apellidos + 
+                                          ' - Doc: ' + patient.documento
+                                };
+                            })
+                        };
+                    },
+                    cache: true
+                }
+            });
+            console.log('Select2 para pacientes inicializado correctamente');
+        } catch (error) {
+            console.error('Error al inicializar Select2 para pacientes:', error);
+        }
+
+        // Inicializar Select2 para profesionales
+        try {
+            $('#profesional').select2({
+                language: 'es',
+                dropdownParent: $('#modalCita'),
+                placeholder: 'Seleccionar profesional...',
+                allowClear: true,
+                minimumInputLength: 2,
+                ajax: {
+                    url: '{% url "profesionales:buscar_profesionales" %}',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        console.log('Buscando profesionales con query:', params.term);
+                        return {
+                            q: params.term,
+                            page: params.page || 1
+                        };
+                    },
+                    processResults: function(data) {
+                        console.log('Resultados de profesionales recibidos:', data);
+                        return {
+                            results: data.results.map(function(prof) {
+                                return {
+                                    id: prof.id,
+                                    text: prof.nombres + ' ' + prof.apellido_paterno + ' ' + prof.apellido_materno + 
+                                          ' - ' + prof.especialidad
+                                };
+                            })
+                        };
+                    },
+                    cache: true
+                }
+            });
+            console.log('Select2 para profesionales inicializado correctamente');
+        } catch (error) {
+            console.error('Error al inicializar Select2 para profesionales:', error);
+        }
+    }
+    
+    // Inicializar Select2 cuando se abra el modal
+    $('#modalCita').on('shown.bs.modal', function() {
+        console.log('Modal abierto, inicializando Select2...');
+        setTimeout(inicializarSelect2, 100); // Pequeño delay para asegurar que el modal esté completamente renderizado
+    });
+
     var calendarEl = document.getElementById('calendar');
     var calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'timeGridWeek',
@@ -744,365 +1320,209 @@ document.addEventListener('DOMContentLoaded', function() {
         slotDuration: '00:30:00',
         selectable: true,
         selectMirror: true,
-        select: function(info) {
-            // Limpiar el formulario, el ID de la cita y el Select2
-            const form = document.getElementById('citaForm');
-            form.reset();
-            document.getElementById('cita_id').value = '';
-            $('#id_paciente').val(null).trigger('change');
-            
-            // Formatear la fecha y hora para el formulario
-            const fecha = info.startStr.split('T')[0];
-            const hora = info.startStr.split('T')[1].substring(0, 5);
-            
-            // Establecer los valores en el formulario
-            document.getElementById('id_fecha').value = fecha;
-            document.getElementById('id_hora').value = hora;
-            
-            // Establecer el profesional si está seleccionado
-            const profesionalId = document.getElementById('profesional').value;
-            if (profesionalId) {
-                document.getElementById('id_profesional').value = profesionalId;
-            }
-            
-            // Ocultar el botón de eliminar
-            toggleDeleteButton(false);
-            
-            // Actualizar el título del modal
-            document.getElementById('citaModalLabel').textContent = 'Nueva Cita';
-            
-            // Mostrar el modal
-            const modal = new bootstrap.Modal(document.getElementById('citaModal'));
-            modal.show();
-        },
+        editable: true,
         events: function(info, successCallback, failureCallback) {
-            var profesionalId = document.getElementById('profesional').value;
-            var url = "{% url 'citas:obtener_citas' %}";
-            if (profesionalId) {
-                url += "?profesional=" + profesionalId;
-            }
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    data.forEach(event => {
-                        // Asegurarse de que todos los datos necesarios estén presentes
-                        event.extendedProps['data-status'] = event.extendedProps.estado || 'PENDIENTE';
-                        event.extendedProps.paciente = event.extendedProps.paciente || 'Paciente no especificado';
-                        event.extendedProps.profesional = event.extendedProps.profesional || 'Profesional no asignado';
-                        event.extendedProps.motivo = event.extendedProps.motivo || 'Sin motivo especificado';
-                    });
+            // Obtener valores de los filtros
+            var profesional = $('#filtro_profesional').val();
+            var estado = $('#filtro_estado').val();
+            
+            // Construir URL con filtros
+            var url = '{% url "citas:obtener_citas" %}?';
+            if (profesional) url += 'profesional=' + profesional + '&';
+            if (estado) url += 'estado=' + estado + '&';
+            url += 'start=' + info.startStr + '&end=' + info.endStr;
+            
+            // Hacer petición AJAX
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function(data) {
                     successCallback(data);
-                })
-                .catch(error => {
-                    console.error('Error al cargar las citas:', error);
-                    failureCallback(error);
-                });
+                },
+                error: function() {
+                    failureCallback('Error al cargar las citas');
+                }
+            });
         },
         eventClick: function(info) {
-            const cita = info.event;
-            const form = document.getElementById('citaForm');
-            
-            // Establecer el ID de la cita
-            document.getElementById('cita_id').value = cita.id;
-            
-            // Mostrar el botón de eliminar solo cuando se está editando una cita existente
-            toggleDeleteButton(true);
-            
-            // Llenar el formulario con los datos de la cita
-            const pacienteSelect = $('#id_paciente');
-            const pacienteOption = new Option(
-                cita.extendedProps.paciente, // text
-                cita.extendedProps.paciente_id, // value
-                true, // selected
-                true // stored
-            );
-            pacienteSelect.append(pacienteOption).trigger('change');
-            
-            form.querySelector('[name="profesional"]').value = cita.extendedProps.profesional_id;
-            form.querySelector('[name="fecha"]').value = cita.startStr.split('T')[0];
-            form.querySelector('[name="hora"]').value = cita.startStr.split('T')[1].substring(0, 5);
-            form.querySelector('[name="duracion"]').value = cita.extendedProps.duracion;
-            form.querySelector('[name="estado"]').value = cita.extendedProps.estado;
-            form.querySelector('[name="motivo"]').value = cita.extendedProps.motivo;
-            
-            // Actualizar el título del modal
-            document.getElementById('citaModalLabel').textContent = 'Editar Cita';
-            
-            // Mostrar el modal
-            const modal = new bootstrap.Modal(document.getElementById('citaModal'));
-            modal.show();
+            // Abrir modal para editar cita existente
+            abrirModalCita(info.event);
         },
-        eventTimeFormat: {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false
+        select: function(info) {
+            // Abrir modal para crear nueva cita
+            abrirModalNuevaCita(info);
         },
-        eventContent: function(arg) {
-            const event = arg.event;
-            const status = event.extendedProps.estado || 'PENDIENTE';
-            const paciente = event.extendedProps.paciente || '';
-            const profesional = event.extendedProps.profesional || '';
-            const duracion = event.extendedProps.duracion || '';
-            const motivo = event.extendedProps.motivo || '';
-
-            let content = document.createElement('div');
-            content.className = 'cita-evento';
-            // Crear elementos manualmente para mejor control y seguridad
-            const citaHeader = document.createElement('div');
-            citaHeader.className = 'cita-header';
-            
-            const citaTime = document.createElement('div');
-            citaTime.className = 'cita-time';
-            citaTime.textContent = arg.timeText;
-            
-            const citaStatus = document.createElement('div');
-            citaStatus.className = 'cita-status';
-            const statusBadge = document.createElement('span');
-            statusBadge.className = `badge bg-${getStatusColor(status)}`;
-            statusBadge.textContent = status;
-            citaStatus.appendChild(statusBadge);
-            
-            citaHeader.appendChild(citaTime);
-            citaHeader.appendChild(citaStatus);
-            
-            const citaBody = document.createElement('div');
-            citaBody.className = 'cita-body';
-            
-            const citaTitle = document.createElement('div');
-            citaTitle.className = 'cita-title';
-            const userIcon = document.createElement('i');
-            userIcon.className = 'fas fa-user me-1';
-            citaTitle.appendChild(userIcon);
-            citaTitle.appendChild(document.createTextNode(paciente));
-            
-            const citaDetails = document.createElement('div');
-            citaDetails.className = 'cita-details';
-            
-            const profDetails = document.createElement('div');
-            const profIcon = document.createElement('i');
-            profIcon.className = 'fas fa-user-md me-1';
-            profDetails.appendChild(profIcon);
-            profDetails.appendChild(document.createTextNode(profesional));
-            
-            const durDetails = document.createElement('div');
-            const durIcon = document.createElement('i');
-            durIcon.className = 'fas fa-clock me-1';
-            durDetails.appendChild(durIcon);
-            durDetails.appendChild(document.createTextNode(`${duracion} min`));
-            
-            citaDetails.appendChild(profDetails);
-            citaDetails.appendChild(durDetails);
-            
-            const citaMotivo = document.createElement('div');
-            citaMotivo.className = 'cita-motivo';
-            citaMotivo.title = motivo;
-            const motivoIcon = document.createElement('i');
-            motivoIcon.className = 'fas fa-comment-medical me-1';
-            citaMotivo.appendChild(motivoIcon);
-            citaMotivo.appendChild(document.createTextNode(truncateText(motivo, 30)));
-            
-            citaBody.appendChild(citaTitle);
-            citaBody.appendChild(citaDetails);
-            citaBody.appendChild(citaMotivo);
-            
-            content.appendChild(citaHeader);
-            content.appendChild(citaBody);
-            return { domNodes: [content] };
-        },
+        eventDidMount: function(info) {
+            // Establecer el atributo data-status para que los estilos CSS se apliquen
+            if (info.event.extendedProps.estado) {
+                info.el.setAttribute('data-status', info.event.extendedProps.estado);
+            }
+        }
     });
     calendar.render();
 
-    // Manejar cambios en el filtro de profesionales
-    document.getElementById('profesional').addEventListener('change', function() {
+    // Cargar profesionales en el filtro
+    function cargarProfesionalesFiltro() {
+        $.ajax({
+            url: '{% url "profesionales:obtener_profesionales" %}',
+            type: 'GET',
+            success: function(data) {
+                var select = $('#filtro_profesional');
+                select.empty();
+                select.append('<option value="">Todos los profesionales</option>');
+                
+                if (data.results && data.results.length > 0) {
+                    data.results.forEach(function(prof) {
+                        var nombreCompleto = prof.nombres + ' ' + prof.apellido_paterno + ' ' + prof.apellido_materno;
+                        var texto = nombreCompleto + ' - ' + prof.especialidad;
+                        select.append('<option value="' + prof.id + '">' + texto + '</option>');
+                    });
+                } else {
+                    select.append('<option value="" disabled>No hay profesionales disponibles</option>');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error al cargar profesionales para el filtro:', error);
+                var select = $('#filtro_profesional');
+                select.empty();
+                select.append('<option value="">Error al cargar profesionales</option>');
+            }
+        });
+    }
+
+    // Cargar profesionales al iniciar
+    cargarProfesionalesFiltro();
+
+    // Manejar cambios en los filtros
+    $('#filtro_profesional, #filtro_estado').change(function() {
+        console.log('Filtro cambiado:', $(this).attr('id'), $(this).val());
         calendar.refetchEvents();
     });
 
-    // Función para obtener el color según el estado
-    function getStatusColor(status) {
-        const colors = {
-            'PENDIENTE': 'warning',
-            'CONFIRMADA': 'success',
-            'COMPLETADA': 'info',
-            'CANCELADA': 'danger'
-        };
-        return colors[status] || 'secondary';
+    // Función para abrir modal de nueva cita
+    function abrirModalNuevaCita(info) {
+        // Limpiar formulario
+        $('#formCita')[0].reset();
+        $('#cita_id').val('');
+        $('#modalTitle').text('Crear Nueva Cita');
+        
+        // Establecer fecha y hora seleccionadas
+        var fecha = info.startStr.split('T')[0];
+        var hora = info.startStr.split('T')[1].substring(0, 5);
+        
+        $('#fecha').val(fecha);
+        $('#hora').val(hora);
+        
+        // Limpiar Select2
+        $('#id_paciente').val(null).trigger('change');
+        $('#profesional').val(null).trigger('change');
+        
+        // Abrir modal
+        $('#modalCita').modal('show');
     }
 
-    // Función para truncar texto
-    function truncateText(text, maxLength) {
-        if (!text) return '';
-        return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
-    }
+    // Función para abrir modal manualmente (sin fecha/hora predefinidas)
+    window.abrirModalNuevaCitaManual = function() {
+        // Limpiar formulario
+        $('#formCita')[0].reset();
+        $('#cita_id').val('');
+        $('#modalTitle').text('Crear Nueva Cita');
+        
+        // Establecer fecha actual
+        var hoy = new Date().toISOString().split('T')[0];
+        $('#fecha').val(hoy);
+        
+        // Limpiar Select2
+        $('#id_paciente').val(null).trigger('change');
+        $('#profesional').val(null).trigger('change');
+        
+        // Abrir modal
+        $('#modalCita').modal('show');
+    };
 
-    // Función para mostrar notificaciones
-    function showNotification(message, type = 'success') {
-        const container = document.querySelector('.toast-container');
-        const toast = document.createElement('div');
-        toast.className = `toast toast-${type}`;
-        toast.innerHTML = `
-            <div class="toast-header">
-                <strong class="me-auto">${type === 'success' ? 'Éxito' : 'Error'}</strong>
-                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
-            </div>
-            <div class="toast-body">
-                ${message}
-            </div>
-        `;
-        container.appendChild(toast);
+    // Función para abrir modal de editar cita
+    function abrirModalCita(evento) {
+        console.log('Abriendo modal para editar cita:', evento);
         
-        const bsToast = new bootstrap.Toast(toast, {
-            autohide: true,
-            delay: 3000
-        });
+        // Establecer título y ID
+        $('#modalTitle').text('Editar Cita');
+        $('#cita_id').val(evento.id);
         
-        bsToast.show();
+        // Cargar datos del evento
+        var fecha = evento.startStr.split('T')[0];
+        var hora = evento.startStr.split('T')[1].substring(0, 5);
         
-        toast.addEventListener('hidden.bs.toast', function() {
-            toast.remove();
-        });
-    }
-
-    // Función para mostrar/ocultar el botón de eliminar
-    function toggleDeleteButton(show) {
-        const deleteButton = document.getElementById('btnEliminarCita');
-        deleteButton.style.display = show ? 'block' : 'none';
-    }
-
-    // Manejar el guardado de la cita
-    document.getElementById('citaForm').addEventListener('submit', function(e) {
-        e.preventDefault();
+        $('#fecha').val(fecha);
+        $('#hora').val(hora);
+        $('#duracion').val(evento.extendedProps.duracion || 30);
+        $('#estado').val(evento.extendedProps.estado || 'PENDIENTE');
+        $('#motivo').val(evento.extendedProps.motivo || '');
         
-        const form = this;
-        const formData = new FormData(form);
-        const citaId = document.getElementById('cita_id').value;
-        
-        // Obtener el token CSRF
-        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-        
-        // Mostrar indicador de carga
-        const submitButton = document.querySelector('#citaModal .btn-primary');
-        const originalText = submitButton.innerHTML;
-        submitButton.disabled = true;
-        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Guardando...';
-        
-        // Asegurarnos de que el paciente esté seleccionado
-        const pacienteSelect = document.getElementById('id_paciente');
-        if (!pacienteSelect.value) {
-            showNotification('Por favor seleccione un paciente', 'error');
-            submitButton.disabled = false;
-            submitButton.innerHTML = originalText;
-            return;
+        // Cargar paciente
+        if (evento.extendedProps.paciente_id) {
+            var pacienteOption = new Option(
+                evento.extendedProps.paciente,
+                evento.extendedProps.paciente_id,
+                true,
+                true
+            );
+            $('#id_paciente').empty().append(pacienteOption).trigger('change');
         }
         
-        // Determinar la URL y el método según si es edición o creación
-        const url = citaId ? `/citas/editar/${citaId}/` : "{% url 'citas:crear_cita' %}";
-        
-        // Configurar los headers
-        const headers = {
-            'X-Requested-With': 'XMLHttpRequest',
-            'X-CSRFToken': csrfToken
-        };
-        
-        // Agregar los datos del paciente
-        const pacienteData = $('#id_paciente').select2('data')[0];
-        if (pacienteData) {
-            formData.set('paciente', pacienteData.id);
+        // Cargar profesional
+        if (evento.extendedProps.profesional_id) {
+            var profesionalOption = new Option(
+                evento.extendedProps.profesional,
+                evento.extendedProps.profesional_id,
+                true,
+                true
+            );
+            $('#profesional').empty().append(profesionalOption).trigger('change');
         }
         
-        fetch(url, {
-            method: 'POST',
-            body: formData,
-            headers: headers
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Error en la respuesta del servidor');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                // Cerrar el modal
-                const modal = bootstrap.Modal.getInstance(document.getElementById('citaModal'));
-                modal.hide();
-                
-                // Limpiar el formulario
-                form.reset();
-                document.getElementById('cita_id').value = '';
-                
-                // Actualizar el calendario
-                calendar.refetchEvents();
-                
-                // Mostrar notificación de éxito
-                showNotification(data.message || 'Cita guardada exitosamente');
-            } else {
-                throw new Error(data.message || 'Error al guardar la cita');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showNotification(error.message || 'Error al guardar la cita', 'error');
-        })
-        .finally(() => {
-            submitButton.disabled = false;
-            submitButton.innerHTML = originalText;
-        });
-    });
+        // Abrir modal
+        $('#modalCita').modal('show');
+    }
 
-    // Manejar la eliminación de citas
-    document.getElementById('btnEliminarCita').addEventListener('click', function() {
-        const citaId = document.getElementById('cita_id').value;
+    // Manejar envío del formulario
+    $('#btnGuardarCita').click(function() {
+        var formData = new FormData($('#formCita')[0]);
         
-        // Mostrar el modal de confirmación
-        const confirmModal = new bootstrap.Modal(document.getElementById('confirmarEliminarModal'));
-        confirmModal.show();
-        
-        // Manejar la confirmación
-        document.getElementById('btnConfirmarEliminar').onclick = function() {
-            // Mostrar indicador de carga
-            const deleteButton = this;
-            const originalText = deleteButton.innerHTML;
-            deleteButton.disabled = true;
-            deleteButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Eliminando...';
-            
-            fetch(`/citas/eliminar/${citaId}/`, {
-                method: 'POST',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Cerrar ambos modales
-                    const citaModal = bootstrap.Modal.getInstance(document.getElementById('citaModal'));
-                    const confirmModal = bootstrap.Modal.getInstance(document.getElementById('confirmarEliminarModal'));
-                    citaModal.hide();
-                    confirmModal.hide();
-                    
-                    // Limpiar el formulario
-                    document.getElementById('citaForm').reset();
-                    document.getElementById('cita_id').value = '';
-                    
-                    // Actualizar el calendario
+        $.ajax({
+            url: '{% url "citas:guardar_cita" %}',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                if (response.success) {
+                    $('#modalCita').modal('hide');
+                    // Recargar calendario
                     calendar.refetchEvents();
-                    
-                    // Mostrar notificación de éxito
-                    showNotification('Cita eliminada correctamente');
+                    // Mostrar mensaje de éxito
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Éxito!',
+                        text: 'Cita guardada correctamente',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
                 } else {
-                    throw new Error(data.message || 'Error al eliminar la cita');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response.message || 'Error al guardar la cita'
+                    });
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showNotification(error.message || 'Error al eliminar la cita', 'error');
-            })
-            .finally(() => {
-                deleteButton.disabled = false;
-                deleteButton.innerHTML = originalText;
-            });
-        };
+            },
+            error: function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Error de conexión al guardar la cita'
+                });
+            }
+        });
     });
 });
 </script>

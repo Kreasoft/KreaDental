@@ -66,7 +66,20 @@ def crear_pago(request, tratamiento_id):
     
     if request.method == 'POST':
         try:
-            monto = float(request.POST.get('monto'))
+            monto_str = request.POST.get('monto', '').strip()
+            
+            # Limpiar el valor del monto (remover espacios y convertir coma a punto)
+            monto_str = monto_str.replace(' ', '').replace(',', '.')
+            
+            # Validar que sea un número válido
+            if not monto_str or not monto_str.replace('.', '').replace('-', '').isdigit():
+                raise ValueError("El monto debe ser un número válido")
+            
+            monto = float(monto_str)
+            
+            if monto < 0:
+                raise ValueError("El monto no puede ser negativo")
+            
             forma_pago_id = request.POST.get('forma_pago')
             comprobante = request.POST.get('comprobante', '')
             notas = request.POST.get('notas', '')
@@ -176,9 +189,28 @@ def editar_pago(request, pago_id):
     pago = get_object_or_404(PagoTratamiento, id=pago_id)
     formas_pago = FormaPago.objects.filter(estado=True)
     
+    # Calcular montos del tratamiento
+    tratamiento = pago.tratamiento
+    pagos_completados = tratamiento.pagos.filter(estado='COMPLETADO').exclude(id=pago.id)
+    total_pagado = pagos_completados.aggregate(total=models.Sum('monto'))['total'] or 0
+    saldo_pendiente = tratamiento.costo_total - total_pagado
+    
     if request.method == 'POST':
         try:
-            monto = float(request.POST.get('monto'))
+            monto_str = request.POST.get('monto', '').strip()
+            
+            # Limpiar el valor del monto (remover espacios y convertir coma a punto)
+            monto_str = monto_str.replace(' ', '').replace(',', '.')
+            
+            # Validar que sea un número válido
+            if not monto_str or not monto_str.replace('.', '').replace('-', '').isdigit():
+                raise ValueError("El monto debe ser un número válido")
+            
+            monto = float(monto_str)
+            
+            if monto < 0:
+                raise ValueError("El monto no puede ser negativo")
+            
             forma_pago_id = request.POST.get('forma_pago')
             comprobante = request.POST.get('comprobante', '')
             notas = request.POST.get('notas', '')
@@ -220,7 +252,9 @@ def editar_pago(request, pago_id):
     context = {
         'pago': pago,
         'formas_pago': formas_pago,
-        'tratamiento': pago.tratamiento
+        'tratamiento': tratamiento,
+        'total_pagado': total_pagado,
+        'saldo_pendiente': saldo_pendiente
     }
     
     return render(request, 'pagos_tratamientos/editar_pago.html', context)
@@ -257,7 +291,7 @@ def exportar_pagos(request):
         ws.cell(row=row_num, column=1, value=pago.id)
         ws.cell(row=row_num, column=2, value=pago.fecha_pago.strftime('%d/%m/%Y %H:%M'))
         ws.cell(row=row_num, column=3, value=str(pago.tratamiento.paciente) if pago.tratamiento.paciente else '')
-        ws.cell(row=row_num, column=4, value=pago.tratamiento.get_tipo_display())
+        ws.cell(row=row_num, column=4, value=pago.tratamiento.get_estado_display())
         ws.cell(row=row_num, column=5, value=float(pago.monto))
         ws.cell(row=row_num, column=6, value=str(pago.forma_pago) if pago.forma_pago else '')
         ws.cell(row=row_num, column=7, value=pago.get_estado_display())

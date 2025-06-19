@@ -1,0 +1,168 @@
+<!-- Información del Paciente y Tratamiento -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="info-card">
+            <h6 class="info-title"><i class="fas fa-user me-2"></i>Paciente</h6>
+            <p class="info-value">{{ tratamiento.paciente.nombre_completo }}</p>
+            {% if tratamiento.paciente.documento %}
+                <small class="text-muted">Documento: {{ tratamiento.paciente.documento }}</small>
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="info-card">
+            <h6 class="info-title"><i class="fas fa-tooth me-2"></i>Tratamiento</h6>
+            <p class="info-value">{{ tratamiento.get_estado_display }}</p>
+            <small class="text-muted">Creado: {{ tratamiento.fecha_creacion|date:"d/m/Y" }}</small>
+        </div>
+    </div>
+</div>
+
+<!-- Resumen Financiero -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="stat-card bg-primary text-white">
+            <div class="stat-icon">
+                <i class="fas fa-dollar-sign"></i>
+            </div>
+            <div class="stat-title">Costo Total</div>
+            <div class="stat-value">${{ tratamiento.costo_total|floatformat:0|intcomma }}</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card bg-success text-white">
+            <div class="stat-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-title">Total Pagado</div>
+            <div class="stat-value">${{ total_pagado|floatformat:0|intcomma }}</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card bg-warning text-white">
+            <div class="stat-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-title">Saldo Pendiente</div>
+            <div class="stat-value">${{ saldo_pendiente|floatformat:0|intcomma }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- Historial de Pagos -->
+<div class="mb-4">
+    <h6 class="section-title">
+        <i class="fas fa-history me-2"></i>Historial de Pagos
+    </h6>
+    {% if pagos %}
+    <div class="table-responsive">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Monto</th>
+                    <th>Forma de Pago</th>
+                    <th>Comprobante</th>
+                    <th>Registrado por</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pago in pagos %}
+                <tr {% if pago.id == pago_actual.id %}class="table-primary"{% endif %}>
+                    <td>{{ pago.fecha_pago|date:"d/m/Y H:i" }}</td>
+                    <td class="font-weight-bold">${{ pago.monto|floatformat:0|intcomma }}</td>
+                    <td>{{ pago.forma_pago.nombre }}</td>
+                    <td>
+                        {% if pago.comprobante %}
+                            {{ pago.comprobante }}
+                        {% else %}
+                            <span class="text-muted">Sin comprobante</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ pago.creado_por.get_full_name|default:pago.creado_por.username }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="text-center py-3">
+        <i class="fas fa-info-circle fa-2x text-muted mb-2"></i>
+        <p class="text-muted">No hay pagos registrados para este tratamiento.</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Acciones -->
+<div class="text-center">
+    {% if saldo_pendiente > 0 %}
+    <a href="{% url 'pagos_tratamientos:crear_pago' tratamiento.id %}" class="btn btn-primary me-2">
+        <i class="fas fa-plus me-2"></i>Registrar Nuevo Pago
+    </a>
+    {% endif %}
+    <a href="{% url 'tratamientos:detalle' tratamiento.id %}" class="btn btn-outline-primary">
+        <i class="fas fa-eye me-2"></i>Ver Tratamiento Completo
+    </a>
+</div>
+
+<style>
+.info-card {
+    background: var(--dental-light);
+    border: 1px solid var(--dental-accent);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.info-title {
+    color: var(--dental-primary);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.info-value {
+    color: var(--dental-text);
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+    font-size: 1.1rem;
+}
+
+.stat-card {
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.stat-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.stat-title {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+}
+
+.stat-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.section-title {
+    color: var(--dental-primary);
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--dental-light);
+}
+
+.table-primary {
+    background-color: rgba(174, 214, 241, 0.3) !important;
+}
+</style> 

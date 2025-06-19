@@ -47,12 +47,17 @@ def dashboard(request):
         x=[x['fecha'] for x in citas_por_dia],
         y=[x['total'] for x in citas_por_dia],
         name='Citas',
-        mode='lines+markers'
+        mode='lines+markers',
+        line=dict(color='#1A5276', width=3),
+        marker=dict(color='#2874A6', size=8)
     ))
     fig_citas.update_layout(
         title='Citas por Día',
         xaxis_title='Fecha',
-        yaxis_title='Número de Citas'
+        yaxis_title='Número de Citas',
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font=dict(color='#2C3E50')
     )
 
     fig_tratamientos = go.Figure()
@@ -60,12 +65,17 @@ def dashboard(request):
         x=[x['fecha_inicio'] for x in tratamientos_por_dia],
         y=[x['total'] for x in tratamientos_por_dia],
         name='Tratamientos',
-        mode='lines+markers'
+        mode='lines+markers',
+        line=dict(color='#2ecc71', width=3),
+        marker=dict(color='#27ae60', size=8)
     ))
     fig_tratamientos.update_layout(
         title='Tratamientos por Día',
         xaxis_title='Fecha',
-        yaxis_title='Número de Tratamientos'
+        yaxis_title='Número de Tratamientos',
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font=dict(color='#2C3E50')
     )
 
     context = {
@@ -127,7 +137,18 @@ def informe_tratamientos(request):
         pd.DataFrame(list(tratamientos_por_estado)),
         values='total',
         names='estado',
-        title='Tratamientos por Estado'
+        title='Tratamientos por Estado',
+        color_discrete_map={
+            'PENDIENTE': '#f39c12',
+            'EN_PROGRESO': '#2874A6',
+            'COMPLETADO': '#2ecc71',
+            'CANCELADO': '#e74c3c'
+        }
+    )
+    fig_estados.update_layout(
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font=dict(color='#2C3E50')
     )
 
     fig_ingresos = go.Figure()
@@ -135,18 +156,25 @@ def informe_tratamientos(request):
         x=[x['fecha_inicio'] for x in ingresos_por_dia],
         y=[x['total'] for x in ingresos_por_dia],
         name='Ingresos Totales',
-        mode='lines+markers'
+        mode='lines+markers',
+        line=dict(color='#1A5276', width=3),
+        marker=dict(color='#2874A6', size=8)
     ))
     fig_ingresos.add_trace(go.Scatter(
         x=[x['fecha_pago'] for x in pagos_por_dia],
         y=[x['total'] for x in pagos_por_dia],
         name='Pagos Recibidos',
-        mode='lines+markers'
+        mode='lines+markers',
+        line=dict(color='#2ecc71', width=3),
+        marker=dict(color='#27ae60', size=8)
     ))
     fig_ingresos.update_layout(
         title='Ingresos y Pagos por Día',
         xaxis_title='Fecha',
-        yaxis_title='Monto'
+        yaxis_title='Monto',
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font=dict(color='#2C3E50')
     )
 
     fig_ingresos_profesionales = px.bar(
@@ -154,7 +182,13 @@ def informe_tratamientos(request):
         x='profesional__nombres',
         y='ingresos',
         title='Ingresos por Profesional',
-        labels={'profesional__nombres': 'Profesional', 'ingresos': 'Ingresos'}
+        labels={'profesional__nombres': 'Profesional', 'ingresos': 'Ingresos'},
+        color_discrete_sequence=['#1A5276']
+    )
+    fig_ingresos_profesionales.update_layout(
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font=dict(color='#2C3E50')
     )
 
     context = {
@@ -226,18 +260,25 @@ def informe_financiero(request):
         x=[x['fecha_inicio'] for x in ingresos_por_dia],
         y=[x['total'] for x in ingresos_por_dia],
         name='Ingresos Totales',
-        mode='lines+markers'
+        mode='lines+markers',
+        line=dict(color='#1A5276', width=3),
+        marker=dict(color='#2874A6', size=8)
     ))
     fig_ingresos.add_trace(go.Scatter(
         x=[x['fecha_pago'] for x in pagos_por_dia],
         y=[x['total'] for x in pagos_por_dia],
         name='Pagos Recibidos',
-        mode='lines+markers'
+        mode='lines+markers',
+        line=dict(color='#2ecc71', width=3),
+        marker=dict(color='#27ae60', size=8)
     ))
     fig_ingresos.update_layout(
         title='Ingresos y Pagos por Día',
         xaxis_title='Fecha',
-        yaxis_title='Monto'
+        yaxis_title='Monto',
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font=dict(color='#2C3E50')
     )
 
     # Gráfico de barras para ingresos por profesional
@@ -249,7 +290,13 @@ def informe_financiero(request):
             x='nombre_completo',
             y='total',
             title='Ingresos por Profesional',
-            labels={'nombre_completo': 'Profesional', 'total': 'Ingresos'}
+            labels={'nombre_completo': 'Profesional', 'total': 'Ingresos'},
+            color_discrete_sequence=['#1A5276']
+        )
+        fig_prof.update_layout(
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='#2C3E50')
         )
     else:
         fig_prof = go.Figure()
@@ -335,7 +382,13 @@ def informe_pacientes(request):
             x='nombre_completo',
             y='total_citas',
             title='Top 10 Pacientes por Número de Citas',
-            labels={'nombre_completo': 'Paciente', 'total_citas': 'Número de Citas'}
+            labels={'nombre_completo': 'Paciente', 'total_citas': 'Número de Citas'},
+            color_discrete_sequence=['#2874A6']
+        )
+        fig_citas.update_layout(
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='#2C3E50')
         )
     else:
         fig_citas = go.Figure()
@@ -348,7 +401,13 @@ def informe_pacientes(request):
             x='nombre_completo',
             y='total_gastos',
             title='Top 10 Pacientes por Gastos en Tratamientos',
-            labels={'nombre_completo': 'Paciente', 'total_gastos': 'Total Gastos'}
+            labels={'nombre_completo': 'Paciente', 'total_gastos': 'Total Gastos'},
+            color_discrete_sequence=['#2ecc71']
+        )
+        fig_gastos.update_layout(
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='#2C3E50')
         )
     else:
         fig_gastos = go.Figure()

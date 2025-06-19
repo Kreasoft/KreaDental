@@ -182,4 +182,57 @@ def eliminar_especialidad(request, especialidad_id):
     context = {
         'especialidad': especialidad
     }
-    return render(request, 'profesionales/especialidades/confirmar_eliminar_especialidad.html', context) 
+    return render(request, 'profesionales/especialidades/confirmar_eliminar_especialidad.html', context)
+
+@login_required
+def obtener_profesionales(request):
+    """Vista para obtener todos los profesionales de la empresa actual"""
+    empresa_actual = get_empresa_actual(request)
+    
+    profesionales = Profesional.objects.filter(
+        empresa=empresa_actual,
+        activo=True
+    ).select_related('especialidad')
+    
+    results = []
+    for profesional in profesionales:
+        results.append({
+            'id': profesional.id,
+            'nombres': profesional.nombres,
+            'apellido_paterno': profesional.apellido_paterno,
+            'apellido_materno': profesional.apellido_materno,
+            'especialidad': profesional.especialidad.nombre if profesional.especialidad else 'Sin especialidad'
+        })
+    
+    return JsonResponse({'results': results})
+
+@login_required
+def buscar_profesionales(request):
+    """Vista para búsqueda AJAX de profesionales"""
+    query = request.GET.get('q', '')
+    empresa_actual = get_empresa_actual(request)
+    
+    if len(query) < 2:
+        return JsonResponse({'results': []})
+    
+    # Buscar profesionales por nombres, apellidos o especialidad
+    profesionales = Profesional.objects.filter(
+        Q(empresa=empresa_actual) &
+        Q(activo=True) &
+        (Q(nombres__icontains=query) | 
+         Q(apellido_paterno__icontains=query) |
+         Q(apellido_materno__icontains=query) |
+         Q(especialidad__nombre__icontains=query))
+    ).select_related('especialidad')[:10]
+    
+    results = []
+    for profesional in profesionales:
+        results.append({
+            'id': profesional.id,
+            'nombres': profesional.nombres,
+            'apellido_paterno': profesional.apellido_paterno,
+            'apellido_materno': profesional.apellido_materno,
+            'especialidad': profesional.especialidad.nombre if profesional.especialidad else 'Sin especialidad'
+        })
+    
+    return JsonResponse({'results': results}) 

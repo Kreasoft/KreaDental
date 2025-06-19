@@ -5,6 +5,16 @@
 
 {% block content %}
 <div class="container-fluid py-4">
+    <!-- Nombre de la empresa activa -->
+    {% if empresa_actual %}
+    <div class="empresa-activa mb-4">
+        <div class="d-flex align-items-center justify-content-center">
+            <i class="fas fa-building me-3"></i>
+            <h4 class="mb-0">{{ empresa_actual.nombre_fantasia|default:empresa_actual.razon_social }}</h4>
+        </div>
+    </div>
+    {% endif %}
+
     <!-- Tarjetas de Resumen -->
     <div class="row g-4 mb-4">
         <!-- Total de Profesionales -->
@@ -320,6 +330,29 @@
 .cita-row:hover {
     background-color: var(--dental-light) !important;
     transform: translateX(5px);
+}
+
+/* Estilos para la empresa activa */
+.empresa-activa {
+    background: linear-gradient(135deg, var(--dental-primary) 0%, var(--dental-secondary) 100%);
+    color: white;
+    padding: 1.5rem 2rem;
+    border-radius: 1rem;
+    text-align: center;
+    font-weight: 600;
+    box-shadow: 0 8px 25px rgba(26, 82, 118, 0.15);
+    margin-bottom: 2rem;
+}
+
+.empresa-activa i {
+    font-size: 1.5rem;
+    opacity: 0.9;
+}
+
+.empresa-activa h4 {
+    font-weight: 700;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 </style>
 {% endblock %}

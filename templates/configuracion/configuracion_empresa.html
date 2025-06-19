@@ -2,60 +2,345 @@
 {% load static %}
 
 {% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/dental-theme.css' %}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <style>
+    body, .container-fluid, .dental-title, .dental-subtitle, .dental-header, .dental-btn, .dental-stats-card, .dental-stats-number, .dental-stats-label, .dental-table, .dental-chart-container, .breadcrumb, .breadcrumb-item {
+        font-family: 'Poppins', sans-serif !important;
+    }
+
+    /* Header de configuración */
+    .config-header {
+        background: linear-gradient(135deg, var(--dental-light), var(--dental-accent));
+        color: var(--dental-primary);
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 8px 25px rgba(26, 82, 118, 0.15);
+        text-align: left;
+        position: relative;
+        overflow: hidden;
+        font-family: 'Poppins', sans-serif;
+        border: 1px solid var(--dental-accent);
+    }
+
+    .config-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(45deg, rgba(174, 214, 241, 0.3) 0%, transparent 50%, rgba(174, 214, 241, 0.3) 100%);
+        pointer-events: none;
+    }
+
+    .config-title {
+        font-family: 'Poppins', sans-serif;
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+        text-shadow: 0 2px 4px rgba(26, 82, 118, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 1.2rem;
+        position: relative;
+        z-index: 1;
+        letter-spacing: -0.5px;
+        color: var(--dental-primary);
+    }
+
+    .config-title i {
+        font-size: 2.2rem;
+        color: var(--dental-secondary);
+        text-shadow: 0 2px 4px rgba(26, 82, 118, 0.2);
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+
+    .config-subtitle {
+        font-family: 'Poppins', sans-serif;
+        font-size: 1.2rem;
+        margin: 1rem 0 0 0;
+        opacity: 0.95;
+        font-weight: 400;
+        position: relative;
+        z-index: 1;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Tarjetas de configuración */
+    .config-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .config-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+    }
+
+    .config-card .card-header {
+        background: linear-gradient(135deg, var(--dental-light), rgba(255, 255, 255, 0.9));
+        border-bottom: 1px solid var(--dental-accent);
+        padding: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .config-card .card-header h5 {
+        font-family: 'Poppins', sans-serif;
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: var(--dental-primary);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .config-card .card-body {
+        padding: 2rem;
+    }
+
+    /* Formularios */
+    .form-label {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 500;
+        color: var(--dental-text-dark);
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+    }
+
+    .form-control, .form-select {
+        font-family: 'Poppins', sans-serif;
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        background-color: #f8f9fa;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--dental-primary);
+        box-shadow: 0 0 0 3px rgba(26, 82, 118, 0.1);
+        background-color: white;
+    }
+
+    .form-control.is-valid {
+        border-color: #28a745;
+        background-color: #f8fff9;
+    }
+
+    .form-control.is-invalid {
+        border-color: #dc3545;
+        background-color: #fff8f8;
+    }
+
+    /* Logo preview */
     .logo-preview-container {
-        border: 2px dashed #ddd;
-        border-radius: 8px;
-        padding: 1rem;
+        border: 3px dashed var(--dental-accent);
+        border-radius: 15px;
+        padding: 2rem;
         text-align: center;
-        background: #f8f9fa;
-        min-height: 200px;
+        background: linear-gradient(135deg, var(--dental-light), rgba(255, 255, 255, 0.8));
+        min-height: 250px;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-direction: column;
+        transition: all 0.3s ease;
     }
+
+    .logo-preview-container:hover {
+        border-color: var(--dental-primary);
+        background: linear-gradient(135deg, rgba(26, 82, 118, 0.05), rgba(255, 255, 255, 0.9));
+    }
+
     .logo-preview-container img {
-        max-height: 150px;
+        max-height: 180px;
         width: auto;
         object-fit: contain;
-        border-radius: 4px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    .red-social-item {
-        background-color: #f8f9fa;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         transition: all 0.3s ease;
-        border: 1px solid #dee2e6;
     }
+
+    .logo-preview-container img:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .logo-preview-container i {
+        color: var(--dental-primary);
+        margin-bottom: 1rem;
+    }
+
+    .logo-preview-container p {
+        font-family: 'Poppins', sans-serif;
+        color: var(--dental-text-light);
+        margin: 0;
+    }
+
+    /* Redes sociales */
+    .red-social-item {
+        background: linear-gradient(135deg, #f8f9fa, white);
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .red-social-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(135deg, var(--dental-primary), var(--dental-secondary));
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+    }
+
     .red-social-item:hover {
-        background-color: #fff;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        border-color: var(--dental-primary);
+        box-shadow: 0 4px 15px rgba(26, 82, 118, 0.1);
+        transform: translateY(-2px);
     }
+
+    .red-social-item:hover::before {
+        transform: scaleX(1);
+    }
+
     .red-social-tipo {
-        min-width: 120px;
-    }
-    .config-card {
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-        margin-bottom: 1.5rem;
+        min-width: 140px;
+        font-weight: 500;
     }
 
-    .config-card .card-header {
-        background-color: #f8f9fc;
-        border-bottom: 1px solid #e3e6f0;
-        padding: 1rem 1.25rem;
+    .red-social-icon {
+        background: linear-gradient(135deg, var(--dental-primary), var(--dental-secondary));
+        color: white;
+        border: none;
+        font-size: 1.1rem;
+        padding: 0.75rem 1rem;
     }
 
-    .config-card .card-body {
-        padding: 1.25rem;
+    .red-social-url {
+        border-left: none;
     }
 
-    .preview-logo {
-        max-width: 200px;
-        max-height: 200px;
-        margin-top: 1rem;
+    .red-social-url:focus {
+        border-left: none;
+        box-shadow: none;
+    }
+
+    .red-social-url:focus + .input-group-text {
+        border-color: var(--dental-primary);
+    }
+
+    /* Botones */
+    .btn-primary {
+        background: linear-gradient(135deg, var(--dental-primary), var(--dental-secondary));
+        border: none;
+        border-radius: 25px;
+        padding: 12px 30px;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(26, 82, 118, 0.3);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(26, 82, 118, 0.4);
+        background: linear-gradient(135deg, var(--dental-secondary), var(--dental-primary));
+    }
+
+    .btn-sm {
+        padding: 8px 20px;
+        font-size: 0.85rem;
+        border-radius: 20px;
+    }
+
+    .btn-outline-danger {
+        border-radius: 20px;
+        border: 2px solid #dc3545;
+        color: #dc3545;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-danger:hover {
+        background: #dc3545;
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
+    }
+
+    /* Validación */
+    .invalid-feedback {
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.85rem;
+        color: #dc3545;
+        margin-top: 0.25rem;
+    }
+
+    .valid-feedback {
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.85rem;
+        color: #28a745;
+        margin-top: 0.25rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .config-title {
+            font-size: 2rem;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        
+        .config-title i {
+            font-size: 2rem;
+        }
+        
+        .config-subtitle {
+            font-size: 1rem;
+        }
+        
+        .config-header {
+            padding: 2rem 1rem;
+        }
+        
+        .config-card .card-body {
+            padding: 1.5rem;
+        }
+        
+        .logo-preview-container {
+            min-height: 200px;
+            padding: 1.5rem;
+        }
     }
 </style>
 {% endblock %}
@@ -64,13 +349,25 @@
 
 {% block content %}
 <div class="container-fluid">
+    <!-- Header de configuración -->
+    <div class="config-header">
+        <h1 class="config-title">
+            <i class="fas fa-tooth"></i>
+            Datos de la Empresa
+        </h1>
+        <p class="config-subtitle">Gestiona la información y apariencia de tu clínica dental</p>
+    </div>
+
     <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
         {% csrf_token %}
 
         <!-- Información Básica -->
         <div class="config-card">
             <div class="card-header">
-                <h5 class="mb-0">Información Básica</h5>
+                <h5>
+                    <i class="fas fa-info-circle"></i>
+                    Información Básica
+                </h5>
             </div>
             <div class="card-body">
                 <div class="row">
@@ -132,7 +429,10 @@
         <!-- Información Adicional -->
         <div class="config-card">
             <div class="card-header">
-                <h5 class="mb-0">Información Adicional</h5>
+                <h5>
+                    <i class="fas fa-plus-circle"></i>
+                    Información Adicional
+                </h5>
             </div>
             <div class="card-body">
                 <div class="row">
@@ -199,7 +499,10 @@
         <!-- Redes Sociales -->
         <div class="config-card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Redes Sociales</h5>
+                <h5>
+                    <i class="fas fa-share-alt"></i>
+                    Redes Sociales
+                </h5>
                 <button type="button" class="btn btn-sm btn-primary" id="agregar-red-social">
                     <i class="fas fa-plus"></i> Agregar Red Social
                 </button>
@@ -214,7 +517,7 @@
 
         <!-- Template para nueva red social -->
         <template id="red-social-template">
-            <div class="red-social-item mb-3 border rounded p-3">
+            <div class="red-social-item">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <div class="input-group">
                         <select class="form-select red-social-tipo">
@@ -237,165 +540,9 @@
             </div>
         </template>
 
-        <style>
-        .red-social-item {
-            background-color: #f8f9fa;
-            transition: all 0.3s ease;
-        }
-        .red-social-item:hover {
-            background-color: #fff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        </style>
-
-        <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const container = document.getElementById('redes-sociales-container');
-            const template = document.getElementById('red-social-template');
-            const hiddenInput = document.querySelector('input[name="redes_sociales"]');
-            let redesSociales = {};
-
-            // Cargar redes sociales existentes
-            try {
-                redesSociales = JSON.parse(hiddenInput.value || '{}');
-                for (const [tipo, url] of Object.entries(redesSociales)) {
-                    agregarRedSocial(tipo, url);
-                }
-            } catch (e) {
-                console.error('Error al cargar redes sociales:', e);
-            }
-
-            // Agregar nueva red social
-            document.getElementById('agregar-red-social').addEventListener('click', () => {
-                agregarRedSocial();
-            });
-
-            // Función para agregar red social
-            function agregarRedSocial(tipo = 'facebook', url = '') {
-                const clone = template.content.cloneNode(true);
-                const item = clone.querySelector('.red-social-item');
-                const select = clone.querySelector('.red-social-tipo');
-                const input = clone.querySelector('.red-social-url');
-                const iconContainer = clone.querySelector('.red-social-icon i');
-
-                select.value = tipo;
-                input.value = url;
-                actualizarIcono(select, iconContainer);
-
-                // Eventos para actualizar el JSON y validar
-                select.addEventListener('change', () => {
-                    actualizarIcono(select, iconContainer);
-                    validarYActualizar(item);
-                });
-
-                input.addEventListener('input', () => {
-                    validarYActualizar(item);
-                });
-
-                input.addEventListener('blur', () => {
-                    validarURL(input, item);
-                });
-
-                // Evento para eliminar
-                clone.querySelector('.eliminar-red-social').addEventListener('click', () => {
-                    if (container.querySelectorAll('.red-social-item').length > 1) {
-                        item.remove();
-                        actualizarJSON();
-                    } else {
-                        mostrarError(item, 'Debe mantener al menos una red social');
-                    }
-                });
-
-                container.appendChild(clone);
-                if (url) validarURL(input, item);
-            }
-
-            // Función para actualizar icono
-            function actualizarIcono(select, iconContainer) {
-                const selectedOption = select.options[select.selectedIndex];
-                const iconClass = selectedOption.getAttribute('data-icon');
-                iconContainer.className = iconClass;
-            }
-
-            // Función para validar URL
-            function validarURL(input, item) {
-                const url = input.value.trim();
-                const tipo = item.querySelector('.red-social-tipo').value;
-                const feedback = item.querySelector('.invalid-feedback');
-                let isValid = true;
-
-                if (url && !url.startsWith('https://')) {
-                    mostrarError(item, 'La URL debe comenzar con https://');
-                    isValid = false;
-                } else if (url) {
-                    try {
-                        new URL(url);
-                        switch(tipo) {
-                            case 'facebook':
-                                if (!url.includes('facebook.com')) {
-                                    mostrarError(item, 'Debe ser una URL válida de Facebook');
-                                    isValid = false;
-                                }
-                                break;
-                            case 'instagram':
-                                if (!url.includes('instagram.com')) {
-                                    mostrarError(item, 'Debe ser una URL válida de Instagram');
-                                    isValid = false;
-                                }
-                                break;
-                            // Agregar más validaciones para otras redes sociales
-                        }
-                    } catch (e) {
-                        mostrarError(item, 'URL inválida');
-                        isValid = false;
-                    }
-                }
-
-                if (isValid) {
-                    feedback.style.display = 'none';
-                    input.classList.remove('is-invalid');
-                    input.classList.add('is-valid');
-                }
-
-                return isValid;
-            }
-
-            // Función para mostrar error
-            function mostrarError(item, mensaje) {
-                const input = item.querySelector('.red-social-url');
-                const feedback = item.querySelector('.invalid-feedback');
-                input.classList.add('is-invalid');
-                input.classList.remove('is-valid');
-                feedback.textContent = mensaje;
-                feedback.style.display = 'block';
-            }
-
-            // Función para validar y actualizar JSON
-            function validarYActualizar(item) {
-                const input = item.querySelector('.red-social-url');
-                if (validarURL(input, item)) {
-                    actualizarJSON();
-                }
-            }
-
-            // Función para actualizar el JSON
-            function actualizarJSON() {
-                const redes = {};
-                container.querySelectorAll('.red-social-item').forEach(item => {
-                    const tipo = item.querySelector('.red-social-tipo').value;
-                    const url = item.querySelector('.red-social-url').value.trim();
-                    if (url && validarURL(item.querySelector('.red-social-url'), item)) {
-                        redes[tipo] = url;
-                    }
-                });
-                hiddenInput.value = JSON.stringify(redes);
-            }
-        });
-        </script>
-
         <!-- Botones de Acción -->
         <div class="row">
-            <div class="col-12 text-end">
+            <div class="col-12 text-center">
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-save"></i> Guardar Configuración
                 </button>
@@ -422,5 +569,149 @@
                 }, false)
             })
     })()
+
+    // Funcionalidad de redes sociales
+    document.addEventListener('DOMContentLoaded', function() {
+        const container = document.getElementById('redes-sociales-container');
+        const template = document.getElementById('red-social-template');
+        const hiddenInput = document.querySelector('input[name="redes_sociales"]');
+        let redesSociales = {};
+
+        // Cargar redes sociales existentes
+        try {
+            redesSociales = JSON.parse(hiddenInput.value || '{}');
+            for (const [tipo, url] of Object.entries(redesSociales)) {
+                agregarRedSocial(tipo, url);
+            }
+        } catch (e) {
+            console.error('Error al cargar redes sociales:', e);
+        }
+
+        // Agregar nueva red social
+        document.getElementById('agregar-red-social').addEventListener('click', () => {
+            agregarRedSocial();
+        });
+
+        // Función para agregar red social
+        function agregarRedSocial(tipo = 'facebook', url = '') {
+            const clone = template.content.cloneNode(true);
+            const item = clone.querySelector('.red-social-item');
+            const select = clone.querySelector('.red-social-tipo');
+            const input = clone.querySelector('.red-social-url');
+            const iconContainer = clone.querySelector('.red-social-icon i');
+
+            select.value = tipo;
+            input.value = url;
+            actualizarIcono(select, iconContainer);
+
+            // Eventos para actualizar el JSON y validar
+            select.addEventListener('change', () => {
+                actualizarIcono(select, iconContainer);
+                validarYActualizar(item);
+            });
+
+            input.addEventListener('input', () => {
+                validarYActualizar(item);
+            });
+
+            input.addEventListener('blur', () => {
+                validarURL(input, item);
+            });
+
+            // Evento para eliminar
+            clone.querySelector('.eliminar-red-social').addEventListener('click', () => {
+                if (container.querySelectorAll('.red-social-item').length > 1) {
+                    item.remove();
+                    actualizarJSON();
+                } else {
+                    mostrarError(item, 'Debe mantener al menos una red social');
+                }
+            });
+
+            container.appendChild(clone);
+            if (url) validarURL(input, item);
+        }
+
+        // Función para actualizar icono
+        function actualizarIcono(select, iconContainer) {
+            const selectedOption = select.options[select.selectedIndex];
+            const iconClass = selectedOption.getAttribute('data-icon');
+            iconContainer.className = iconClass;
+        }
+
+        // Función para validar URL
+        function validarURL(input, item) {
+            const url = input.value.trim();
+            const tipo = item.querySelector('.red-social-tipo').value;
+            const feedback = item.querySelector('.invalid-feedback');
+            let isValid = true;
+
+            if (url && !url.startsWith('https://')) {
+                mostrarError(item, 'La URL debe comenzar con https://');
+                isValid = false;
+            } else if (url) {
+                try {
+                    new URL(url);
+                    switch(tipo) {
+                        case 'facebook':
+                            if (!url.includes('facebook.com')) {
+                                mostrarError(item, 'Debe ser una URL válida de Facebook');
+                                isValid = false;
+                            }
+                            break;
+                        case 'instagram':
+                            if (!url.includes('instagram.com')) {
+                                mostrarError(item, 'Debe ser una URL válida de Instagram');
+                                isValid = false;
+                            }
+                            break;
+                        // Agregar más validaciones para otras redes sociales
+                    }
+                } catch (e) {
+                    mostrarError(item, 'URL inválida');
+                    isValid = false;
+                }
+            }
+
+            if (isValid) {
+                feedback.style.display = 'none';
+                input.classList.remove('is-invalid');
+                input.classList.add('is-valid');
+            }
+
+            return isValid;
+        }
+
+        // Función para mostrar error
+        function mostrarError(item, mensaje) {
+            const input = item.querySelector('.red-social-url');
+            const feedback = item.querySelector('.invalid-feedback');
+            input.classList.add('is-invalid');
+            input.classList.remove('is-valid');
+            feedback.textContent = mensaje;
+            feedback.style.display = 'block';
+        }
+
+        // Función para validar y actualizar JSON
+        function validarYActualizar(item) {
+            const input = item.querySelector('.red-social-url');
+            if (validarURL(input, item)) {
+                actualizarJSON();
+            }
+        }
+
+        // Función para actualizar el JSON
+        function actualizarJSON() {
+            const redes = {};
+            container.querySelectorAll('.red-social-item').forEach(item => {
+                const tipo = item.querySelector('.red-social-tipo').value;
+                const url = item.querySelector('.red-social-url').value.trim();
+                if (url && validarURL(item.querySelector('.red-social-url'), item)) {
+                    redes[tipo] = url;
+                }
+            });
+            hiddenInput.value = JSON.stringify(redes);
+        }
+    });
 </script>
 {% endblock %}

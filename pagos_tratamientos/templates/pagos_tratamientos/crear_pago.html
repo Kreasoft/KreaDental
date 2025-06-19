@@ -1,67 +1,288 @@
-{% extends 'base.html' %}
+{% extends 'core/base.html' %}
 {% load humanize %}
 
 {% block title %}Crear Pago{% endblock %}
 
 {% block extra_css %}
 <style>
+    /* Tema Dental Moderno */
+    :root {
+        --primary-color: #1A5276;      /* Azul principal */
+        --primary-light: #2874A6;      /* Azul secundario */
+        --primary-dark: #154360;       /* Azul oscuro */
+        --accent-color: #AED6F1;       /* Azul claro */
+        --light-bg: #E8F4FC;           /* Fondo claro */
+        --secondary-color: #2ecc71;    /* Verde */
+        --warning-color: #f39c12;      /* Amarillo */
+        --danger-color: #e74c3c;       /* Rojo */
+        --success-color: #2ecc71;      /* Verde */
+        --info-color: #06b6d4;         /* Azul info */
+        --card-bg: #ffffff;
+        --text-primary: #2C3E50;       /* Texto principal */
+        --text-secondary: #7F8C8D;     /* Texto secundario */
+        --border-color: #AED6F1;
+        --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, var(--light-bg) 0%, #f8fafc 100%);
+        color: var(--text-primary);
+    }
+
+    .container {
+        max-width: 1200px;
+    }
+
     .form-card {
-        background: white;
-        border-radius: 1rem;
-        padding: 1.75rem;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        margin-bottom: 1.5rem;
+        background: var(--card-bg);
+        border-radius: 1.5rem;
+        padding: 2rem;
+        box-shadow: var(--shadow-lg);
+        border: 1px solid var(--border-color);
+        margin-bottom: 2rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     }
 
     .card {
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        background: var(--card-bg);
+        border-radius: 1.5rem;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border-color);
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-lg);
     }
 
     .card-header {
-        background: none;
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+        color: white;
         border: none;
-        padding: 1rem;
+        padding: 1.5rem;
+        font-weight: 600;
+        font-size: 1.1rem;
     }
 
     .card-title {
-        color: #2d3748;
-        font-size: 1.25rem;
-        font-weight: 600;
+        color: var(--primary-color);
+        font-size: 1.5rem;
+        font-weight: 700;
         margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .card-title i {
+        color: var(--primary-color);
+        font-size: 1.25rem;
     }
 
     .form-label {
-        font-weight: 500;
-        color: #4a5568;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
     }
 
-    .form-control {
-        border-radius: 0.5rem;
-        border: 1px solid #e2e8f0;
-        padding: 0.75rem;
+    .form-control, .form-select {
+        border-radius: 0.75rem;
+        border: 2px solid var(--border-color);
+        padding: 0.875rem 1rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: var(--card-bg);
     }
 
-    .form-control:focus {
-        border-color: #4299e1;
-        box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(26, 82, 118, 0.1);
+        outline: none;
+    }
+
+    .input-group-text {
+        background: var(--primary-color);
+        color: white;
+        border: 2px solid var(--primary-color);
+        border-radius: 0.75rem 0 0 0.75rem;
+        font-weight: 600;
     }
 
     .btn-back {
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        padding: 0.5rem 1rem;
-        border-radius: 0.5rem;
-        background: #edf2f7;
-        color: #4a5568;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.75rem;
+        background: var(--light-bg);
+        color: var(--text-secondary);
         text-decoration: none;
-        transition: all 0.2s;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        border: 2px solid var(--border-color);
     }
 
     .btn-back:hover {
-        background: #e2e8f0;
-        color: #2d3748;
-        transform: translateX(-2px);
+        background: var(--primary-color);
+        color: white;
+        transform: translateX(-3px);
+        box-shadow: var(--shadow);
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+        border: none;
+        border-radius: 0.75rem;
+        padding: 0.875rem 2rem;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+        background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
+    }
+
+    .form-text {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        margin-top: 0.5rem;
+    }
+
+    .info-section {
+        background: linear-gradient(135deg, var(--light-bg) 0%, #f0f9ff 100%);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border: 1px solid var(--border-color);
+    }
+
+    .info-title {
+        color: var(--primary-color);
+        font-weight: 700;
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .info-item {
+        background: white;
+        padding: 1rem;
+        border-radius: 0.75rem;
+        border: 1px solid var(--border-color);
+    }
+
+    .info-label {
+        font-weight: 600;
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .info-value {
+        font-weight: 700;
+        color: var(--text-primary);
+        font-size: 1.125rem;
+    }
+
+    .info-value.success {
+        color: var(--success-color);
+    }
+
+    .info-value.danger {
+        color: var(--danger-color);
+    }
+
+    .info-value.warning {
+        color: var(--warning-color);
+    }
+
+    .alert {
+        border-radius: 1rem;
+        border: none;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .alert-info {
+        background: linear-gradient(135deg, var(--light-bg) 0%, #f0f9ff 100%);
+        color: var(--primary-color);
+        border: 1px solid var(--border-color);
+    }
+
+    .badge {
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+
+    .badge-success {
+        background: var(--success-color);
+        color: white;
+    }
+
+    .badge-warning {
+        background: var(--warning-color);
+        color: white;
+    }
+
+    .badge-danger {
+        background: var(--danger-color);
+        color: white;
+    }
+
+    /* Animaciones */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .form-card {
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .form-card {
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .card-title {
+            font-size: 1.25rem;
+        }
     }
 </style>
 {% endblock %}
@@ -69,28 +290,29 @@
 {% block content %}
 <div class="container mt-4">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <!-- Información del Procedimiento -->
-            <div class="card mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Información del Procedimiento</h5>
+        <div class="col-lg-10">
+            <!-- Información del Tratamiento -->
+            <div class="info-section">
+                <div class="info-title">
+                    <i class="fas fa-tooth"></i>
+                    Información del Tratamiento
                 </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h6 class="fw-bold">Procedimiento</h6>
-                            <p>{{ tratamiento.procedimiento.nombre }}</p>
-                            
-                            <h6 class="fw-bold mt-3">Descripción</h6>
-                            <p>{{ tratamiento.procedimiento.descripcion|default:'Sin descripción' }}</p>
-                        </div>
-                        <div class="col-md-6">
-                            <h6 class="fw-bold">Costo Total</h6>
-                            <p>${{ tratamiento.costo_total|floatformat:0|intcomma }}</p>
-
-                            <h6 class="fw-bold mt-3">Saldo Pendiente</h6>
-                            <p class="text-danger">${{ saldo_pendiente|floatformat:0|intcomma }}</p>
-                        </div>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Paciente</div>
+                        <div class="info-value">{{ tratamiento.paciente.nombre_completo }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Procedimiento</div>
+                        <div class="info-value">{{ tratamiento.procedimiento.nombre }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Costo Total</div>
+                        <div class="info-value success">${{ tratamiento.costo_total|floatformat:0|intcomma }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Saldo Pendiente</div>
+                        <div class="info-value danger">${{ saldo_pendiente|floatformat:0|intcomma }}</div>
                     </div>
                 </div>
             </div>
@@ -99,58 +321,77 @@
             <div class="mb-4">
                 <a href="{% url 'tratamientos:detalle' tratamiento.id %}" class="btn-back">
                     <i class="fas fa-arrow-left"></i>
-                    Volver al tratamiento
+                    Volver al Tratamiento
                 </a>
             </div>
 
             <!-- Formulario de Pago -->
-            <div class="card">
-                <div class="card-header bg-white">
-                    <h5 class="mb-0"><i class="fas fa-money-bill-wave me-2"></i>Registrar Pago</h5>
+            <div class="form-card">
+                <div class="card-title">
+                    <i class="fas fa-money-bill-wave"></i>
+                    Registrar Nuevo Pago
                 </div>
-                <div class="card-body">
-                    <form method="post" class="needs-validation" novalidate>
-                        {% csrf_token %}
-                        
-                        <div class="mb-3">
-                            <label for="monto" class="form-label">Monto del Pago</label>
-                            <div class="input-group">
-                                <span class="input-group-text">$</span>
-                                <input type="number" class="form-control" id="monto" name="monto" 
-                                       required min="1" max="{{ saldo_pendiente }}">
-                            </div>
-                            <div class="form-text">Monto máximo: ${{ saldo_pendiente|floatformat:0|intcomma }}</div>
+                
+                <form method="post" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label for="monto" class="form-label">
+                            <i class="fas fa-dollar-sign me-2"></i>Monto del Pago
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="text" class="form-control" id="monto" name="monto" 
+                                   required placeholder="Ingrese el monto">
                         </div>
+                        <div class="form-text">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Monto máximo disponible: ${{ saldo_pendiente|floatformat:0|intcomma }}
+                        </div>
+                    </div>
 
-                        <div class="mb-3">
-                            <label for="forma_pago" class="form-label">Forma de Pago</label>
-                            <select class="form-select" id="forma_pago" name="forma_pago" required>
-                                <option value="">Seleccione una forma de pago</option>
-                                {% for forma in formas_pago %}
-                                <option value="{{ forma.id }}">{{ forma.nombre }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
+                    <div class="mb-4">
+                        <label for="forma_pago" class="form-label">
+                            <i class="fas fa-credit-card me-2"></i>Forma de Pago
+                        </label>
+                        <select class="form-select" id="forma_pago" name="forma_pago" required>
+                            <option value="">Seleccione una forma de pago</option>
+                            {% for forma in formas_pago %}
+                            <option value="{{ forma.id }}">{{ forma.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
-                        <div class="mb-3">
-                            <label for="comprobante" class="form-label">Número de Comprobante</label>
-                            <input type="text" class="form-control" id="comprobante" name="comprobante">
-                            <div class="form-text">Opcional: número de boleta, factura o transacción</div>
+                    <div class="mb-4">
+                        <label for="comprobante" class="form-label">
+                            <i class="fas fa-receipt me-2"></i>Número de Comprobante
+                        </label>
+                        <input type="text" class="form-control" id="comprobante" name="comprobante" 
+                               placeholder="Ej: Boleta 001-123456">
+                        <div class="form-text">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Opcional: número de boleta, factura o transacción
                         </div>
+                    </div>
 
-                        <div class="mb-3">
-                            <label for="notas" class="form-label">Notas</label>
-                            <textarea class="form-control" id="notas" name="notas" rows="3"></textarea>
-                            <div class="form-text">Opcional: agregue notas o comentarios sobre el pago</div>
+                    <div class="mb-4">
+                        <label for="notas" class="form-label">
+                            <i class="fas fa-sticky-note me-2"></i>Notas Adicionales
+                        </label>
+                        <textarea class="form-control" id="notas" name="notas" rows="3" 
+                                  placeholder="Agregue notas o comentarios sobre el pago"></textarea>
+                        <div class="form-text">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Opcional: información adicional sobre el pago
                         </div>
+                    </div>
 
-                        <div class="d-flex justify-content-end gap-2">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save me-2"></i>Registrar Pago
-                            </button>
-                        </div>
-                    </form>
-                </div>
+                    <div class="d-flex justify-content-end gap-3">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Registrar Pago
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -168,10 +409,30 @@
         // Validación del monto
         if (montoInput) {
             montoInput.addEventListener('input', function() {
-                const valor = this.value.trim();
-                const monto = parseFloat(valor);
+                let value = this.value;
                 
-                if (valor === '') {
+                // Permitir solo números, punto y coma
+                value = value.replace(/[^\d.,]/g, '');
+                
+                // Convertir coma a punto si es necesario
+                if (value.includes(',')) {
+                    value = value.replace(',', '.');
+                }
+                
+                // Asegurar que solo haya un punto decimal
+                const parts = value.split('.');
+                if (parts.length > 2) {
+                    value = parts[0] + '.' + parts.slice(1).join('');
+                }
+                
+                // Validar que sea un número válido
+                if (value && !isNaN(parseFloat(value))) {
+                    this.value = value;
+                }
+                
+                // Validación del rango
+                const monto = parseFloat(value);
+                if (value === '') {
                     this.setCustomValidity('Por favor, ingrese un monto');
                 } else if (isNaN(monto) || monto <= 0) {
                     this.setCustomValidity('El monto debe ser un número positivo');
@@ -199,13 +460,43 @@
         // Validación del formulario completo
         if (form) {
             form.addEventListener('submit', function(e) {
-                if (!form.checkValidity()) {
-                    e.preventDefault();
-                    e.stopPropagation();
+                const montoValue = montoInput.value.trim();
+                const formaPagoValue = formaPagoSelect.value;
+                
+                // Limpiar el valor del monto antes de enviar
+                let cleanMontoValue = montoValue.replace(/[^\d.,]/g, '');
+                cleanMontoValue = cleanMontoValue.replace(',', '.');
+                
+                const parts = cleanMontoValue.split('.');
+                if (parts.length > 2) {
+                    cleanMontoValue = parts[0] + '.' + parts.slice(1).join('');
                 }
+                
+                if (!montoValue) {
+                    e.preventDefault();
+                    alert('Por favor ingrese un monto válido');
+                    return;
+                }
+                
+                if (isNaN(parseFloat(cleanMontoValue))) {
+                    e.preventDefault();
+                    alert('Por favor ingrese un monto válido');
+                    return;
+                }
+                
+                if (!formaPagoValue) {
+                    e.preventDefault();
+                    alert('Por favor seleccione una forma de pago');
+                    return;
+                }
+                
+                // Establecer el valor limpio en el campo
+                montoInput.value = cleanMontoValue;
+                
+                // Si todo está bien, enviar el formulario
                 form.classList.add('was-validated');
             });
-    }
-});
+        }
+    });
 </script>
 {% endblock %}

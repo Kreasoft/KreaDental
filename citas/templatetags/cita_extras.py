@@ -21,9 +21,9 @@ def get_estado_color(estado):
     Retorna el color correspondiente al estado de la cita
     """
     colores = {
-        'PENDIENTE': '#ffc107',
-        'CONFIRMADA': '#28a745',
-        'COMPLETADA': '#007bff',
-        'CANCELADA': '#dc3545'
+        'PENDIENTE': '#FFD700',    # Dorado suave (mismo que en calendario)
+        'CONFIRMADA': '#90EE90',   # Verde claro (mismo que en calendario)
+        'COMPLETADA': '#87CEEB',   # Azul claro (mismo que en calendario)
+        'CANCELADA': '#FFB6C1'     # Rosa claro (mismo que en calendario)
     }
     return colores.get(estado, '#6c757d') 

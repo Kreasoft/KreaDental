@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Confirmar Eliminación{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">Confirmar Eliminación</h4>
+                </div>
+                <div class="card-body">
+                    <p class="lead">¿Está seguro que desea eliminar el pago de {{ pago.tratamiento.paciente.nombre_completo }}?</p>
+                    <p>Detalles del pago:</p>
+                    <ul>
+                        <li>Fecha: {{ pago.fecha|date:"d/m/Y" }}</li>
+                        <li>Monto: ${{ pago.monto|floatformat:0|intcomma }}</li>
+                        <li>Método: {{ pago.get_metodo_pago_display }}</li>
+                        <li>Estado: {{ pago.get_estado_display }}</li>
+                    </ul>
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </button>
+                        <a href="{% url 'tratamientos:pagos_tratamiento' pago.tratamiento.id %}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

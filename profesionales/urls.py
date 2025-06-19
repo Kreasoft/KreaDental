@@ -8,6 +8,8 @@ urlpatterns = [
     path('nuevo/', views.nuevo_profesional, name='nuevo_profesional'),
     path('editar/<int:pk>/', views.editar_profesional, name='editar_profesional'),
     path('eliminar/<int:pk>/', views.eliminar_profesional, name='eliminar_profesional'),
+    path('buscar/', views.buscar_profesionales, name='buscar_profesionales'),
+    path('obtener/', views.obtener_profesionales, name='obtener_profesionales'),
     
     # URLs para Especialidades
     path('especialidades/', views.lista_especialidades, name='lista_especialidades'),

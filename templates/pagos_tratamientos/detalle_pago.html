@@ -1,43 +1,62 @@
 {% extends 'base.html' %}
 {% load humanize %}
+{% load static %}
 
 {% block title %}Detalle de Pago{% endblock %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dental-theme.css' %}">
 <style>
     .detail-card {
         background: white;
-        border-radius: 1rem;
+        border-radius: 15px;
         padding: 1.75rem;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         margin-bottom: 1.5rem;
+        border: 1px solid var(--dental-accent);
+        transition: all 0.3s ease;
+    }
+
+    .detail-card:hover {
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        transform: translateY(-2px);
     }
 
     .detail-card .card-header {
         background: none;
         border: none;
-        padding: 0 0 1rem 0;
+        padding: 0 0 1.5rem 0;
+        border-bottom: 2px solid var(--dental-light);
     }
 
     .detail-card .card-title {
-        color: #2d3748;
-        font-size: 1.25rem;
+        color: var(--dental-primary);
+        font-size: 1.4rem;
         font-weight: 600;
         margin: 0;
         display: flex;
         align-items: center;
         gap: 0.75rem;
+        font-family: 'Poppins', sans-serif;
     }
 
     .detail-card .card-title i {
-        color: #4a5568;
-        opacity: 0.7;
+        color: var(--dental-secondary);
+        font-size: 1.2rem;
     }
 
     .info-group {
         margin-bottom: 1.5rem;
         padding-bottom: 1.5rem;
-        border-bottom: 1px solid #e2e8f0;
+        border-bottom: 1px solid var(--dental-light);
+        transition: all 0.3s ease;
+    }
+
+    .info-group:hover {
+        background-color: var(--dental-light);
+        padding: 1rem;
+        border-radius: 8px;
+        margin: 0 -1rem 1.5rem -1rem;
     }
 
     .info-group:last-child {
@@ -48,37 +67,44 @@
 
     .info-label {
         font-size: 0.875rem;
-        color: #718096;
+        color: var(--dental-text-light);
         text-transform: uppercase;
         letter-spacing: 0.05em;
         margin-bottom: 0.5rem;
+        font-weight: 500;
     }
 
     .info-value {
-        font-size: 1rem;
-        color: #2d3748;
-        font-weight: 500;
+        font-size: 1.1rem;
+        color: var(--dental-text);
+        font-weight: 600;
     }
 
     .badge {
-        padding: 0.5em 1em;
-        font-weight: 500;
-        border-radius: 9999px;
+        padding: 0.6em 1.2em;
+        font-weight: 600;
+        border-radius: 25px;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
     .badge-pendiente {
-        background-color: #ed8936;
+        background: linear-gradient(135deg, var(--dental-warning), #f39c12);
         color: white;
+        box-shadow: 0 2px 8px rgba(243, 156, 18, 0.3);
     }
 
     .badge-completado {
-        background-color: #38a169;
+        background: linear-gradient(135deg, var(--dental-success), #27ae60);
         color: white;
+        box-shadow: 0 2px 8px rgba(46, 204, 113, 0.3);
     }
 
     .badge-anulado {
-        background-color: #e53e3e;
+        background: linear-gradient(135deg, var(--dental-danger), #c0392b);
         color: white;
+        box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
     }
 
     .timeline {
@@ -92,13 +118,19 @@
         left: 0;
         top: 0;
         bottom: 0;
-        width: 2px;
-        background: #e2e8f0;
+        width: 3px;
+        background: linear-gradient(to bottom, var(--dental-primary), var(--dental-secondary));
+        border-radius: 2px;
     }
 
     .timeline-item {
         position: relative;
         padding-bottom: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .timeline-item:hover {
+        transform: translateX(5px);
     }
 
     .timeline-item:last-child {
@@ -108,55 +140,124 @@
     .timeline-item::before {
         content: '';
         position: absolute;
-        left: -2rem;
+        left: -2.25rem;
         top: 0.25rem;
-        width: 1rem;
-        height: 1rem;
+        width: 1.2rem;
+        height: 1.2rem;
         border-radius: 50%;
-        background: #4299e1;
-        border: 2px solid white;
-        box-shadow: 0 0 0 2px #4299e1;
+        background: var(--dental-primary);
+        border: 3px solid white;
+        box-shadow: 0 0 0 3px var(--dental-accent);
+        transition: all 0.3s ease;
+    }
+
+    .timeline-item:hover::before {
+        background: var(--dental-secondary);
+        transform: scale(1.2);
     }
 
     .timeline-date {
         font-size: 0.875rem;
-        color: #718096;
-        margin-bottom: 0.25rem;
+        color: var(--dental-text-light);
+        margin-bottom: 0.5rem;
+        font-weight: 500;
     }
 
     .timeline-content {
-        background: #f7fafc;
-        padding: 1rem;
-        border-radius: 0.5rem;
+        background: var(--dental-light);
+        padding: 1.25rem;
+        border-radius: 12px;
+        border-left: 4px solid var(--dental-primary);
+        transition: all 0.3s ease;
+    }
+
+    .timeline-content:hover {
+        background: white;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
     }
 
     .timeline-title {
         font-weight: 600;
-        color: #2d3748;
-        margin-bottom: 0.5rem;
+        color: var(--dental-primary);
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .timeline-title i {
+        font-size: 1.1rem;
     }
 
     .timeline-details {
-        font-size: 0.875rem;
-        color: #4a5568;
+        font-size: 0.9rem;
+        color: var(--dental-text);
+        line-height: 1.5;
+    }
+
+    .timeline-details p {
+        margin-bottom: 0.5rem;
+    }
+
+    .timeline-details small {
+        color: var(--dental-text-light);
+        font-style: italic;
     }
 
     .btn-back {
         display: inline-flex;
         align-items: center;
-        gap: 0.5rem;
-        padding: 0.5rem 1rem;
-        border-radius: 0.5rem;
-        background: #edf2f7;
-        color: #4a5568;
+        gap: 0.75rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 25px;
+        background: linear-gradient(135deg, var(--dental-light), var(--dental-accent));
+        color: var(--dental-primary);
         text-decoration: none;
-        transition: all 0.2s;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        border: 2px solid var(--dental-accent);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 
     .btn-back:hover {
-        background: #e2e8f0;
-        color: #2d3748;
-        transform: translateX(-2px);
+        background: linear-gradient(135deg, var(--dental-accent), var(--dental-secondary));
+        color: white;
+        transform: translateX(-5px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        text-decoration: none;
+    }
+
+    .btn-back i {
+        font-size: 1.1rem;
+    }
+
+    .amount-highlight {
+        font-size: 1.3rem;
+        color: var(--dental-primary);
+        font-weight: 700;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .status-section {
+        background: linear-gradient(135deg, var(--dental-light), white);
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 2rem;
+        color: var(--dental-text-light);
+        font-style: italic;
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        color: var(--dental-accent);
+        margin-bottom: 1rem;
+        opacity: 0.5;
     }
 </style>
 {% endblock %}
@@ -181,32 +282,37 @@
                     </h5>
                 </div>
                 <div class="card-body">
-                    <div class="info-group">
-                        <div class="info-label">Estado</div>
+                    <div class="status-section">
+                        <div class="info-label">Estado del Pago</div>
                         <div class="info-value">
                             <span class="badge badge-{{ pago.estado|lower }}">
                                 {{ pago.get_estado_display }}
                             </span>
                         </div>
                     </div>
+                    
                     <div class="info-group">
-                        <div class="info-label">Monto</div>
-                        <div class="info-value">${{ pago.monto|floatformat:0|intcomma }}</div>
+                        <div class="info-label">Monto del Pago</div>
+                        <div class="info-value amount-highlight">${{ pago.monto|floatformat:0|intcomma }}</div>
                     </div>
+                    
                     <div class="info-group">
                         <div class="info-label">Forma de Pago</div>
                         <div class="info-value">{{ pago.forma_pago.nombre }}</div>
                     </div>
+                    
                     <div class="info-group">
                         <div class="info-label">Fecha de Pago</div>
                         <div class="info-value">{{ pago.fecha_pago|date:"d/m/Y H:i" }}</div>
                     </div>
+                    
                     <div class="info-group">
                         <div class="info-label">Comprobante</div>
                         <div class="info-value">{{ pago.comprobante|default:"No especificado" }}</div>
                     </div>
+                    
                     <div class="info-group">
-                        <div class="info-label">Notas</div>
+                        <div class="info-label">Notas Adicionales</div>
                         <div class="info-value">{{ pago.notas|default:"Sin notas" }}</div>
                     </div>
                 </div>
@@ -240,20 +346,23 @@
                                 </div>
                                 <div class="timeline-details">
                                     {% if registro.estado_anterior %}
-                                        <p>Estado: {{ registro.estado_anterior }} → {{ registro.estado_nuevo }}</p>
+                                        <p><strong>Estado:</strong> {{ registro.estado_anterior }} → {{ registro.estado_nuevo }}</p>
                                     {% endif %}
                                     {% if registro.monto_anterior %}
-                                        <p>Monto: ${{ registro.monto_anterior|floatformat:0|intcomma }} → ${{ registro.monto_nuevo|floatformat:0|intcomma }}</p>
+                                        <p><strong>Monto:</strong> ${{ registro.monto_anterior|floatformat:0|intcomma }} → ${{ registro.monto_nuevo|floatformat:0|intcomma }}</p>
                                     {% endif %}
                                     {% if registro.notas %}
                                         <p class="text-muted">{{ registro.notas }}</p>
                                     {% endif %}
-                                    <small class="text-muted">Por: {{ registro.realizado_por.get_full_name|default:registro.realizado_por.username }}</small>
+                                    <small>Por: {{ registro.realizado_por.get_full_name|default:registro.realizado_por.username }}</small>
                                 </div>
                             </div>
                         </div>
                         {% empty %}
-                        <p class="text-muted text-center">No hay registros en el historial</p>
+                        <div class="empty-state">
+                            <i class="fas fa-history"></i>
+                            <p>No hay registros en el historial</p>
+                        </div>
                         {% endfor %}
                     </div>
                 </div>

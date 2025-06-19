@@ -1,0 +1,1754 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Calendario de Citas{% endblock %}
+{% block page_title %}Calendario de Citas{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/dental-theme.css' %}">
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+<link href='https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css' rel='stylesheet' />
+<style>
+    body, .container-fluid, .dental-title, .dental-subtitle, .dental-header, .dental-btn, .dental-stats-card, .dental-stats-number, .dental-stats-label, .dental-table, .dental-chart-container, .breadcrumb, .breadcrumb-item {
+        font-family: 'Poppins', sans-serif !important;
+    }
+
+    /* Header del calendario */
+    .calendar-header {
+        background: linear-gradient(135deg, rgba(26, 82, 118, 0.1), rgba(255, 255, 255, 0.9));
+        color: var(--dental-primary);
+        padding: 1.5rem 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        text-align: left;
+        border: 1px solid var(--dental-accent);
+    }
+
+    .calendar-title {
+        font-family: 'Poppins', sans-serif;
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin: 0;
+        color: var(--dental-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+    }
+
+    .calendar-subtitle {
+        font-family: 'Poppins', sans-serif;
+        font-size: 1rem;
+        margin: 0.3rem 0 0 0;
+        color: var(--dental-text-light);
+        font-weight: 400;
+    }
+
+    /* Contenedor principal del calendario */
+    #calendar {
+        background: linear-gradient(135deg, var(--dental-light), rgba(255, 255, 255, 0.95));
+        padding: 2rem;
+        min-height: 700px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(26, 82, 118, 0.1);
+        border: 1px solid var(--dental-accent);
+        font-family: 'Poppins', sans-serif;
+    }
+
+    /* Estilos para los eventos del calendario */
+    .fc-event {
+        cursor: pointer;
+        border: none;
+        border-radius: 8px;
+        padding: 0;
+        font-weight: 500;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        margin: 1px 0;
+        min-height: 60px;
+        overflow: hidden;
+        color: white;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .fc-event:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+
+    .cita-evento {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 8px;
+    }
+
+    .cita-header {
+        padding: 3px 6px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(0, 0, 0, 0.1);
+        border-bottom: 1px solid rgba(0,0,0,0.1);
+        border-radius: 8px 8px 0 0;
+    }
+
+    .cita-time {
+        font-size: 0.75em;
+        font-weight: 600;
+        color: white;
+        font-family: 'Poppins', sans-serif;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
+
+    .cita-status .badge {
+        font-size: 0.65em;
+        padding: 0.25em 0.5em;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+        background: rgba(255, 255, 255, 0.9);
+        color: #333;
+        border-radius: 4px;
+    }
+
+    .cita-body {
+        padding: 4px 6px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 0 0 8px 8px;
+    }
+
+    .cita-title {
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 0.85em;
+        line-height: 1.2;
+        margin-bottom: 2px;
+        padding: 3px 4px;
+        background: rgba(255,255,255,0.9);
+        border-radius: 3px;
+        border: 1px solid rgba(0,0,0,0.05);
+        font-family: 'Poppins', sans-serif;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .cita-details {
+        display: flex;
+        flex-direction: column;
+        font-size: 0.75em;
+        color: #34495e;
+        margin: 1px 0;
+        gap: 1px;
+    }
+
+    .cita-details > div {
+        padding: 2px 4px;
+        font-weight: 500;
+        font-size: 0.75em;
+        color: #34495e;
+        background: rgba(255,255,255,0.9);
+        border-radius: 3px;
+        margin-bottom: 1px;
+        border: 1px solid rgba(0,0,0,0.05);
+        font-family: 'Poppins', sans-serif;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .cita-motivo {
+        font-size: 0.7em;
+        color: #576574;
+        line-height: 1.1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        padding: 2px 4px;
+        margin-top: 1px;
+        background: rgba(255,255,255,0.9);
+        border-radius: 3px;
+        border: 1px solid rgba(0,0,0,0.05);
+        font-family: 'Poppins', sans-serif;
+    }
+
+    /* Paleta de colores del tema dental para estados de citas */
+    .fc-event[data-status="PENDIENTE"] {
+        background: linear-gradient(135deg, var(--dental-primary) 0%, var(--dental-secondary) 100%);
+        box-shadow: 0 2px 6px rgba(26, 82, 118, 0.4);
+    }
+
+    .fc-event[data-status="CONFIRMADA"] {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        box-shadow: 0 2px 6px rgba(40, 167, 69, 0.4);
+    }
+
+    .fc-event[data-status="COMPLETADA"] {
+        background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+        box-shadow: 0 2px 6px rgba(23, 162, 184, 0.4);
+    }
+
+    .fc-event[data-status="CANCELADA"] {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        box-shadow: 0 2px 6px rgba(220, 53, 69, 0.4);
+    }
+
+    .fc-event[data-status="PENDIENTE"]:hover {
+        box-shadow: 0 4px 12px rgba(26, 82, 118, 0.5);
+    }
+
+    .fc-event[data-status="CONFIRMADA"]:hover {
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.5);
+    }
+
+    .fc-event[data-status="COMPLETADA"]:hover {
+        box-shadow: 0 4px 12px rgba(23, 162, 184, 0.5);
+    }
+
+    .fc-event[data-status="CANCELADA"]:hover {
+        box-shadow: 0 4px 12px rgba(220, 53, 69, 0.5);
+    }
+
+    /* Estilos para la cabecera del calendario */
+    .fc .fc-toolbar {
+        padding: 1rem 0;
+        margin-bottom: 1.5rem;
+    }
+
+    .fc .fc-toolbar-title {
+        font-size: 1.75em;
+        color: var(--dental-primary);
+        font-weight: 700;
+        text-transform: capitalize;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .fc .fc-button-primary {
+        background: linear-gradient(135deg, var(--dental-primary), var(--dental-secondary));
+        border: none;
+        color: white;
+        font-weight: 500;
+        text-transform: capitalize;
+        padding: 0.6rem 1.2rem;
+        border-radius: 12px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 2px 4px rgba(26, 82, 118, 0.2);
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .fc .fc-button-primary:hover {
+        background: linear-gradient(135deg, var(--dental-secondary), var(--dental-primary));
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(26, 82, 118, 0.3);
+    }
+
+    .fc .fc-button-primary:focus {
+        box-shadow: 0 0 0 3px rgba(26, 82, 118, 0.2);
+    }
+
+    /* Botones de acción */
+    .btn-nueva-cita {
+        background: linear-gradient(135deg, var(--dental-primary), var(--dental-secondary));
+        border: none;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 25px;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(26, 82, 118, 0.3);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-nueva-cita:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(26, 82, 118, 0.4);
+        background: linear-gradient(135deg, var(--dental-secondary), var(--dental-primary));
+        color: white;
+        text-decoration: none;
+    }
+
+    /* Controles de filtro */
+    .filtros-container {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+        border: 1px solid var(--dental-accent);
+    }
+
+    .filtros-container label {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 500;
+        color: var(--dental-text-dark);
+        margin-bottom: 0.5rem;
+    }
+
+    .filtros-container .form-control,
+    .filtros-container .form-select {
+        font-family: 'Poppins', sans-serif;
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+
+    .filtros-container .form-control:focus,
+    .filtros-container .form-select:focus {
+        border-color: var(--dental-primary);
+        box-shadow: 0 0 0 3px rgba(26, 82, 118, 0.1);
+    }
+
+    /* Select2 personalizado */
+    .select2 {
+        width: 100% !important;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .select2-container--default .select2-selection--single {
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 0.75rem 1rem;
+        font-family: 'Poppins', sans-serif;
+        transition: all 0.3s ease;
+    }
+
+    .select2-container--default.select2-container--focus .select2-selection--single {
+        border-color: var(--dental-primary);
+        box-shadow: 0 0 0 3px rgba(26, 82, 118, 0.1);
+    }
+
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background-color: var(--dental-primary);
+        color: white;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .calendar-title {
+            font-size: 2rem;
+        }
+        
+        #calendar {
+            padding: 1rem;
+        }
+        
+        .filtros-container {
+            padding: 1rem;
+        }
+    }
+
+    /* Modal de cita mejorado */
+    .modal-content {
+        border-radius: 15px;
+        border: none;
+        box-shadow: 0 10px 30px rgba(26, 82, 118, 0.2);
+        overflow: hidden;
+    }
+
+    .modal-header {
+        background: linear-gradient(135deg, var(--dental-primary), var(--dental-secondary));
+        color: white;
+        padding: 1.5rem 2rem;
+        border-bottom: none;
+    }
+
+    .modal-title {
+        font-family: 'Poppins', sans-serif;
+        font-size: 1.4rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        color: white;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-title i {
+        font-size: 1.3rem;
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .btn-close-white {
+        filter: brightness(0) invert(1);
+    }
+
+    .modal-body {
+        padding: 2rem;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 249, 250, 0.95));
+    }
+
+    .modal-footer {
+        padding: 1.5rem 2rem;
+        background: linear-gradient(135deg, rgba(26, 82, 118, 0.02), rgba(255, 255, 255, 0.9));
+        border-top: 1px solid var(--dental-accent);
+    }
+
+    /* Controles del formulario con iconos */
+    .form-group {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group .form-label {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 500;
+        color: var(--dental-text-dark);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-group .form-label i {
+        color: var(--dental-primary);
+        font-size: 0.9rem;
+    }
+
+    .form-control, .form-select {
+        font-family: 'Poppins', sans-serif;
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        background-color: white;
+        position: relative;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--dental-primary);
+        box-shadow: 0 0 0 3px rgba(26, 82, 118, 0.1);
+        background-color: white;
+    }
+
+    .form-control.is-valid {
+        border-color: #28a745;
+        background-color: #f8fff9;
+    }
+
+    .form-control.is-invalid {
+        border-color: #dc3545;
+        background-color: #fff8f8;
+    }
+
+    /* Iconos en los controles */
+    .input-icon {
+        position: absolute;
+        left: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--dental-primary);
+        font-size: 0.9rem;
+        z-index: 2;
+        pointer-events: none;
+    }
+
+    .form-control:focus + .input-icon,
+    .form-select:focus + .input-icon {
+        color: var(--dental-secondary);
+    }
+
+    /* Botones del modal mejorados */
+    .modal-footer .btn {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: 25px;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        text-transform: none;
+        letter-spacing: 0.5px;
+        border: 2px solid transparent;
+    }
+
+    .modal-footer .btn-primary {
+        background: linear-gradient(135deg, #28a745, #20c997);
+        border-color: #28a745;
+        color: white;
+        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+    }
+
+    .modal-footer .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        background: linear-gradient(135deg, #20c997, #28a745);
+        border-color: #20c997;
+        color: white;
+    }
+
+    .modal-footer .btn-secondary {
+        background: linear-gradient(135deg, #6c757d, #5a6268);
+        border-color: #6c757d;
+        color: white;
+        box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+    }
+
+    .modal-footer .btn-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
+        background: linear-gradient(135deg, #5a6268, #6c757d);
+        border-color: #5a6268;
+        color: white;
+    }
+
+    .modal-footer .btn-danger {
+        background: linear-gradient(135deg, #dc3545, #c82333);
+        border-color: #dc3545;
+        color: white;
+        box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+    }
+
+    .modal-footer .btn-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+        background: linear-gradient(135deg, #c82333, #dc3545);
+        border-color: #c82333;
+        color: white;
+    }
+
+    /* Textarea con icono */
+    .textarea-group {
+        position: relative;
+    }
+
+    .textarea-group .form-control {
+        padding-left: 2.5rem;
+        min-height: 80px;
+        resize: vertical;
+    }
+
+    .textarea-group .input-icon {
+        top: 1.5rem;
+        transform: none;
+    }
+
+    /* Select2 personalizado para el modal */
+    .modal .select2-container--default .select2-selection--single {
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        font-family: 'Poppins', sans-serif;
+        transition: all 0.3s ease;
+        background-color: white;
+        height: auto;
+        min-height: 45px;
+    }
+
+    .modal .select2-container--default.select2-container--focus .select2-selection--single {
+        border-color: var(--dental-primary);
+        box-shadow: 0 0 0 3px rgba(26, 82, 118, 0.1);
+    }
+
+    .modal .select2-container--default .select2-selection--single .select2-selection__rendered {
+        padding-left: 0;
+        color: var(--dental-text-dark);
+        line-height: 1.5;
+    }
+
+    .modal .select2-container--default .select2-selection--single .select2-selection__arrow {
+        right: 0.75rem;
+        height: 100%;
+    }
+
+    .modal .select2-container--default .select2-selection--single .select2-selection__placeholder {
+        color: #6c757d;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .modal .select2-dropdown {
+        border: 2px solid var(--dental-primary);
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(26, 82, 118, 0.15);
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .modal .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background-color: var(--dental-primary);
+        color: white;
+    }
+
+    .modal .select2-container--default .select2-results__option[aria-selected=true] {
+        background-color: rgba(26, 82, 118, 0.1);
+        color: var(--dental-primary);
+    }
+
+    .modal .select2-search__field {
+        border: 1px solid #e9ecef;
+        border-radius: 5px;
+        padding: 0.5rem;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .modal .select2-search__field:focus {
+        border-color: var(--dental-primary);
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(26, 82, 118, 0.1);
+    }
+
+    /* Responsive para el modal */
+    @media (max-width: 768px) {
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .modal-footer {
+            padding: 1rem 1.5rem;
+        }
+        
+        .form-control, .form-select {
+            padding-left: 2rem;
+        }
+        
+        .input-icon {
+            left: 0.5rem;
+        }
+    }
+
+    /* Botones con estados de carga mejorados */
+    .modal-footer .btn:disabled {
+        opacity: 0.7;
+        transform: none !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .modal-footer .btn .fa-spinner {
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header del calendario -->
+    <div class="calendar-header">
+        <h1 class="calendar-title">
+            <i class="fas fa-calendar-alt"></i>
+            Calendario de Citas
+        </h1>
+        <p class="calendar-subtitle">Gestiona y visualiza todas las citas de tu clínica dental</p>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filtros-container">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="filtro-profesional">Profesional:</label>
+                    <select id="filtro-profesional" class="form-select">
+                        <option value="">Todos los profesionales</option>
+                        {% for profesional in profesionales %}
+                        <option value="{{ profesional.id }}">{{ profesional.nombres }} {{ profesional.apellido_paterno }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="filtro-estado">Estado:</label>
+                    <select id="filtro-estado" class="form-select">
+                        <option value="">Todos los estados</option>
+                        <option value="PENDIENTE">Pendiente</option>
+                        <option value="CONFIRMADA">Confirmada</option>
+                        <option value="COMPLETADA">Completada</option>
+                        <option value="CANCELADA">Cancelada</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="filtro-paciente">Paciente:</label>
+                    <input type="text" id="filtro-paciente" class="form-control" placeholder="Buscar paciente...">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <button type="button" class="btn btn-nueva-cita d-block w-100" data-bs-toggle="modal" data-bs-target="#modalCita">
+                        <i class="fas fa-plus"></i> Nueva Cita
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendario -->
+    <div id="calendar"></div>
+</div>
+
+<!-- Modal para crear/editar cita -->
+<div class="modal fade" id="modalCita" tabindex="-1" aria-labelledby="modalCitaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalCitaLabel">
+                    <i class="fas fa-calendar-plus"></i>
+                    <span id="modalTitle">Crear Nueva Cita</span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formCita" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" id="cita_id" name="cita_id">
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="paciente" class="form-label">
+                                    <i class="fas fa-user"></i>
+                                    Paciente *
+                                </label>
+                                <div class="position-relative">
+                                    <i class="fas fa-user input-icon"></i>
+                                    <select id="paciente" name="paciente" class="form-select" required>
+                                        <option value="">Seleccionar paciente...</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="profesional" class="form-label">
+                                    <i class="fas fa-user-md"></i>
+                                    Profesional *
+                                </label>
+                                <div class="position-relative">
+                                    <i class="fas fa-user-md input-icon"></i>
+                                    <select id="profesional" name="profesional" class="form-select" required>
+                                        <option value="">Seleccionar profesional...</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="fecha" class="form-label">
+                                    <i class="fas fa-calendar"></i>
+                                    Fecha *
+                                </label>
+                                <div class="position-relative">
+                                    <i class="fas fa-calendar input-icon"></i>
+                                    <input type="date" id="fecha" name="fecha" class="form-control" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="hora" class="form-label">
+                                    <i class="fas fa-clock"></i>
+                                    Hora *
+                                </label>
+                                <div class="position-relative">
+                                    <i class="fas fa-clock input-icon"></i>
+                                    <input type="time" id="hora" name="hora" class="form-control" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="duracion" class="form-label">
+                                    <i class="fas fa-hourglass-half"></i>
+                                    Duración (minutos) *
+                                </label>
+                                <div class="position-relative">
+                                    <i class="fas fa-hourglass-half input-icon"></i>
+                                    <select id="duracion" name="duracion" class="form-select" required>
+                                        <option value="30">30 minutos</option>
+                                        <option value="60" selected>1 hora</option>
+                                        <option value="90">1.5 horas</option>
+                                        <option value="120">2 horas</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="estado" class="form-label">
+                                    <i class="fas fa-info-circle"></i>
+                                    Estado *
+                                </label>
+                                <div class="position-relative">
+                                    <i class="fas fa-info-circle input-icon"></i>
+                                    <select id="estado" name="estado" class="form-select" required>
+                                        <option value="PENDIENTE">Pendiente</option>
+                                        <option value="CONFIRMADA">Confirmada</option>
+                                        <option value="COMPLETADA">Completada</option>
+                                        <option value="CANCELADA">Cancelada</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="motivo" class="form-label">
+                            <i class="fas fa-sticky-note"></i>
+                            Motivo de la cita
+                        </label>
+                        <div class="textarea-group">
+                            <i class="fas fa-sticky-note input-icon"></i>
+                            <textarea id="motivo" name="motivo" class="form-control" rows="3" placeholder="Descripción del motivo de la cita..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="observaciones" class="form-label">
+                            <i class="fas fa-comment"></i>
+                            Observaciones
+                        </label>
+                        <div class="textarea-group">
+                            <i class="fas fa-comment input-icon"></i>
+                            <textarea id="observaciones" name="observaciones" class="form-control" rows="2" placeholder="Observaciones adicionales..."></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" id="btnGuardarCita">
+                    <i class="fas fa-save"></i> Guardar Cita
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación de eliminación -->
+<div class="modal fade" id="modalConfirmarEliminar" tabindex="-1" aria-labelledby="modalConfirmarEliminarLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalConfirmarEliminarLabel">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Confirmar Eliminación
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-0">
+                    <i class="fas fa-question-circle text-warning me-2"></i>
+                    ¿Está seguro de que desea eliminar esta cita? Esta acción no se puede deshacer.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-danger" id="btnConfirmarEliminar">
+                    <i class="fas fa-trash"></i> Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Calendario de Citas{% endblock %}
+{% block page_title %}Calendario de Citas{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/dental-theme.css' %}">
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+<link href='https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css' rel='stylesheet' />
+<style>
+    body, .container-fluid, .dental-title, .dental-subtitle, .dental-header, .dental-btn, .dental-stats-card, .dental-stats-number, .dental-stats-label, .dental-table, .dental-chart-container, .breadcrumb, .breadcrumb-item {
+        font-family: 'Poppins', sans-serif !important;
+    }
+
+    /* Header del calendario */
+    .calendar-header {
+        background: linear-gradient(135deg, rgba(26, 82, 118, 0.1), rgba(255, 255, 255, 0.9));
+        color: var(--dental-primary);
+        padding: 1.5rem 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        text-align: left;
+        border: 1px solid var(--dental-accent);
+    }
+
+    .calendar-title {
+        font-family: 'Poppins', sans-serif;
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin: 0;
+        color: var(--dental-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+    }
+
+    .calendar-subtitle {
+        font-family: 'Poppins', sans-serif;
+        font-size: 1rem;
+        margin: 0.3rem 0 0 0;
+        color: var(--dental-text-light);
+        font-weight: 400;
+    }
+
+    /* Contenedor principal del calendario */
+    #calendar {
+        background: linear-gradient(135deg, var(--dental-light), rgba(255, 255, 255, 0.95));
+        padding: 2rem;
+        min-height: 700px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(26, 82, 118, 0.1);
+        border: 1px solid var(--dental-accent);
+        font-family: 'Poppins', sans-serif;
+    }
+
+    /* Estilos para los eventos del calendario */
+    .fc-event {
+        cursor: pointer;
+        border: none;
+        border-radius: 8px;
+        padding: 0;
+        font-weight: 500;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        margin: 1px 0;
+        min-height: 60px;
+        overflow: hidden;
+        color: white;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .fc-event:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+
+    .cita-evento {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 8px;
+    }
+
+    .cita-header {
+        padding: 3px 6px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(0, 0, 0, 0.1);
+        border-bottom: 1px solid rgba(0,0,0,0.1);
+        border-radius: 8px 8px 0 0;
+    }
+
+    .cita-time {
+        font-size: 0.75em;
+        font-weight: 600;
+        color: white;
+        font-family: 'Poppins', sans-serif;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
+
+    .cita-status .badge {
+        font-size: 0.65em;
+        padding: 0.25em 0.5em;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+        background: rgba(255, 255, 255, 0.9);
+        color: #333;
+        border-radius: 4px;
+    }
+
+    .cita-body {
+        padding: 4px 6px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 0 0 8px 8px;
+    }
+
+    .cita-title {
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 0.85em;
+        line-height: 1.2;
+        margin-bottom: 2px;
+        padding: 3px 4px;
+        background: rgba(255,255,255,0.9);
+        border-radius: 3px;
+        border: 1px solid rgba(0,0,0,0.05);
+        font-family: 'Poppins', sans-serif;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .cita-details {
+        display: flex;
+        flex-direction: column;
+        font-size: 0.75em;
+        color: #34495e;
+        margin: 1px 0;
+        gap: 1px;
+    }
+
+    .cita-details > div {
+        padding: 2px 4px;
+        font-weight: 500;
+        font-size: 0.75em;
+        color: #34495e;
+        background: rgba(255,255,255,0.9);
+        border-radius: 3px;
+        margin-bottom: 1px;
+        border: 1px solid rgba(0,0,0,0.05);
+        font-family: 'Poppins', sans-serif;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .cita-motivo {
+        font-size: 0.7em;
+        color: #576574;
+        line-height: 1.1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        padding: 2px 4px;
+        margin-top: 1px;
+        background: rgba(255,255,255,0.9);
+        border-radius: 3px;
+        border: 1px solid rgba(0,0,0,0.05);
+        font-family: 'Poppins', sans-serif;
+    }
+
+    /* Paleta de colores del tema dental para estados de citas */
+    .fc-event[data-status="PENDIENTE"] {
+        background: linear-gradient(135deg, var(--dental-primary) 0%, var(--dental-secondary) 100%);
+        box-shadow: 0 2px 6px rgba(26, 82, 118, 0.4);
+    }
+
+    .fc-event[data-status="CONFIRMADA"] {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        box-shadow: 0 2px 6px rgba(40, 167, 69, 0.4);
+    }
+
+    .fc-event[data-status="COMPLETADA"] {
+        background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+        box-shadow: 0 2px 6px rgba(23, 162, 184, 0.4);
+    }
+
+    .fc-event[data-status="CANCELADA"] {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        box-shadow: 0 2px 6px rgba(220, 53, 69, 0.4);
+    }
+
+    .fc-event[data-status="PENDIENTE"]:hover {
+        box-shadow: 0 4px 12px rgba(26, 82, 118, 0.5);
+    }
+
+    .fc-event[data-status="CONFIRMADA"]:hover {
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.5);
+    }
+
+    .fc-event[data-status="COMPLETADA"]:hover {
+        box-shadow: 0 4px 12px rgba(23, 162, 184, 0.5);
+    }
+
+    .fc-event[data-status="CANCELADA"]:hover {
+        box-shadow: 0 4px 12px rgba(220, 53, 69, 0.5);
+    }
+
+    /* Estilos para la cabecera del calendario */
+    .fc .fc-toolbar {
+        padding: 1rem 0;
+        margin-bottom: 1.5rem;
+    }
+
+    .fc .fc-toolbar-title {
+        font-size: 1.75em;
+        color: var(--dental-primary);
+        font-weight: 700;
+        text-transform: capitalize;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .fc .fc-button-primary {
+        background: linear-gradient(135deg, var(--dental-primary), var(--dental-secondary));
+        border: none;
+        color: white;
+        font-weight: 500;
+        text-transform: capitalize;
+        padding: 0.6rem 1.2rem;
+        border-radius: 12px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 2px 4px rgba(26, 82, 118, 0.2);
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .fc .fc-button-primary:hover {
+        background: linear-gradient(135deg, var(--dental-secondary), var(--dental-primary));
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(26, 82, 118, 0.3);
+    }
+
+    .fc .fc-button-primary:focus {
+        box-shadow: 0 0 0 3px rgba(26, 82, 118, 0.2);
+    }
+
+    /* Botones de acción */
+    .btn-nueva-cita {
+        background: linear-gradient(135deg, var(--dental-primary), var(--dental-secondary));
+        border: none;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 25px;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(26, 82, 118, 0.3);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-nueva-cita:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(26, 82, 118, 0.4);
+        background: linear-gradient(135deg, var(--dental-secondary), var(--dental-primary));
+        color: white;
+        text-decoration: none;
+    }
+
+    /* Controles de filtro */
+    .filtros-container {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+        border: 1px solid var(--dental-accent);
+    }
+
+    .filtros-container label {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 500;
+        color: var(--dental-text-dark);
+        margin-bottom: 0.5rem;
+    }
+
+    .filtros-container .form-control,
+    .filtros-container .form-select {
+        font-family: 'Poppins', sans-serif;
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+
+    .filtros-container .form-control:focus,
+    .filtros-container .form-select:focus {
+        border-color: var(--dental-primary);
+        box-shadow: 0 0 0 3px rgba(26, 82, 118, 0.1);
+    }
+
+    /* Select2 personalizado */
+    .select2 {
+        width: 100% !important;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .select2-container--default .select2-selection--single {
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 0.75rem 1rem;
+        font-family: 'Poppins', sans-serif;
+        transition: all 0.3s ease;
+    }
+
+    .select2-container--default.select2-container--focus .select2-selection--single {
+        border-color: var(--dental-primary);
+        box-shadow: 0 0 0 3px rgba(26, 82, 118, 0.1);
+    }
+
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background-color: var(--dental-primary);
+        color: white;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .calendar-title {
+            font-size: 2rem;
+        }
+        
+        #calendar {
+            padding: 1rem;
+        }
+        
+        .filtros-container {
+            padding: 1rem;
+        }
+    }
+
+    /* Modal de cita mejorado */
+    .modal-content {
+        border-radius: 15px;
+        border: none;
+        box-shadow: 0 10px 30px rgba(26, 82, 118, 0.2);
+        overflow: hidden;
+    }
+
+    .modal-header {
+        background: linear-gradient(135deg, var(--dental-primary), var(--dental-secondary));
+        color: white;
+        padding: 1.5rem 2rem;
+        border-bottom: none;
+    }
+
+    .modal-title {
+        font-family: 'Poppins', sans-serif;
+        font-size: 1.4rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        color: white;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-title i {
+        font-size: 1.3rem;
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .btn-close-white {
+        filter: brightness(0) invert(1);
+    }
+
+    .modal-body {
+        padding: 2rem;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 249, 250, 0.95));
+    }
+
+    .modal-footer {
+        padding: 1.5rem 2rem;
+        background: linear-gradient(135deg, rgba(26, 82, 118, 0.02), rgba(255, 255, 255, 0.9));
+        border-top: 1px solid var(--dental-accent);
+    }
+
+    /* Controles del formulario con iconos */
+    .form-group {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group .form-label {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 500;
+        color: var(--dental-text-dark);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-group .form-label i {
+        color: var(--dental-primary);
+        font-size: 0.9rem;
+    }
+
+    .form-control, .form-select {
+        font-family: 'Poppins', sans-serif;
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        background-color: white;
+        position: relative;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--dental-primary);
+        box-shadow: 0 0 0 3px rgba(26, 82, 118, 0.1);
+        background-color: white;
+    }
+
+    .form-control.is-valid {
+        border-color: #28a745;
+        background-color: #f8fff9;
+    }
+
+    .form-control.is-invalid {
+        border-color: #dc3545;
+        background-color: #fff8f8;
+    }
+
+    /* Iconos en los controles */
+    .input-icon {
+        position: absolute;
+        left: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--dental-primary);
+        font-size: 0.9rem;
+        z-index: 2;
+        pointer-events: none;
+    }
+
+    .form-control:focus + .input-icon,
+    .form-select:focus + .input-icon {
+        color: var(--dental-secondary);
+    }
+
+    /* Botones del modal mejorados */
+    .modal-footer .btn {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: 25px;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        text-transform: none;
+        letter-spacing: 0.5px;
+        border: 2px solid transparent;
+    }
+
+    .modal-footer .btn-primary {
+        background: linear-gradient(135deg, #28a745, #20c997);
+        border-color: #28a745;
+        color: white;
+        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+    }
+
+    .modal-footer .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        background: linear-gradient(135deg, #20c997, #28a745);
+        border-color: #20c997;
+        color: white;
+    }
+
+    .modal-footer .btn-secondary {
+        background: linear-gradient(135deg, #6c757d, #5a6268);
+        border-color: #6c757d;
+        color: white;
+        box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+    }
+
+    .modal-footer .btn-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
+        background: linear-gradient(135deg, #5a6268, #6c757d);
+        border-color: #5a6268;
+        color: white;
+    }
+
+    .modal-footer .btn-danger {
+        background: linear-gradient(135deg, #dc3545, #c82333);
+        border-color: #dc3545;
+        color: white;
+        box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+    }
+
+    .modal-footer .btn-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+        background: linear-gradient(135deg, #c82333, #dc3545);
+        border-color: #c82333;
+        color: white;
+    }
+
+    /* Textarea con icono */
+    .textarea-group {
+        position: relative;
+    }
+
+    .textarea-group .form-control {
+        padding-left: 2.5rem;
+        min-height: 80px;
+        resize: vertical;
+    }
+
+    .textarea-group .input-icon {
+        top: 1.5rem;
+        transform: none;
+    }
+
+    /* Select2 personalizado para el modal */
+    .modal .select2-container--default .select2-selection--single {
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        font-family: 'Poppins', sans-serif;
+        transition: all 0.3s ease;
+        background-color: white;
+        height: auto;
+        min-height: 45px;
+    }
+
+    .modal .select2-container--default.select2-container--focus .select2-selection--single {
+        border-color: var(--dental-primary);
+        box-shadow: 0 0 0 3px rgba(26, 82, 118, 0.1);
+    }
+
+    .modal .select2-container--default .select2-selection--single .select2-selection__rendered {
+        padding-left: 0;
+        color: var(--dental-text-dark);
+        line-height: 1.5;
+    }
+
+    .modal .select2-container--default .select2-selection--single .select2-selection__arrow {
+        right: 0.75rem;
+        height: 100%;
+    }
+
+    .modal .select2-container--default .select2-selection--single .select2-selection__placeholder {
+        color: #6c757d;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .modal .select2-dropdown {
+        border: 2px solid var(--dental-primary);
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(26, 82, 118, 0.15);
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .modal .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background-color: var(--dental-primary);
+        color: white;
+    }
+
+    .modal .select2-container--default .select2-results__option[aria-selected=true] {
+        background-color: rgba(26, 82, 118, 0.1);
+        color: var(--dental-primary);
+    }
+
+    .modal .select2-search__field {
+        border: 1px solid #e9ecef;
+        border-radius: 5px;
+        padding: 0.5rem;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .modal .select2-search__field:focus {
+        border-color: var(--dental-primary);
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(26, 82, 118, 0.1);
+    }
+
+    /* Responsive para el modal */
+    @media (max-width: 768px) {
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .modal-footer {
+            padding: 1rem 1.5rem;
+        }
+        
+        .form-control, .form-select {
+            padding-left: 2rem;
+        }
+        
+        .input-icon {
+            left: 0.5rem;
+        }
+    }
+
+    /* Botones con estados de carga mejorados */
+    .modal-footer .btn:disabled {
+        opacity: 0.7;
+        transform: none !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .modal-footer .btn .fa-spinner {
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header del calendario -->
+    <div class="calendar-header">
+        <h1 class="calendar-title">
+            <i class="fas fa-calendar-alt"></i>
+            Calendario de Citas
+        </h1>
+        <p class="calendar-subtitle">Gestiona y visualiza todas las citas de tu clínica dental</p>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filtros-container">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="filtro-profesional">Profesional:</label>
+                    <select id="filtro-profesional" class="form-select">
+                        <option value="">Todos los profesionales</option>
+                        {% for profesional in profesionales %}
+                        <option value="{{ profesional.id }}">{{ profesional.nombres }} {{ profesional.apellido_paterno }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="filtro-estado">Estado:</label>
+                    <select id="filtro-estado" class="form-select">
+                        <option value="">Todos los estados</option>
+                        <option value="PENDIENTE">Pendiente</option>
+                        <option value="CONFIRMADA">Confirmada</option>
+                        <option value="COMPLETADA">Completada</option>
+                        <option value="CANCELADA">Cancelada</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="filtro-paciente">Paciente:</label>
+                    <input type="text" id="filtro-paciente" class="form-control" placeholder="Buscar paciente...">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <button type="button" class="btn btn-nueva-cita d-block w-100" data-bs-toggle="modal" data-bs-target="#modalCita">
+                        <i class="fas fa-plus"></i> Nueva Cita
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendario -->
+    <div id="calendar"></div>
+</div>
+
+<!-- Modal para crear/editar cita -->
+<div class="modal fade" id="modalCita" tabindex="-1" aria-labelledby="modalCitaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalCitaLabel">
+                    <i class="fas fa-calendar-plus"></i>
+                    <span id="modalTitle">Crear Nueva Cita</span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formCita" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" id="cita_id" name="cita_id">
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="paciente" class="form-label">
+                                    <i class="fas fa-user"></i>
+                                    Paciente *
+                                </label>
+                                <div class="position-relative">
+                                    <i class="fas fa-user input-icon"></i>
+                                    <select id="paciente" name="paciente" class="form-select" required>
+                                        <option value="">Seleccionar paciente...</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="profesional" class="form-label">
+                                    <i class="fas fa-user-md"></i>
+                                    Profesional *
+                                </label>
+                                <div class="position-relative">
+                                    <i class="fas fa-user-md input-icon"></i>
+                                    <select id="profesional" name="profesional" class="form-select" required>
+                                        <option value="">Seleccionar profesional...</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="fecha" class="form-label">
+                                    <i class="fas fa-calendar"></i>
+                                    Fecha *
+                                </label>
+                                <div class="position-relative">
+                                    <i class="fas fa-calendar input-icon"></i>
+                                    <input type="date" id="fecha" name="fecha" class="form-control" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="hora" class="form-label">
+                                    <i class="fas fa-clock"></i>
+                                    Hora *
+                                </label>
+                                <div class="position-relative">
+                                    <i class="fas fa-clock input-icon"></i>
+                                    <input type="time" id="hora" name="hora" class="form-control" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="duracion" class="form-label">
+                                    <i class="fas fa-hourglass-half"></i>
+                                    Duración (minutos) *
+                                </label>
+                                <div class="position-relative">
+                                    <i class="fas fa-hourglass-half input-icon"></i>
+                                    <select id="duracion" name="duracion" class="form-select" required>
+                                        <option value="30">30 minutos</option>
+                                        <option value="60" selected>1 hora</option>
+                                        <option value="90">1.5 horas</option>
+                                        <option value="120">2 horas</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="estado" class="form-label">
+                                    <i class="fas fa-info-circle"></i>
+                                    Estado *
+                                </label>
+                                <div class="position-relative">
+                                    <i class="fas fa-info-circle input-icon"></i>
+                                    <select id="estado" name="estado" class="form-select" required>
+                                        <option value="PENDIENTE">Pendiente</option>
+                                        <option value="CONFIRMADA">Confirmada</option>
+                                        <option value="COMPLETADA">Completada</option>
+                                        <option value="CANCELADA">Cancelada</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="motivo" class="form-label">
+                            <i class="fas fa-sticky-note"></i>
+                            Motivo de la cita
+                        </label>
+                        <div class="textarea-group">
+                            <i class="fas fa-sticky-note input-icon"></i>
+                            <textarea id="motivo" name="motivo" class="form-control" rows="3" placeholder="Descripción del motivo de la cita..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="observaciones" class="form-label">
+                            <i class="fas fa-comment"></i>
+                            Observaciones
+                        </label>
+                        <div class="textarea-group">
+                            <i class="fas fa-comment input-icon"></i>
+                            <textarea id="observaciones" name="observaciones" class="form-control" rows="2" placeholder="Observaciones adicionales..."></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" id="btnGuardarCita">
+                    <i class="fas fa-save"></i> Guardar Cita
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación de eliminación -->
+<div class="modal fade" id="modalConfirmarEliminar" tabindex="-1" aria-labelledby="modalConfirmarEliminarLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalConfirmarEliminarLabel">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Confirmar Eliminación
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-0">
+                    <i class="fas fa-question-circle text-warning me-2"></i>
+                    ¿Está seguro de que desea eliminar esta cita? Esta acción no se puede deshacer.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-danger" id="btnConfirmarEliminar">
+                    <i class="fas fa-trash"></i> Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js'></script>
+<script>
+</script>
+{% endblock %} 

@@ -11,19 +11,24 @@ class EmpresaMiddleware:
         rutas_excluidas = [
             '/login/',
             '/logout/',
-            '/seleccionar-empresa/',
+            '/empresas/',
             '/admin/',
             '/static/',
             '/media/',
             '/favicon.ico',
         ]
         
+        # Solo verificar empresa para rutas que no están excluidas
         if (request.user.is_authenticated and 
             not any(request.path.startswith(ruta) for ruta in rutas_excluidas)):
             
-            # Si no tiene empresa seleccionada, redirigir a selección
-            if 'empresa_actual_id' not in request.session:
-                return redirect('seleccionar_empresa')
+            # Verificar si tiene empresa seleccionada
+            empresa_id = request.session.get('empresa_actual_id') or request.session.get('empresa_id')
+            
+            if not empresa_id:
+                # Solo redirigir si no está ya en una página de empresa
+                if not request.path.startswith('/empresas/'):
+                    return redirect('empresa:seleccionar_empresa')
                     
         response = self.get_response(request)
         return response

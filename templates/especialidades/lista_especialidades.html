@@ -1,0 +1,402 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Especialidades{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
+<link rel="stylesheet" href="{% static 'css/dental-theme.css' %}">
+<style>
+    .card {
+        border: 1px solid var(--dental-accent);
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    }
+
+    .card-header {
+        background-color: var(--dental-light);
+        border-bottom: 1px solid var(--dental-accent);
+        border-radius: 15px 15px 0 0 !important;
+        padding: 1.5rem;
+    }
+
+    .card-header h3 {
+        color: var(--dental-primary);
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    .table {
+        border: 1px solid var(--dental-accent);
+        border-radius: 8px;
+        margin-bottom: 0;
+    }
+
+    .table thead th {
+        background-color: var(--dental-light);
+        color: var(--dental-primary);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        border-bottom: 2px solid var(--dental-accent);
+        padding: 0.75rem 0.5rem;
+    }
+
+    .table td {
+        vertical-align: middle;
+        padding: 0.75rem 0.5rem;
+        border-bottom: 1px solid var(--dental-light);
+    }
+
+    .table tbody tr:hover {
+        background-color: rgba(174, 214, 241, 0.1);
+    }
+
+    /* Botones con tema dental */
+    .btn-primary {
+        background-color: var(--dental-primary);
+        border-color: var(--dental-primary);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: var(--dental-dark);
+        border-color: var(--dental-dark);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .btn-warning {
+        background-color: var(--dental-warning);
+        border-color: var(--dental-warning);
+        color: white;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-warning:hover {
+        background-color: #e67e22;
+        border-color: #e67e22;
+        color: white;
+        transform: translateY(-1px);
+    }
+
+    .btn-danger {
+        background-color: var(--dental-danger);
+        border-color: var(--dental-danger);
+        color: white;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-danger:hover {
+        background-color: #c0392b;
+        border-color: #c0392b;
+        color: white;
+        transform: translateY(-1px);
+    }
+
+    /* Badges de estado */
+    .estado-badge {
+        padding: 0.4rem 0.8rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .estado-activo {
+        background-color: var(--dental-success);
+        color: white;
+    }
+
+    .estado-inactivo {
+        background-color: var(--dental-danger);
+        color: white;
+    }
+
+    /* Barra de búsqueda */
+    .search-box {
+        border: 1px solid var(--dental-accent);
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .search-box:focus {
+        border-color: var(--dental-primary);
+        box-shadow: 0 0 0 0.2rem rgba(26, 82, 118, 0.1);
+        outline: none;
+    }
+
+    /* Texto */
+    .text-muted {
+        color: var(--dental-text-light) !important;
+    }
+
+    /* Botones de acción */
+    .btn-group .btn {
+        margin-right: 0.25rem;
+    }
+
+    .btn-group .btn:last-child {
+        margin-right: 0;
+    }
+
+    /* Estado vacío */
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+    }
+
+    .empty-state i {
+        color: var(--dental-text-light);
+        margin-bottom: 1rem;
+    }
+
+    .empty-state h5 {
+        color: var(--dental-text);
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+        color: var(--dental-text-light);
+        margin-bottom: 1.5rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 1rem;
+        }
+        
+        .table-responsive {
+            border-radius: 8px;
+            border: 1px solid var(--dental-accent);
+        }
+        
+        .btn-group .btn {
+            margin-bottom: 0.25rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-0"><i class="fas fa-stethoscope me-2"></i>Especialidades</h3>
+                            <p class="text-muted mb-0">Gestione las especialidades dentales disponibles en la clínica</p>
+                        </div>
+                        <a href="{% url 'especialidades:nueva_especialidad' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Nueva Especialidad
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Barra de búsqueda -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <form method="get" class="d-flex">
+                                <input type="text" name="q" class="form-control search-box me-2" placeholder="Buscar especialidad..." value="{{ request.GET.q }}">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search me-2"></i>Buscar
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    {% if especialidades %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Descripción</th>
+                                    <th>Estado</th>
+                                    <th class="text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for especialidad in especialidades %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ especialidad.nombre }}</strong>
+                                    </td>
+                                    <td>
+                                        {% if especialidad.descripcion %}
+                                            {{ especialidad.descripcion|truncatechars:100 }}
+                                        {% else %}
+                                            <span class="text-muted">Sin descripción</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="estado-badge {% if especialidad.estado %}estado-activo{% else %}estado-inactivo{% endif %}">
+                                            {% if especialidad.estado %}
+                                                <i class="fas fa-check-circle"></i>Activa
+                                            {% else %}
+                                                <i class="fas fa-times-circle"></i>Inactiva
+                                            {% endif %}
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group">
+                                            <a href="{% url 'especialidades:editar_especialidad' especialidad.id %}" class="btn btn-warning btn-sm" title="Editar especialidad">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-danger btn-sm" onclick="confirmarEliminacion({{ especialidad.id }})" title="Eliminar especialidad">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-stethoscope fa-4x"></i>
+                        <h5>No hay especialidades registradas</h5>
+                        <p>Comience agregando una nueva especialidad para organizar mejor los servicios dentales</p>
+                        <a href="{% url 'especialidades:nueva_especialidad' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Agregar Especialidad
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+<script>
+    // Configuración base de Toast con tema dental
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        customClass: {
+            popup: 'swal2-toast-dental'
+        }
+    });
+
+    // Mostrar mensajes de Django
+    {% if messages %}
+        {% for message in messages %}
+            Toast.fire({
+                icon: '{{ message.tags }}',
+                title: '{{ message }}',
+                background: '#E8F4FC',
+                color: '#1A5276'
+            });
+        {% endfor %}
+    {% endif %}
+
+    function confirmarEliminacion(especialidadId) {
+        Swal.fire({
+            title: '¿Está seguro?',
+            text: "Esta acción no se puede deshacer. La especialidad será eliminada permanentemente.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#e74c3c',
+            cancelButtonColor: '#95a5a6',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar',
+            customClass: {
+                popup: 'swal2-popup-dental',
+                confirmButton: 'swal2-confirm-dental',
+                cancelButton: 'swal2-cancel-dental'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Mostrar loading
+                Swal.fire({
+                    title: 'Eliminando...',
+                    text: 'Por favor espere',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+                
+                // Redirigir a la URL de eliminación
+                window.location.href = `/especialidades/eliminar/${especialidadId}/`;
+            }
+        });
+    }
+
+    // Animaciones para las filas de la tabla
+    document.addEventListener('DOMContentLoaded', function() {
+        const tableRows = document.querySelectorAll('tbody tr');
+        tableRows.forEach((row, index) => {
+            row.style.opacity = '0';
+            row.style.transform = 'translateY(20px)';
+            row.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            
+            setTimeout(() => {
+                row.style.opacity = '1';
+                row.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    });
+</script>
+
+<style>
+    /* Estilos personalizados para SweetAlert2 con tema dental */
+    .swal2-toast-dental {
+        background: #E8F4FC !important;
+        border: 1px solid #AED6F1 !important;
+        color: #1A5276 !important;
+    }
+
+    .swal2-popup-dental {
+        border-radius: 15px !important;
+        border: 1px solid #AED6F1 !important;
+    }
+
+    .swal2-confirm-dental {
+        background-color: #e74c3c !important;
+        border-color: #e74c3c !important;
+        border-radius: 8px !important;
+        padding: 0.75rem 1.5rem !important;
+        font-weight: 500 !important;
+    }
+
+    .swal2-cancel-dental {
+        background-color: #95a5a6 !important;
+        border-color: #95a5a6 !important;
+        border-radius: 8px !important;
+        padding: 0.75rem 1.5rem !important;
+        font-weight: 500 !important;
+    }
+</style>
+{% endblock %} 

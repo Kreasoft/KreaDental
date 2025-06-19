@@ -126,6 +126,7 @@ def guardar_cita(request):
 def obtener_citas(request):
     try:
         profesional_id = request.GET.get('profesional')
+        estado = request.GET.get('estado')
         fecha_inicio = request.GET.get('start')
         fecha_fin = request.GET.get('end')
         
@@ -133,6 +134,9 @@ def obtener_citas(request):
         
         if profesional_id:
             citas = citas.filter(profesional_id=profesional_id)
+        
+        if estado:
+            citas = citas.filter(estado=estado)
         
         if fecha_inicio:
             try:
@@ -160,11 +164,12 @@ def obtener_citas(request):
                     'start': f'{cita.fecha}T{hora_inicio}',
                     'end': f'{cita.fecha}T{hora_fin}',
                     'backgroundColor': {
-                        'PENDIENTE': '#ffc107',
-                        'CONFIRMADA': '#0d6efd',
-                        'COMPLETADA': '#198754',
-                        'CANCELADA': '#dc3545'
+                        'PENDIENTE': '#FFD700',    # Dorado suave
+                        'CONFIRMADA': '#90EE90',   # Verde claro
+                        'COMPLETADA': '#87CEEB',   # Azul claro
+                        'CANCELADA': '#FFB6C1'     # Rosa claro
                     }.get(cita.estado, '#6c757d'),
+                    'className': f'fc-event-{cita.estado.lower()}',
                     'extendedProps': {
                         'paciente_id': cita.paciente.id,
                         'paciente': cita.paciente.nombre_completo(),

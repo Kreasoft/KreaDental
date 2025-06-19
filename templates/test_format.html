@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Prueba de Formato{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h5>Prueba de Formato de Números</h5>
+        </div>
+        <div class="card-body">
+            <h6>Números de prueba:</h6>
+            <ul>
+                <li>1000 → {{ 1000|intcomma }}</li>
+                <li>1250000 → {{ 1250000|intcomma }}</li>
+                <li>50000.50 → {{ 50000.50|floatformat:0|intcomma }}</li>
+                <li>750000.75 → {{ 750000.75|floatformat:0|intcomma }}</li>
+            </ul>
+            
+            <h6>Con símbolo de peso:</h6>
+            <ul>
+                <li>$1000 → ${{ 1000|intcomma }}</li>
+                <li>$1250000 → ${{ 1250000|intcomma }}</li>
+                <li>$50000.50 → ${{ 50000.50|floatformat:0|intcomma }}</li>
+                <li>$750000.75 → ${{ 750000.75|floatformat:0|intcomma }}</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %} 
