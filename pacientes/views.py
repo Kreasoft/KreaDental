@@ -9,7 +9,7 @@ from django.db.models import Count, Q
 from django.utils import timezone
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-from .models import Paciente, HistorialClinico
+from .models import Paciente, HistorialClinico, Profesional
 from .forms import PacienteForm, HistorialClinicoForm
 from prevision.models import Prevision
 from tratamientos.models import Tratamiento
@@ -235,7 +235,10 @@ def agregar_historial(request, paciente_id):
         if form.is_valid():
             historial = form.save(commit=False)
             historial.paciente = paciente
-            historial.profesional = request.user
+            # Obtener el Profesional asociado al usuario usando la relación inversa
+            profesional = request.user.profesional_relacionado
+            if profesional:
+                historial.profesional = profesional
             historial.save()
             messages.success(request, 'Registro clínico agregado exitosamente.')
             return redirect('pacientes:editar_paciente', pk=paciente.id)
@@ -309,3 +312,25 @@ def buscar_pacientes(request):
             'more': len(results) == page_size
         }
     })
+
+@login_required
+def detalle_paciente(request, pk):
+    # Obtener la empresa actual del usuario
+    usuario_empresa = request.user.usuarioempresa_set.filter(activo=True).first()
+    empresa_actual = usuario_empresa.empresa if usuario_empresa else None
+    
+    if not empresa_actual:
+        messages.error(request, 'No tienes una empresa asignada.')
+        return redirect('home')
+
+    paciente = get_object_or_404(Paciente, pk=pk, empresa=empresa_actual)
+    # Usar el related_name correcto
+    historiales = paciente.historiales_clinicos.all().order_by('-fecha')
+    
+    context = {
+        'paciente': paciente,
+        'historiales': historiales,
+        'empresa_actual': empresa_actual,
+    }
+    
+    return render(request, 'pacientes/detalle_paciente.html', context)

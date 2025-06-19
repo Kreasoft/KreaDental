@@ -52,6 +52,12 @@
         background: linear-gradient(45deg, #f6c23e, #dda20a);
         color: white;
     }
+    .stat-card.pagos {
+        border-left-color: #4e73df;
+        background: linear-gradient(45deg, #4e73df, #224abe);
+        color: white;
+        cursor: pointer;
+    }
     .stat-card .text-xs {
         font-size: 0.8rem;
         opacity: 0.8;
@@ -87,6 +93,14 @@
     .card-header {
         background-color: #f8f9fc;
         border-bottom: 1px solid #e3e6f0;
+    }
+    .pagos-link {
+        text-decoration: none;
+        color: inherit;
+    }
+    .pagos-link:hover {
+        text-decoration: none;
+        color: inherit;
     }
 </style>
 {% endblock %}
@@ -185,6 +199,29 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Segunda fila de tarjetas -->
+    <div class="row">
+        <!-- Pagos -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <a href="{% url 'pagos_tratamientos:lista_pagos' %}" class="pagos-link">
+                <div class="card stat-card pagos h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-uppercase mb-1">
+                                    Gestión de Pagos</div>
+                                <div class="h5 mb-0 font-weight-bold">Ver Pagos</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-money-bill-wave"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
         </div>
     </div>
 

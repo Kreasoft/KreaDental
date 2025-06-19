@@ -1,23 +1,14 @@
 // Toggle the side navigation
-const sidebarToggle = document.body.querySelector('#sidebarToggle');
-const sidebar = document.body.querySelector('#wrapper');
-const content = document.body.querySelector('#content');
-
-if (sidebarToggle) {
-    // Mostrar/ocultar el menú en dispositivos móviles
-    sidebarToggle.addEventListener('click', function(e) {
-        e.preventDefault();
-        document.body.classList.toggle('sidebar-toggled');
-        sidebar.classList.toggle('toggled');
-        
-        // Si el menú está abierto, agregar padding al contenido
-        if (sidebar.classList.contains('toggled')) {
-            content.style.paddingLeft = '0';
-        } else {
-            content.style.paddingLeft = '250px';
-        }
-    });
-}
+document.addEventListener('DOMContentLoaded', function() {
+    const sidebarToggle = document.body.querySelector('#sidebarToggle');
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', event => {
+            event.preventDefault();
+            document.body.classList.toggle('sb-sidenav-toggled');
+            localStorage.setItem('sb|sidebar-toggle', document.body.classList.contains('sb-sidenav-toggled'));
+        });
+    }
+});
 
 // Cerrar el menú al hacer clic fuera de él
 document.addEventListener('click', function(e) {

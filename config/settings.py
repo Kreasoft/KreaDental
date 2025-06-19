@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+import locale
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -104,6 +105,21 @@ TIME_ZONE = 'America/Santiago'
 USE_I18N = True
 
 USE_TZ = True
+
+# Configuración para formato de números
+USE_THOUSAND_SEPARATOR = True
+THOUSAND_SEPARATOR = ','
+DECIMAL_SEPARATOR = '.'
+NUMBER_GROUPING = 3
+
+# Configuración de locale para formato de números
+try:
+    locale.setlocale(locale.LC_ALL, 'es_CL.UTF-8')
+except:
+    try:
+        locale.setlocale(locale.LC_ALL, 'Spanish_Chile.1252')
+    except:
+        pass
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'

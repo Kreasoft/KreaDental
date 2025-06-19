@@ -124,7 +124,10 @@ def cerrar_caja(request, cierre_id):
                     cierre.total_transferencia = total
             
             # Calcular diferencia
-            cierre.diferencia = cierre.monto_final - (cierre.monto_inicial + total_sistema)
+            if cierre.monto_final is not None:
+                cierre.diferencia = cierre.monto_final - (cierre.monto_inicial + total_sistema)
+            else:
+                cierre.diferencia = Decimal('0')  # Establecer un valor por defecto
             
             # Actualizar estado y usuario
             cierre.estado = 'CERRADO'

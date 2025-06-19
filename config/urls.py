@@ -3,6 +3,7 @@ from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from django.conf import settings
 from django.conf.urls.static import static
+from django.shortcuts import render
 from core import views
 from configuracion.models import ConfiguracionEmpresa
 
@@ -11,6 +12,9 @@ def get_empresa_config():
         return {'empresa': ConfiguracionEmpresa.objects.first()}
     except:
         return {'empresa': None}
+
+def test_format(request):
+    return render(request, 'test_format.html')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -31,6 +35,7 @@ urlpatterns = [
     path('laboratorios/', include(('lab_dental.urls', 'lab_dental'), namespace='lab_dental')),
     path('empresas/', include(('empresa.urls', 'empresa'), namespace='empresa')),
     path('usuarios/', include(('usuarios.urls', 'usuarios'), namespace='usuarios')),
+    path('test-format/', test_format, name='test_format'),
     path('login/', auth_views.LoginView.as_view(
         template_name='core/login.html',
         extra_context=get_empresa_config()

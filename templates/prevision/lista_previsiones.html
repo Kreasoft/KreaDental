@@ -27,32 +27,13 @@
         border-bottom: 1px solid rgba(0,0,0,0.05);
         border-radius: 15px 15px 0 0 !important;
     }
-    .btn-action {
-        padding: 0.4rem 0.75rem;
-        font-size: 0.875rem;
-        border-radius: 8px;
-        transition: all 0.3s;
-        position: relative;
-        overflow: hidden;
+    .btn-action, .btn-action:visited, .btn-action:active {
+        font-size: 0.85rem !important;
+        padding: 0.25rem 0.6rem !important;
+        text-decoration: none !important;
     }
-    .btn-action::after {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 0;
-        height: 0;
-        background: rgba(255,255,255,0.2);
-        border-radius: 50%;
-        transform: translate(-50%, -50%);
-        transition: width 0.6s ease, height 0.6s ease;
-    }
-    .btn-action:hover::after {
-        width: 150%;
-        height: 150%;
-    }
-    .btn-action:hover {
-        transform: translateY(-2px);
+    .btn-action:hover, .btn-action:focus {
+        text-decoration: none !important;
     }
     .table-hover tbody tr {
         transition: all 0.3s ease;
@@ -115,6 +96,32 @@
     .fade-in {
         animation: fadeIn 0.3s ease forwards;
     }
+    .form-check-input[type="checkbox"] {
+        width: 2.2em;
+        height: 1.2em;
+        background-color: #e9ecef;
+        border-radius: 1em;
+        border: 1px solid #bfc9d1;
+        transition: background 0.3s;
+        cursor: pointer;
+    }
+    .form-check-input:checked {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+    .form-check-input:focus {
+        box-shadow: 0 0 0 0.2rem rgba(40,167,69,.25);
+    }
+    .form-check-label {
+        margin-left: 0.5em;
+        font-size: 0.95em;
+    }
+    a.btn, a.btn-action {
+        text-decoration: none !important;
+    }
+    a.btn:hover, a.btn-action:hover {
+        text-decoration: none !important;
+    }
 </style>
 {% endblock %}
 
@@ -158,14 +165,15 @@
         <div class="card-header py-3">
             <div class="row align-items-center">
                 <div class="col-12 col-md-6 mb-2 mb-md-0">
-                    <h6 class="m-0 font-weight-bold text-primary">Lista de Previsiones</h6>
+                    <h5 class="m-0 fw-bold text-primary">Listado completo de Previsiones de Salud y Convenios</h5>
+                    <span class="text-muted" style="font-size:0.95rem;">Aquí puedes gestionar todas las previsiones disponibles en el sistema.</span>
                 </div>
                 <div class="col-12 col-md-6 d-flex justify-content-md-end">
                     <div class="search-box me-2 flex-grow-1 flex-md-grow-0">
                         <i class="fas fa-search"></i>
                         <input type="text" id="searchInput" class="form-control" placeholder="Buscar previsión...">
                     </div>
-                    <a href="{% url 'prevision:crear_prevision' %}" class="btn btn-primary btn-nuevo">
+                    <a href="{% url 'prevision:crear_prevision' %}" class="btn btn-primary btn-nuevo ms-1" style="font-size:0.9rem; padding:0.3rem 0.8rem;">
                         <i class="fas fa-plus me-2"></i>Nueva Previsión
                     </a>
                 </div>
@@ -205,13 +213,13 @@
                             </td>
                             <td class="text-end">
                                 <a href="{% url 'prevision:editar_prevision' prevision.id %}" 
-                                   class="btn btn-action btn-primary me-1" title="Editar">
+                                   class="btn btn-action btn-primary me-1" title="Editar" style="font-size:0.85rem; padding:0.25rem 0.6rem; text-decoration:none;">
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 <button type="button" class="btn btn-action btn-danger" 
                                         data-bs-toggle="modal" 
                                         data-bs-target="#deleteModal{{ prevision.id }}" 
-                                        title="Eliminar">
+                                        title="Eliminar" style="font-size:0.85rem; padding:0.25rem 0.6rem; text-decoration:none;">
                                     <i class="fas fa-trash"></i>
                                 </button>
 

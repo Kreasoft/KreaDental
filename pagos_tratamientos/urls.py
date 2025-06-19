@@ -9,4 +9,6 @@ urlpatterns = [
     path('anular/<int:pago_id>/', views.anular_pago, name='anular_pago'),
     path('detalle/<int:pago_id>/', views.detalle_pago, name='detalle_pago'),
     path('editar/<int:pago_id>/', views.editar_pago, name='editar_pago'),
+    path('exportar/', views.exportar_pagos, name='exportar_pagos'),
+    path('resumen/<int:pago_id>/', views.resumen_tratamiento, name='resumen_tratamiento'),
 ]

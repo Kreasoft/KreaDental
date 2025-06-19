@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{{ accion }} Paciente{% endblock %}
+{% block title %}{% if accion == 'Nuevo' %}Nuevo Paciente{% else %}Editar Paciente{% endif %}{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -58,27 +58,30 @@
     .form-label {
         color: #1A5276;
         font-weight: 500;
+        font-size: 0.9rem;
         margin-bottom: 0.5rem;
     }
 
     .form-control, .form-select {
         border: 1px solid #AED6F1;
         border-radius: 8px;
-        padding: 0.75rem;
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
         transition: all 0.3s ease;
     }
 
     .form-control:focus, .form-select:focus {
         border-color: #2874A6;
-        box-shadow: 0 0 0 0.2rem rgba(26, 82, 118, 0.1);
+        box-shadow: 0 0 0 0.2rem rgba(40, 116, 166, 0.25);
     }
 
     .btn-primary {
         background-color: #1A5276;
         border-color: #1A5276;
-        padding: 0.75rem 1.5rem;
+        padding: 0.5rem 1rem;
         font-weight: 500;
         border-radius: 8px;
+        font-size: 0.9rem;
     }
 
     .btn-primary:hover {
@@ -89,9 +92,10 @@
     .btn-secondary {
         background-color: #95a5a6;
         border-color: #95a5a6;
-        padding: 0.75rem 1.5rem;
+        padding: 0.5rem 1rem;
         font-weight: 500;
         border-radius: 8px;
+        font-size: 0.9rem;
     }
 
     .btn-secondary:hover {
@@ -165,6 +169,33 @@
         padding: 0.5rem;
         border-radius: 6px;
     }
+
+    .alert-danger {
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+        color: #721c24;
+        border-radius: 8px;
+        padding: 1rem;
+    }
+
+    .invalid-feedback {
+        color: #e74c3c;
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+    }
+
+    .fas {
+        color: #1A5276;
+    }
+
+    .section-title {
+        color: #1A5276;
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin: 1.5rem 0 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #AED6F1;
+    }
 </style>
 {% endblock %}
 
@@ -174,7 +205,24 @@
         <div class="col-lg-10">
             <div class="card">
                 <div class="card-header">
-                    <h3>{{ accion }} Paciente</h3>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-0">
+                                {% if accion == 'Nuevo' %}
+                                <i class="fas fa-user-plus me-2"></i>Nuevo Paciente
+                                {% else %}
+                                <i class="fas fa-user-edit me-2"></i>Editar Paciente
+                                {% endif %}
+                            </h3>
+                            <p class="text-muted mb-0">
+                                {% if accion == 'Nuevo' %}
+                                Complete el formulario para registrar un nuevo paciente en el sistema. Los campos marcados con * son obligatorios.
+                                {% else %}
+                                Modifique la información del paciente según sea necesario. Los campos marcados con * son obligatorios.
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body">
                     {% if messages %}
@@ -213,49 +261,82 @@
                                 <div class="row">
                                     <!-- Datos Personales -->
                                     <div class="col-md-6 mb-3">
-                                        <label for="nombre" class="form-label">Nombre</label>
-                                        <input type="text" class="form-control" id="nombre" name="nombre" value="{{ paciente.nombre|default:'' }}" required>
+                                        <label for="{{ form.nombre.id_for_label }}" class="form-label">Nombre *</label>
+                                        {{ form.nombre }}
+                                        {% if form.nombre.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.nombre.errors }}
+                                        </div>
+                                        {% endif %}
                                     </div>
                                     <div class="col-md-6 mb-3">
-                                        <label for="apellidos" class="form-label">Apellidos</label>
-                                        <input type="text" class="form-control" id="apellidos" name="apellidos" value="{{ paciente.apellidos|default:'' }}" required>
+                                        <label for="{{ form.apellidos.id_for_label }}" class="form-label">Apellidos *</label>
+                                        {{ form.apellidos }}
+                                        {% if form.apellidos.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.apellidos.errors }}
+                                        </div>
+                                        {% endif %}
                                     </div>
                                     <div class="col-md-6 mb-3">
-                                        <label for="documento" class="form-label">RUT</label>
-                                        <input type="text" class="form-control" id="documento" name="documento" value="{{ paciente.documento|default:'' }}" required>
+                                        <label for="{{ form.documento.id_for_label }}" class="form-label">RUT *</label>
+                                        {{ form.documento }}
+                                        {% if form.documento.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.documento.errors }}
+                                        </div>
+                                        {% endif %}
                                     </div>
                                     <div class="col-md-6 mb-3">
-                                        <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
-                                        <input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento" value="{{ paciente.fecha_nacimiento|date:'Y-m-d'|default:'' }}">
+                                        <label for="{{ form.fecha_nacimiento.id_for_label }}" class="form-label">Fecha de Nacimiento *</label>
+                                        {{ form.fecha_nacimiento }}
+                                        {% if form.fecha_nacimiento.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.fecha_nacimiento.errors }}
+                                        </div>
+                                        {% endif %}
                                     </div>
 
                                     <!-- Contacto -->
                                     <div class="col-md-6 mb-3">
-                                        <label for="telefono" class="form-label">Teléfono</label>
-                                        <input type="tel" class="form-control" id="telefono" name="telefono" value="{{ paciente.telefono|default:'' }}">
+                                        <label for="{{ form.telefono.id_for_label }}" class="form-label">Teléfono</label>
+                                        {{ form.telefono }}
+                                        {% if form.telefono.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.telefono.errors }}
+                                        </div>
+                                        {% endif %}
                                     </div>
                                     <div class="col-md-6 mb-3">
-                                        <label for="email" class="form-label">Email</label>
-                                        <input type="email" class="form-control" id="email" name="email" value="{{ paciente.email|default:'' }}">
+                                        <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                                        {{ form.email }}
+                                        {% if form.email.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.email.errors }}
+                                        </div>
+                                        {% endif %}
                                     </div>
 
                                     <!-- Dirección -->
                                     <div class="col-12 mb-3">
-                                        <label for="direccion" class="form-label">Dirección</label>
-                                        <input type="text" class="form-control" id="direccion" name="direccion" value="{{ paciente.direccion|default:'' }}">
+                                        <label for="{{ form.direccion.id_for_label }}" class="form-label">Dirección</label>
+                                        {{ form.direccion }}
+                                        {% if form.direccion.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.direccion.errors }}
+                                        </div>
+                                        {% endif %}
                                     </div>
 
                                     <!-- Previsión -->
                                     <div class="col-md-6 mb-3">
-                                        <label for="prevision" class="form-label">Previsión</label>
-                                        <select class="form-select" id="prevision" name="prevision">
-                                            <option value="">Seleccione una previsión</option>
-                                            {% for prevision in previsiones %}
-                                            <option value="{{ prevision.id }}" {% if paciente.prevision.id == prevision.id %}selected{% endif %}>
-                                                {{ prevision.nombre }}
-                                            </option>
-                                            {% endfor %}
-                                        </select>
+                                        <label for="{{ form.prevision.id_for_label }}" class="form-label">Previsión</label>
+                                        {{ form.prevision }}
+                                        {% if form.prevision.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.prevision.errors }}
+                                        </div>
+                                        {% endif %}
                                     </div>
 
                                     <!-- Estado -->

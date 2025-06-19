@@ -5,372 +5,300 @@
 
 {% block extra_css %}
 <style>
-    /* Gradientes para las tarjetas de estadísticas */
-    .bg-gradient-primary {
-        background: linear-gradient(45deg, #4e73df 0%, #224abe 100%);
-        color: white;
+    .stats-row {
+        margin-bottom: 2rem;
     }
-
-    .bg-gradient-success {
-        background: linear-gradient(45deg, #1cc88a 0%, #13855c 100%);
-        color: white;
-    }
-
-    .bg-gradient-info {
-        background: linear-gradient(45deg, #36b9cc 0%, #258391 100%);
-        color: white;
-    }
-
-    .bg-gradient-warning {
-        background: linear-gradient(45deg, #f6c23e 0%, #dda20a 100%);
-        color: white;
-    }
-
-    /* Estilos para el ícono de fondo */
-    .page-icon {
-        position: absolute;
-        right: -2rem;
-        top: -2rem;
-        font-size: 15rem;
-        opacity: 0.03;
-        transform: rotate(15deg);
-        z-index: 0;
-        color: #2c3e50;
-    }
-
-    /* Estilos para el encabezado de página */
-    .page-title {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #2c3e50;
-        margin-bottom: 0.5rem;
-    }
-
-    .page-description {
-        font-size: 1.1rem;
-        color: #64748b;
-        max-width: 800px;
-    }
-
-    /* Ajuste para el contenedor principal */
-    .container-fluid {
-        position: relative;
-        z-index: 1;
-    }
-
+    .card-azul-1 { background: #007bff !important; color: #fff !important; }
+    .card-azul-2 { background: #339af0 !important; color: #fff !important; }
+    .card-azul-3 { background: #5a99d4 !important; color: #fff !important; }
+    .card-azul-4 { background: #6ec1e4 !important; color: #fff !important; }
     .stats-card {
-        position: relative;
-        padding: 1.75rem;
-        border-radius: 1rem;
-        overflow: hidden;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        border: 1px solid #AED6F1;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.05);
         transition: all 0.3s ease;
+        margin-bottom: 1.5rem;
     }
-    
     .stats-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 8px 15px rgba(0,0,0,0.1);
     }
-
     .stats-icon {
-        position: absolute;
-        right: 1.5rem;
-        bottom: 1rem;
-        font-size: 4.5rem;
-        opacity: 0.15;
-        transform: rotate(-5deg);
-        transition: all 0.3s ease;
-    }
-
-    .stats-card:hover .stats-icon {
-        transform: rotate(0deg) scale(1.1);
+        font-size: 2.5rem;
         opacity: 0.2;
+        margin-bottom: 0.5rem;
     }
-
-    .stats-number {
+    .stats-value {
         font-size: 2rem;
         font-weight: 700;
-        margin-bottom: 0.75rem;
-        position: relative;
-        z-index: 1;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        margin-bottom: 0.25rem;
     }
-
     .stats-label {
-        font-size: 0.9rem;
-        font-weight: 500;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        position: relative;
-        z-index: 1;
+        font-size: 1rem;
         opacity: 0.9;
     }
-
-    .content-card {
-        background: white;
-        border-radius: 1rem;
+    .table-container {
+        border: 1px solid #AED6F1;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.05);
         padding: 1.75rem;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         margin-bottom: 1.5rem;
     }
-
-    .content-card .card-header {
-        background: none;
-        border: none;
-        padding: 0 0 1rem 0;
-    }
-
-    .content-card .card-title {
-        color: #2d3748;
-        font-size: 1.25rem;
-        font-weight: 600;
-        margin: 0;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
-
-    .content-card .card-title i {
-        color: #4a5568;
-        opacity: 0.7;
-    }
-
-    .table {
-        margin-bottom: 0;
-    }
-
     .table thead th {
         background-color: #f7fafc;
         color: #4a5568;
         font-weight: 600;
         text-transform: uppercase;
-        font-size: 0.75rem;
+        font-size: 0.85rem;
         letter-spacing: 0.05em;
+        padding: 12px;
     }
-
+    .table tbody tr {
+        transition: all 0.2s ease;
+    }
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .table td {
+        padding: 12px;
+        vertical-align: middle;
+        color: #495057;
+    }
     .badge {
-        padding: 0.5em 1em;
+        padding: 6px 14px;
         font-weight: 500;
         border-radius: 9999px;
+        font-size: 0.95em;
     }
-
     .badge-abierto {
-        background-color: #48bb78;
+        background-color: #007bff;
         color: white;
     }
-
     .badge-cerrado {
-        background-color: #4299e1;
+        background-color: #5a99d4;
         color: white;
     }
-
-    .btn-icon {
-        padding: 0.5rem;
-        border-radius: 0.5rem;
-        transition: all 0.2s;
+    .btn-action {
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        transition: all 0.2s ease;
+        margin-right: 4px;
     }
-
-    .btn-icon:hover {
-        transform: translateY(-2px);
+    .btn-action:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-
-    .btn-add {
-        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    .btn-ver {
+        background-color: #17a2b8;
         color: white;
-        border: none;
-        padding: 0.75rem 1.5rem;
-        border-radius: 0.5rem;
+    }
+    .btn-ver:hover {
+        background-color: #138496;
+        color: white;
+    }
+    .btn-cerrar {
+        background-color: #007bff;
+        color: white;
+    }
+    .btn-cerrar:hover {
+        background-color: #0056b3;
+        color: white;
+    }
+    .empty-state-container {
+        text-align: center;
+        padding: 60px 20px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin: 20px 0;
+    }
+    .empty-state-icon {
+        font-size: 64px;
+        color: #6ec1e4;
+        margin-bottom: 20px;
+    }
+    .empty-state-title {
+        font-size: 24px;
+        color: #495057;
+        margin-bottom: 10px;
         font-weight: 500;
-        transition: all 0.3s ease;
-        text-decoration: none;
     }
-
-    .btn-add:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    .empty-state-text {
+        color: #6c757d;
+        margin-bottom: 30px;
+        font-size: 16px;
+    }
+    .btn-create {
+        background-color: #007bff;
         color: white;
+        padding: 10px 20px;
+        border-radius: 4px;
+        text-decoration: none;
+        transition: all 0.3s ease;
     }
-
-    .btn-add i {
-        margin-right: 0.5rem;
+    .btn-create:hover {
+        background-color: #0056b3;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .search-box {
+        border: 1px solid #AED6F1;
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+    }
+    .search-box:focus {
+        border-color: #2874A6;
+        box-shadow: 0 0 0 0.2rem rgba(40, 116, 166, 0.25);
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid position-relative overflow-hidden">
-    <!-- Ícono de fondo -->
-    <div class="page-icon">
-        <i class="fas fa-cash-register"></i>
-    </div>
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-12">
+            <div class="card mb-4">
+                <div class="card-header" style="background-color: #E8F4FC; border-bottom: 1px solid #AED6F1; border-radius: 15px 15px 0 0 !important; padding: 1.5rem;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-0" style="color: #1A5276; font-size: 1.5rem; font-weight: 600; font-family: 'Poppins', sans-serif;"><i class="fas fa-cash-register me-2"></i>Cierres de Caja</h3>
+                            <p class="text-muted mb-0">Gestiona los movimientos diarios de caja. Puedes abrir, cerrar y consultar el historial de cierres para mantener el control financiero de la clínica.</p>
+                        </div>
+                        <a href="{% url 'cierres_caja:abrir_caja' %}" class="btn btn-primary" style="background-color: #1A5276; border-color: #1A5276; padding: 0.5rem 1rem; font-weight: 500; border-radius: 8px; font-size: 0.9rem;">
+                            <i class="fas fa-plus me-2"></i>Nuevo Cierre
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body" style="padding: 2rem;">
+                    <div class="row stats-row">
+                        <div class="col-md-3">
+                            <div class="card card-azul-1 stats-card text-center">
+                                <div class="stats-icon"><i class="fas fa-cash-register"></i></div>
+                                <div class="stats-value">{{ total_cierres }}</div>
+                                <div class="stats-label">Total de Cierres</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card card-azul-2 stats-card text-center">
+                                <div class="stats-icon"><i class="fas fa-lock-open"></i></div>
+                                <div class="stats-value">{{ abiertos }}</div>
+                                <div class="stats-label">Cajas Abiertas</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card card-azul-3 stats-card text-center">
+                                <div class="stats-icon"><i class="fas fa-lock"></i></div>
+                                <div class="stats-value">{{ cerrados }}</div>
+                                <div class="stats-label">Cajas Cerradas</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card card-azul-4 stats-card text-center">
+                                <div class="stats-icon"><i class="fas fa-calendar-day"></i></div>
+                                <div class="stats-value">{{ cierres_hoy }}</div>
+                                <div class="stats-label">Cierres Hoy</div>
+                            </div>
+                        </div>
+                    </div>
 
-    <!-- Encabezado de página -->
-    <div class="page-header mb-4">
-        <div class="row align-items-center">
-            <div class="col-lg-8">
-                <h1 class="page-title">
-                    <i class="fas fa-cash-register me-2"></i>
-                    Control de Cierres de Caja
-                </h1>
-                <p class="page-description mb-0">
-                    Gestiona los movimientos diarios de caja, registra aperturas y cierres, y mantén un control preciso de tus ingresos.
-                </p>
-            </div>
-            <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
-                {% if not hay_caja_abierta %}
-                <a href="{% url 'cierres_caja:abrir_caja' %}" class="btn-add">
-                    <i class="fas fa-plus"></i>
-                    Abrir Nueva Caja
-                </a>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-
-    <!-- Tarjetas de resumen -->
-    <div class="row mb-4">
-        <div class="col-md-6 col-lg-3">
-            <div class="stats-card bg-gradient-primary">
-                <div class="stats-icon">
-                    <i class="fas fa-cash-register"></i>
-                </div>
-                <div class="stats-number">
-                    {{ resumen_semana.cantidad_cierres|default:0 }}
-                </div>
-                <div class="stats-label">Cierres en el Período</div>
-            </div>
-        </div>
-        <div class="col-md-6 col-lg-3">
-            <div class="stats-card bg-gradient-success">
-                <div class="stats-icon">
-                    <i class="fas fa-money-bill-wave"></i>
-                </div>
-                <div class="stats-number">
-                    ${{ resumen_semana.total_efectivo|default:0|floatformat:0|intcomma }}
-                </div>
-                <div class="stats-label">Total Efectivo</div>
-            </div>
-        </div>
-        <div class="col-md-6 col-lg-3">
-            <div class="stats-card bg-gradient-info">
-                <div class="stats-icon">
-                    <i class="fas fa-credit-card"></i>
-                </div>
-                <div class="stats-number">
-                    ${{ resumen_semana.total_tarjeta|default:0|floatformat:0|intcomma }}
-                </div>
-                <div class="stats-label">Total Tarjetas</div>
-            </div>
-        </div>
-        <div class="col-md-6 col-lg-3">
-            <div class="stats-card bg-gradient-warning">
-                <div class="stats-icon">
-                    <i class="fas fa-exchange-alt"></i>
-                </div>
-                <div class="stats-number">
-                    ${{ resumen_semana.total_transferencia|default:0|floatformat:0|intcomma }}
-                </div>
-                <div class="stats-label">Total Transferencias</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="content-card">
-        <!-- Filtros -->
-        <div class="card-header">
-            <form method="get" class="row g-3 align-items-end">
-                <div class="col-md-3">
-                    <label class="form-label">Fecha Inicio</label>
-                    <input type="date" name="fecha_inicio" class="form-control form-control-sm" value="{{ fecha_inicio }}">
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Fecha Fin</label>
-                    <input type="date" name="fecha_fin" class="form-control form-control-sm" value="{{ fecha_fin }}">
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Estado</label>
-                    <select name="estado" class="form-select form-select-sm">
-                        <option value="">Todos</option>
-                        <option value="ABIERTO" {% if estado_filtro == 'ABIERTO' %}selected{% endif %}>Abierto</option>
-                        <option value="CERRADO" {% if estado_filtro == 'CERRADO' %}selected{% endif %}>Cerrado</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <button type="submit" class="btn btn-primary btn-sm w-100">
-                        <i class="fas fa-filter me-1"></i> Filtrar
-                    </button>
-                </div>
-            </form>
-        </div>
-        <div class="card-body p-0">
-            {% if cierres %}
-            <div class="table-responsive">
-                <table class="table table-hover table-sm align-middle">
-                    <thead>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>Apertura</th>
-                            <th>Cierre</th>
-                            <th>Monto Inicial</th>
-                            <th>Monto Final</th>
-                            <th>Total del Día</th>
-                            <th>Diferencia</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for cierre in cierres %}
-                        <tr>
-                            <td>{{ cierre.fecha|date:"d/m/Y" }}</td>
-                            <td>{{ cierre.hora_apertura|time:"H:i" }}</td>
-                            <td>{{ cierre.hora_cierre|time:"H:i"|default:"-" }}</td>
-                            <td>${{ cierre.monto_inicial|floatformat:0|intcomma }}</td>
-                            <td>${{ cierre.monto_final|floatformat:0|default:"-"|intcomma }}</td>
-                            <td>
-                                ${{ cierre.total_efectivo|add:cierre.total_tarjeta|add:cierre.total_transferencia|floatformat:0|intcomma }}
-                            </td>
-                            <td>
-                                {% if cierre.diferencia %}
-                                    <span class="{% if cierre.diferencia < 0 %}text-danger{% else %}text-success{% endif %}">
-                                        ${{ cierre.diferencia|floatformat:0|intcomma }}
-                                    </span>
-                                {% else %}
-                                    -
-                                {% endif %}
-                            </td>
-                            <td>
-                                <span class="badge badge-{{ cierre.estado|lower }}">
-                                    {{ cierre.get_estado_display }}
+                    <div class="row mb-4">
+                        <div class="col-md-8">
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-search"></i>
                                 </span>
-                            </td>
-                            <td>
-                                <div class="btn-group">
-                                    <a href="{% url 'cierres_caja:detalle_cierre' cierre.id %}" 
-                                       class="btn btn-icon btn-light" title="Ver detalle">
-                                        <i class="fas fa-eye text-primary"></i>
-                                    </a>
-                                    {% if cierre.estado == 'ABIERTO' %}
-                                    <a href="{% url 'cierres_caja:cerrar_caja' cierre.id %}" 
-                                       class="btn btn-icon btn-light" title="Cerrar caja">
-                                        <i class="fas fa-lock text-success"></i>
-                                    </a>
-                                    {% endif %}
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                                <input type="text" id="searchInput" class="form-control search-box" placeholder="Buscar cierre...">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Fecha</th>
+                                        <th>Usuario Apertura</th>
+                                        <th>Usuario Cierre</th>
+                                        <th>Monto Inicial</th>
+                                        <th>Monto Final</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cierresList">
+                                    {% for cierre in cierres %}
+                                    <tr class="cierre-row" data-search="{{ cierre.usuario_apertura }} {{ cierre.usuario_cierre }} {{ cierre.fecha_apertura }} {{ cierre.fecha_cierre }}">
+                                        <td>{{ cierre.id }}</td>
+                                        <td>{{ cierre.fecha_apertura|date:"d/m/Y H:i" }}</td>
+                                        <td>{{ cierre.usuario_apertura }}</td>
+                                        <td>{{ cierre.usuario_cierre|default:'-' }}</td>
+                                        <td>${{ cierre.monto_inicial|floatformat:0|intcomma }}</td>
+                                        <td>${{ cierre.monto_final|floatformat:0|intcomma }}</td>
+                                        <td>
+                                            {% if cierre.estado == 'ABIERTO' %}
+                                            <span class="badge badge-abierto">Abierto</span>
+                                            {% else %}
+                                            <span class="badge badge-cerrado">Cerrado</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'cierres_caja:detalle_cierre' cierre.id %}" class="btn btn-action btn-ver" title="Ver detalles">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            {% if cierre.estado == 'ABIERTO' %}
+                                            <a href="{% url 'cierres_caja:cerrar_caja' cierre.id %}" class="btn btn-action btn-cerrar" title="Cerrar Caja">
+                                                <i class="fas fa-lock"></i>
+                                            </a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="8">
+                                            <div class="empty-state-container">
+                                                <i class="fas fa-cash-register empty-state-icon"></i>
+                                                <h3 class="empty-state-title">No hay cierres registrados</h3>
+                                                <p class="empty-state-text">Comienza registrando un nuevo cierre de caja para llevar el control financiero.</p>
+                                                <a href="{% url 'cierres_caja:abrir_caja' %}" class="btn btn-create">
+                                                    <i class="fas fa-plus"></i> Registrar Nuevo Cierre
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
-            {% else %}
-            <div class="text-center py-5">
-                <i class="fas fa-cash-register fa-3x text-muted mb-3"></i>
-                <p class="text-muted">No hay cierres de caja registrados</p>
-            </div>
-            {% endif %}
         </div>
     </div>
 </div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Búsqueda en tiempo real
+    const searchInput = document.getElementById('searchInput');
+    const cierresList = document.getElementById('cierresList');
+    const cierreRows = cierresList.getElementsByClassName('cierre-row');
+
+    searchInput.addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        Array.from(cierreRows).forEach(row => {
+            const searchText = row.dataset.search.toLowerCase();
+            row.style.display = searchText.includes(searchTerm) ? '' : 'none';
+        });
+    });
+});
+</script>
 {% endblock %}

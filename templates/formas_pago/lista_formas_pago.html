@@ -1,191 +1,305 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Lista de Formas de Pago{% endblock %}
+{% block title %}Lista de Formas de Pago - KreaDental{% endblock %}
 
 {% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/dental-theme.css' %}">
 <style>
-    body {
-        background: linear-gradient(135deg, #f8f9fc 0%, #e3e6f0 100%);
-        min-height: 100vh;
+    body, .container-fluid, .dental-card, .dental-header, .dental-btn, .dental-table, .dental-badge, .dental-search input, .dental-empty-state, .dental-form-label, .dental-form-control, .dental-checkbox-label, .breadcrumb, .breadcrumb-item, .dental-back-link {
+        font-family: 'Poppins', sans-serif !important;
     }
-    .card {
-        border: none;
-        border-radius: 15px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    /* Usar las variables CSS del tema dental */
+    .dental-card {
         background: rgba(255, 255, 255, 0.98);
-        -webkit-backdrop-filter: blur(10px);
-        backdrop-filter: blur(10px);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: 1px solid var(--dental-accent);
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+        overflow: hidden;
     }
-    .card:hover {
+
+    .dental-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 25px rgba(0,0,0,0.1);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
     }
-    .card-header {
-        background: linear-gradient(135deg, #ffffff 0%, #f8f9fc 100%);
-        border-bottom: 1px solid rgba(0,0,0,0.05);
+
+    .dental-header {
+        background-color: var(--dental-light);
+        border-bottom: 1px solid var(--dental-accent);
         border-radius: 15px 15px 0 0 !important;
+        padding: 1.5rem;
+        color: var(--dental-primary);
     }
-    .btn-action {
-        padding: 0.4rem 0.75rem;
-        font-size: 0.875rem;
+
+    .dental-btn {
         border-radius: 8px;
-        transition: all 0.3s;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border: none;
         position: relative;
         overflow: hidden;
     }
-    .btn-action::after {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 0;
-        height: 0;
-        background: rgba(255,255,255,0.2);
-        border-radius: 50%;
-        transform: translate(-50%, -50%);
-        transition: width 0.6s ease, height 0.6s ease;
+
+    .dental-btn-primary {
+        background-color: var(--dental-primary);
+        border-color: var(--dental-primary);
+        color: white;
     }
-    .btn-action:hover::after {
-        width: 150%;
-        height: 150%;
+
+    .dental-btn-primary:hover {
+        background-color: var(--dental-dark);
+        border-color: var(--dental-dark);
+        color: white;
+        transform: translateY(-1px);
     }
-    .btn-action:hover {
-        transform: translateY(-2px);
+
+    .dental-btn-success {
+        background-color: var(--dental-success);
+        color: white;
     }
-    .table-hover tbody tr {
+
+    .dental-btn-danger {
+        background-color: var(--dental-danger);
+        color: white;
+    }
+
+    .dental-btn-warning {
+        background-color: var(--dental-warning);
+        color: white;
+    }
+
+    .dental-table {
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    .dental-table thead {
+        background-color: var(--dental-light);
+        color: var(--dental-primary);
+    }
+
+    .dental-table th {
+        border: none;
+        padding: 1rem;
+        font-weight: 600;
+        border-bottom: 2px solid var(--dental-accent);
+    }
+
+    .dental-table tbody tr {
         transition: all 0.3s ease;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
     }
-    .table-hover tbody tr:hover {
-        background-color: rgba(52, 152, 219, 0.05);
+
+    .dental-table tbody tr:hover {
+        background-color: var(--dental-light);
         transform: scale(1.005);
     }
-    .badge {
-        padding: 0.5em 1em;
-        font-weight: 500;
-        transition: all 0.3s ease;
+
+    .dental-table td {
+        padding: 1rem;
+        vertical-align: middle;
+        border: none;
     }
-    .search-box {
+
+    .dental-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 500;
+        font-size: 0.75rem;
+    }
+
+    .dental-badge-success {
+        background-color: var(--dental-success);
+        color: white;
+    }
+
+    .dental-badge-danger {
+        background-color: var(--dental-danger);
+        color: white;
+    }
+
+    .dental-search {
         position: relative;
         max-width: 300px;
     }
-    .search-box input {
-        padding-left: 2.5rem;
-        border-radius: 20px;
-        border: 1px solid rgba(0,0,0,0.1);
+
+    .dental-search input {
+        padding: 0.75rem 1rem 0.75rem 3rem;
+        border-radius: 8px;
+        border: 1px solid var(--dental-accent);
         background: rgba(255,255,255,0.9);
         transition: all 0.3s ease;
     }
-    .search-box input:focus {
-        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
-        background: #fff;
+
+    .dental-search input:focus {
+        border-color: var(--dental-primary);
+        box-shadow: 0 0 0 0.2rem rgba(26, 82, 118, 0.1);
+        background: white;
     }
-    .search-box i {
+
+    .dental-search i {
         position: absolute;
         left: 1rem;
         top: 50%;
         transform: translateY(-50%);
-        color: #6c757d;
+        color: var(--dental-primary);
     }
-    .stats-box {
-        background: rgba(255,255,255,0.9);
-        border-radius: 10px;
-        padding: 1rem;
-        margin-bottom: 1rem;
-        border: 1px solid rgba(0,0,0,0.05);
+
+    .dental-switch {
+        position: relative;
+        display: inline-block;
+        width: 2.2em;
+        height: 1.2em;
     }
-    .stats-item {
+
+    .dental-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .dental-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #e9ecef;
+        transition: .4s;
+        border-radius: 1em;
+        border: 1px solid #bfc9d1;
+    }
+
+    .dental-slider:before {
+        position: absolute;
+        content: "";
+        height: 0.9em;
+        width: 0.9em;
+        left: 0.15em;
+        bottom: 0.15em;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+
+    .dental-switch input:checked + .dental-slider {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+
+    .dental-switch input:checked + .dental-slider:before {
+        transform: translateX(1em);
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .fade-in-up {
+        animation: fadeInUp 0.6s ease forwards;
+    }
+
+    .dental-empty-state {
         text-align: center;
-        padding: 0.5rem;
+        padding: 3rem;
+        color: var(--dental-text);
     }
-    .stats-number {
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: #2c3e50;
-    }
-    .stats-label {
-        font-size: 0.875rem;
-        color: #6c757d;
-    }
-    .empty-state {
-        text-align: center;
-        padding: 2rem;
-    }
-    .empty-state i {
-        font-size: 3rem;
-        color: #6c757d;
+
+    .dental-empty-state i {
+        font-size: 4rem;
+        color: var(--dental-primary);
         margin-bottom: 1rem;
+        opacity: 0.5;
     }
-    .empty-state p {
-        color: #6c757d;
+
+    .dental-empty-state h4 {
+        color: var(--dental-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .dental-empty-state p {
+        color: var(--dental-text-light);
         margin-bottom: 0;
     }
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
+
+    .dental-alert {
+        border-radius: 8px;
+        border: 1px solid var(--dental-accent);
     }
-    .fade-in {
-        animation: fadeIn 0.3s ease forwards;
+
+    /* Mejorar botones de acción y quitar subrayado */
+    .dental-btn, .dental-btn:visited, .dental-btn:active {
+        font-size: 0.9rem !important;
+        padding: 0.3rem 0.8rem !important;
+        text-decoration: none !important;
+    }
+    .dental-btn-sm, .dental-btn.btn-sm {
+        font-size: 0.85rem !important;
+        padding: 0.25rem 0.6rem !important;
+    }
+    .dental-btn:hover, .dental-btn:focus {
+        text-decoration: none !important;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid fade-in">
-    {% if messages %}
-    {% for message in messages %}
-    <div class="alert alert-{{ message.tags }} alert-dismissible fade show mb-4" role="alert">
-        {{ message }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    {% endfor %}
-    {% endif %}
+<div class="container-fluid fade-in-up">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'formas_pago:lista_formas_pago' %}" class="dental-back-link">
+                    <i class="fas fa-arrow-left me-2"></i>Formas de Pago
+                </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                Listado de Formas de Pago
+            </li>
+        </ol>
+    </nav>
 
-    <div class="row mb-4">
-        <div class="col-12 col-md-6">
-            <div class="stats-box">
-                <div class="row">
-                    <div class="col-6">
-                        <div class="stats-item">
-                            <div class="stats-number text-success">
-                                {{ formas_pago|dictsort:"estado"|last|length }}
-                            </div>
-                            <div class="stats-label">Formas de Pago Activas</div>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="stats-item">
-                            <div class="stats-number text-danger">
-                                {{ formas_pago|dictsort:"estado"|first|length }}
-                            </div>
-                            <div class="stats-label">Formas de Pago Inactivas</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
+    <!-- Tarjeta principal -->
+    <div class="dental-card">
+        <div class="dental-header">
             <div class="row align-items-center">
-                <div class="col-12 col-md-6 mb-2 mb-md-0">
-                    <h6 class="m-0 font-weight-bold text-primary">Lista de Formas de Pago</h6>
+                <div class="col-12 col-md-6 mb-3 mb-md-0">
+                    <h4 class="mb-0">
+                        <i class="fas fa-credit-card me-2"></i>
+                        Listado completo de Formas de Pago y Métodos
+                    </h4>
+                    <p class="mb-0 opacity-75" style="font-size:1rem;">Aquí puedes gestionar, editar y activar/desactivar todas las formas de pago disponibles en el sistema.</p>
                 </div>
-                <div class="col-12 col-md-6 d-flex justify-content-md-end">
-                    <div class="search-box me-2 flex-grow-1 flex-md-grow-0">
+                <div class="col-12 col-md-6 d-flex flex-column flex-md-row gap-2 justify-content-md-end">
+                    <div class="dental-search">
+                        <label for="searchInput" class="visually-hidden">Buscar forma de pago</label>
                         <i class="fas fa-search"></i>
-                        <input type="text" id="searchInput" class="form-control" placeholder="Buscar forma de pago...">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Buscar forma de pago..." title="Buscar forma de pago por nombre o descripción">
                     </div>
-                    <a href="{% url 'formas_pago:crear_forma_pago' %}" class="btn btn-primary btn-nuevo">
-                        <i class="fas fa-plus me-2"></i>Nueva Forma de Pago
+                    <a href="{% url 'formas_pago:crear_forma_pago' %}" class="dental-btn dental-btn-primary btn-sm btn-nuevo ms-1" style="font-size:0.9rem; padding:0.3rem 0.8rem; text-decoration:none; display:flex; flex-direction:column; align-items:center; min-width:80px;">
+                        <i class="fas fa-plus mb-1"></i>
+                        <span style="font-size:0.8rem;">Nueva Forma</span>
                     </a>
                 </div>
             </div>
         </div>
+
+        <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover table-sm align-middle" id="dataTable">
+                <table class="table table-hover mb-0 dental-table" id="dataTable">
                     <thead>
                         <tr>
                             <th>#</th>
@@ -197,41 +311,53 @@
                     </thead>
                     <tbody>
                         {% for forma_pago in formas_pago %}
-                        <tr>
+                        <tr data-id="{{ forma_pago.id }}">
                             <td>{{ forloop.counter }}</td>
-                            <td>{{ forma_pago.nombre }}</td>
-                            <td>{{ forma_pago.descripcion|default:"-" }}</td>
                             <td>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" 
-                                           id="estado{{ forma_pago.id }}" 
+                                <strong>{{ forma_pago.nombre }}</strong>
+                            </td>
+                            <td>
+                                <span class="text-muted">
+                                    {{ forma_pago.descripcion|default:"Sin descripción"|truncatechars:50 }}
+                                </span>
+                            </td>
+                            <td>
+                                <label class="dental-switch">
+                                    <input type="checkbox" 
                                            {% if forma_pago.estado %}checked{% endif %}
-                                           onchange="cambiarEstado({{ forma_pago.id }})">
-                                    <label class="form-check-label" for="estado{{ forma_pago.id }}">
-                                        <span class="badge {% if forma_pago.estado %}bg-success{% else %}bg-danger{% endif %}">
-                                            {% if forma_pago.estado %}Activo{% else %}Inactivo{% endif %}
-                                        </span>
-                                    </label>
-                                </div>
+                                           onchange="cambiarEstado({{ forma_pago.id }}, this)">
+                                    <span class="dental-slider"></span>
+                                </label>
+                                <span class="dental-badge {% if forma_pago.estado %}dental-badge-success{% else %}dental-badge-danger{% endif %} ms-2">
+                                    {% if forma_pago.estado %}Activo{% else %}Inactivo{% endif %}
+                                </span>
                             </td>
                             <td class="text-end">
                                 <a href="{% url 'formas_pago:editar_forma_pago' forma_pago.id %}" 
-                                   class="btn btn-action btn-primary me-1" title="Editar">
+                                   class="dental-btn dental-btn-warning btn-sm me-2" 
+                                   title="Editar forma de pago"
+                                   style="font-size:0.85rem; padding:0.25rem 0.6rem; text-decoration:none;">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <a href="{% url 'formas_pago:eliminar_forma_pago' forma_pago.id %}" 
-                                   class="btn btn-action btn-danger" title="Eliminar"
-                                   onclick="return confirm('¿Está seguro de eliminar esta forma de pago?')">
+                                <button type="button" 
+                                        class="dental-btn dental-btn-danger btn-sm" 
+                                        onclick="confirmarEliminacion({{ forma_pago.id }}, '{{ forma_pago.nombre }}')"
+                                        title="Eliminar forma de pago"
+                                        style="font-size:0.85rem; padding:0.25rem 0.6rem; text-decoration:none;">
                                     <i class="fas fa-trash"></i>
-                                </a>
+                                </button>
                             </td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="5" class="text-center py-4">
-                                <div class="empty-state">
-                                    <i class="fas fa-credit-card mb-3"></i>
-                                    <p class="mb-0">No hay formas de pago registradas</p>
+                            <td colspan="5">
+                                <div class="dental-empty-state">
+                                    <i class="fas fa-credit-card"></i>
+                                    <h4>No hay formas de pago registradas</h4>
+                                    <p>Comienza agregando la primera forma de pago al sistema</p>
+                                    <a href="{% url 'formas_pago:crear_forma_pago' %}" class="dental-btn dental-btn-primary mt-3">
+                                        <i class="fas fa-plus me-2"></i>Crear Primera Forma de Pago
+                                    </a>
                                 </div>
                             </td>
                         </tr>
@@ -242,94 +368,114 @@
         </div>
     </div>
 </div>
+
+<!-- Formulario oculto para eliminación -->
+<form id="deleteForm" method="POST" style="display: none;">
+    {% csrf_token %}
+</form>
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Inicializar variables
-    const searchInput = document.getElementById('searchInput');
-    const table = document.getElementById('dataTable');
-    const tbody = table ? table.querySelector('tbody') : null;
+    // Mostrar SweetAlert si hay mensajes de Django
+    {% if messages %}
+        {% for message in messages %}
+            Swal.fire({
+                title: '{% if message.tags == "success" %}¡Éxito!{% elif message.tags == "error" %}Error{% else %}Información{% endif %}',
+                text: '{{ message }}',
+                icon: '{% if message.tags == "success" %}success{% elif message.tags == "error" %}error{% else %}info{% endif %}',
+                confirmButtonColor: '{% if message.tags == "success" %}#28a745{% elif message.tags == "error" %}#dc3545{% else %}#17a2b8{% endif %}',
+                confirmButtonText: 'Entendido'
+            });
+        {% endfor %}
+    {% endif %}
 
     // Función de búsqueda en tiempo real
-    if (searchInput && tbody) {
-        searchInput.addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase().trim();
-            const rows = tbody.getElementsByTagName('tr');
+    const searchInput = document.getElementById('searchInput');
+    const table = document.getElementById('dataTable');
+    const rows = table.getElementsByTagName('tr');
 
-            Array.from(rows).forEach(row => {
-                if (row.querySelector('.empty-state')) {
-                    row.style.display = ''; // Siempre mostrar el mensaje de "no hay registros"
-                    return;
+    searchInput.addEventListener('keyup', function() {
+        const searchTerm = searchInput.value.toLowerCase();
+
+        for (let i = 1; i < rows.length; i++) {
+            const row = rows[i];
+            const cells = row.getElementsByTagName('td');
+            let found = false;
+
+            for (let j = 0; j < cells.length; j++) {
+                const cellText = cells[j].textContent.toLowerCase();
+                if (cellText.indexOf(searchTerm) > -1) {
+                    found = true;
+                    break;
                 }
+            }
 
-                const cells = row.getElementsByTagName('td');
-                const found = Array.from(cells).some(cell => 
-                    cell.textContent.toLowerCase().includes(searchTerm)
-                );
-
+            if (row.querySelector('.dental-empty-state')) {
+                row.style.display = found ? 'none' : '';
+            } else {
                 row.style.display = found ? '' : 'none';
-            });
-        });
-    }
-
-    // Función para cambiar estado con animación
-    const switches = document.querySelectorAll('.form-check-input');
-    switches.forEach(switchEl => {
-        switchEl.addEventListener('change', function() {
-            const badge = this.parentElement.querySelector('.badge');
-            if (!badge) return;
-
-            const formaPagoId = this.id.replace('estado', '');
-            const activo = this.checked;
-            const originalState = !activo;
-
-            // Animación de transición
-            const updateBadgeUI = (estado) => {
-                badge.style.transform = 'scale(0.8)';
-                badge.style.opacity = '0.5';
-
-                setTimeout(() => {
-                    badge.classList.remove('bg-success', 'bg-danger');
-                    badge.classList.add(estado ? 'bg-success' : 'bg-danger');
-                    badge.textContent = estado ? 'Activo' : 'Inactivo';
-                    badge.style.transform = 'scale(1)';
-                    badge.style.opacity = '1';
-                }, 200);
-            };
-
-            // Actualizar UI inmediatamente
-            updateBadgeUI(activo);
-
-            // Llamada AJAX para actualizar el estado
-            fetch(`/formas_pago/cambiar_estado/${formaPagoId}/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}'
-                },
-                body: JSON.stringify({ activo })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Error en la respuesta del servidor');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (!data.success) {
-                    throw new Error(data.error || 'Error al cambiar el estado');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                this.checked = originalState;
-                updateBadgeUI(originalState);
-                alert('Error al cambiar el estado de la forma de pago: ' + error.message);
-            });
-        });
+            }
+        }
     });
 });
+
+// Función para cambiar estado
+function cambiarEstado(formaPagoId, checkbox) {
+    const badge = checkbox.parentElement.nextElementSibling;
+    
+    // Animación de transición
+    badge.style.transform = 'scale(0.8)';
+    badge.style.opacity = '0.5';
+
+    setTimeout(() => {
+        if (checkbox.checked) {
+            badge.className = 'dental-badge dental-badge-success ms-2';
+            badge.textContent = 'Activo';
+        } else {
+            badge.className = 'dental-badge dental-badge-danger ms-2';
+            badge.textContent = 'Inactivo';
+        }
+        badge.style.transform = 'scale(1)';
+        badge.style.opacity = '1';
+    }, 200);
+
+    // Aquí iría la llamada AJAX para actualizar el estado
+    console.log('Cambiando estado de forma de pago:', formaPagoId, 'a:', checkbox.checked);
+}
+
+// Función para confirmar eliminación
+function confirmarEliminacion(formaPagoId, nombre) {
+    Swal.fire({
+        title: '¿Eliminar forma de pago?',
+        html: `¿Estás seguro de que deseas eliminar la forma de pago <strong>${nombre}</strong>?<br><br>Esta acción no se puede deshacer.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#e74c3c',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: '<i class="fas fa-trash me-2"></i>Sí, eliminar',
+        cancelButtonText: '<i class="fas fa-times me-2"></i>Cancelar',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Mostrar loading
+            Swal.fire({
+                title: 'Eliminando...',
+                html: 'Por favor espera mientras se elimina la forma de pago.',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Crear y enviar formulario
+            const form = document.getElementById('deleteForm');
+            form.action = `/formas_pago/eliminar/${formaPagoId}/`;
+            form.submit();
+        }
+    });
+}
 </script>
 {% endblock %}

@@ -3,21 +3,139 @@
 
 {% block title %}Mis Empresas{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
+<style>
+    .card {
+        border: none;
+        border-radius: 0.5rem;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+    }
+
+    .card-header {
+        background-color: #fff;
+        border-bottom: 1px solid #e3e6f0;
+        border-radius: 0.5rem 0.5rem 0 0 !important;
+        padding: 1rem 1.25rem;
+    }
+
+    .card-header h4 {
+        color: #5a5c69;
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .card-body {
+        padding: 1.25rem;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+    .table th {
+        background-color: #f8f9fc;
+        color: #5a5c69;
+        font-weight: 600;
+        border-bottom: 1px solid #e3e6f0;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 0.85rem;
+        padding: 0.75rem;
+    }
+
+    .table td {
+        border-bottom: 1px solid #e3e6f0;
+        vertical-align: middle;
+        font-size: 0.9rem;
+        padding: 0.75rem;
+        color: #5a5c69;
+    }
+
+    .btn-primary {
+        background-color: #4e73df;
+        border-color: #4e73df;
+        padding: 0.375rem 0.75rem;
+        font-weight: 500;
+        border-radius: 0.35rem;
+        font-size: 0.875rem;
+    }
+
+    .btn-primary:hover {
+        background-color: #2e59d9;
+        border-color: #2653d4;
+    }
+
+    .btn-light {
+        background-color: #f8f9fc;
+        border-color: #d1d3e2;
+        color: #5a5c69;
+        padding: 0.375rem 0.75rem;
+        font-weight: 500;
+        border-radius: 0.35rem;
+        font-size: 0.875rem;
+    }
+
+    .btn-light:hover {
+        background-color: #eaecf4;
+        border-color: #d1d3e2;
+        color: #2e59d9;
+    }
+
+    .badge {
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.35rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+
+    .bg-success {
+        background-color: #1cc88a !important;
+    }
+
+    .bg-danger {
+        background-color: #e74a3b !important;
+    }
+
+    .bg-info {
+        background-color: #36b9cc !important;
+    }
+
+    .text-muted {
+        color: #858796 !important;
+    }
+
+    .table-primary {
+        background-color: #eaecf4 !important;
+    }
+
+    .text-primary {
+        color: #4e73df !important;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container py-4">
-    <div class="row">
-        <div class="col-12">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0">Mis Empresas</h4>
-                    <a href="{% url 'empresa:crear_empresa_inicial' %}" class="btn btn-light">
-                        <i class="fas fa-plus me-2"></i>Nueva Empresa
-                    </a>
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-0"><i class="fas fa-building me-2"></i>Mis Empresas</h4>
+                            <p class="text-muted mb-0">Gestione las empresas asociadas a su cuenta. Puede crear nuevas empresas, cambiar entre ellas y administrar su información.</p>
+                        </div>
+                        <a href="{% url 'empresa:crear_empresa_inicial' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Nueva Empresa
+                        </a>
+                    </div>
                 </div>
                 <div class="card-body">
                     {% if empresas %}
                         <div class="table-responsive">
-                            <table class="table table-hover">
+                            <table class="table">
                                 <thead>
                                     <tr>
                                         <th>Nombre</th>
@@ -25,21 +143,50 @@
                                         <th>Razón Social</th>
                                         <th>Teléfono</th>
                                         <th>Email</th>
-                                        <th>Acciones</th>
+                                        <th>Estado</th>
+                                        <th class="text-center">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for empresa in empresas %}
-                                    <tr>
-                                        <td>{{ empresa.nombre }}</td>
+                                    <tr class="{% if empresa.id|stringformat:'s' == request.session.empresa_id %}table-primary{% endif %}">
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-building text-primary me-2"></i>
+                                                <strong>{{ empresa.nombre_fantasia|default:empresa.razon_social }}</strong>
+                                            </div>
+                                        </td>
                                         <td>{{ empresa.ruc }}</td>
                                         <td>{{ empresa.razon_social }}</td>
-                                        <td>{{ empresa.telefono }}</td>
-                                        <td>{{ empresa.email }}</td>
                                         <td>
-                                            <a href="{% url 'empresa:cambiar_empresa' empresa.id %}" class="btn btn-primary btn-sm">
-                                                <i class="fas fa-check me-1"></i>Seleccionar
-                                            </a>
+                                            <i class="fas fa-phone text-muted me-1"></i>
+                                            {{ empresa.telefono|default:"No especificado" }}
+                                        </td>
+                                        <td>
+                                            <i class="fas fa-envelope text-muted me-1"></i>
+                                            {{ empresa.email|default:"No especificado" }}
+                                        </td>
+                                        <td>
+                                            {% if empresa.activo %}
+                                                <span class="badge bg-success">
+                                                    <i class="fas fa-check-circle me-1"></i>Activa
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-danger">
+                                                    <i class="fas fa-times-circle me-1"></i>Inactiva
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-center">
+                                            {% if empresa.id|stringformat:'s' != request.session.empresa_id %}
+                                                <a href="{% url 'empresa:cambiar_empresa' empresa.id %}" class="btn btn-primary btn-sm" title="Seleccionar empresa">
+                                                    <i class="fas fa-check me-1"></i>Seleccionar
+                                                </a>
+                                            {% else %}
+                                                <span class="badge bg-info">
+                                                    <i class="fas fa-check-circle me-1"></i>Actual
+                                                </span>
+                                            {% endif %}
                                         </td>
                                     </tr>
                                     {% endfor %}
@@ -47,9 +194,9 @@
                             </table>
                         </div>
                     {% else %}
-                        <div class="text-center py-4">
+                        <div class="text-center py-5">
                             <i class="fas fa-building fa-3x text-muted mb-3"></i>
-                            <h5>No tienes empresas registradas</h5>
+                            <h5 class="text-muted">No tienes empresas registradas</h5>
                             <p class="text-muted">Crea tu primera empresa para comenzar a usar el sistema</p>
                             <a href="{% url 'empresa:crear_empresa_inicial' %}" class="btn btn-primary">
                                 <i class="fas fa-plus me-2"></i>Crear Empresa
@@ -61,4 +208,8 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
 {% endblock %} 

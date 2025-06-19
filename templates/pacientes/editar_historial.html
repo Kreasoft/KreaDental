@@ -1,13 +1,116 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block title %}Editar Registro Clínico{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card {
+        border: 1px solid #AED6F1;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    }
+
+    .card-header {
+        background-color: #E8F4FC;
+        border-bottom: 1px solid #AED6F1;
+        border-radius: 15px 15px 0 0 !important;
+        padding: 1.5rem;
+    }
+
+    .card-header h3 {
+        color: #1A5276;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    .form-label {
+        color: #1A5276;
+        font-weight: 500;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        border: 1px solid #AED6F1;
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .form-control:focus {
+        border-color: #2874A6;
+        box-shadow: 0 0 0 0.2rem rgba(40, 116, 166, 0.25);
+    }
+
+    .btn-primary {
+        background-color: #1A5276;
+        border-color: #1A5276;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        border-radius: 8px;
+        font-size: 0.9rem;
+    }
+
+    .btn-primary:hover {
+        background-color: #2874A6;
+        border-color: #2874A6;
+    }
+
+    .btn-secondary {
+        background-color: #95a5a6;
+        border-color: #95a5a6;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        border-radius: 8px;
+        font-size: 0.9rem;
+    }
+
+    .btn-secondary:hover {
+        background-color: #7f8c8d;
+        border-color: #7f8c8d;
+    }
+
+    .alert-danger {
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+        color: #721c24;
+        border-radius: 8px;
+        padding: 1rem;
+    }
+
+    .invalid-feedback {
+        color: #e74c3c;
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+    }
+
+    .fas {
+        color: #1A5276;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid">
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <div class="card shadow">
+            <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title mb-0">Editar Registro Clínico</h3>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-0">
+                                <i class="fas fa-edit me-2"></i>Editar Registro Clínico
+                            </h3>
+                            <p class="text-muted mb-0">Modifique la información del registro clínico según sea necesario</p>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body">
                     <form method="post" enctype="multipart/form-data">
@@ -16,7 +119,7 @@
                         {% if form.errors %}
                         <div class="alert alert-danger">
                             <strong>Por favor corrija los siguientes errores:</strong>
-                            <ul>
+                            <ul class="mb-0">
                                 {% for field, errors in form.errors.items %}
                                     {% for error in errors %}
                                         <li>{{ error }}</li>
@@ -74,18 +177,11 @@
                                 {{ form.archivo.errors }}
                             </div>
                             {% endif %}
-                            {% if historial.archivo %}
-                            <div class="mt-2">
-                                <a href="{{ historial.archivo.url }}" target="_blank" class="btn btn-sm btn-info">
-                                    <i class="fas fa-download me-2"></i>Ver archivo actual
-                                </a>
-                            </div>
-                            {% endif %}
                         </div>
 
                         <div class="mt-4">
                             <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save me-2"></i>Guardar
+                                <i class="fas fa-save me-2"></i>Guardar Cambios
                             </button>
                             <a href="{% url 'pacientes:editar_paciente' historial.paciente.id %}" class="btn btn-secondary">
                                 <i class="fas fa-times me-2"></i>Cancelar

@@ -39,17 +39,27 @@ class Tratamiento(models.Model):
         total = sum(detalle.total for detalle in self.detalles.all())
         return total
 
+    @property
+    def monto_pagado(self):
+        return sum(pago.monto for pago in self.pagos_realizados.filter(estado='PAGADO'))
+
+    @property
+    def monto_pendiente(self):
+        return self.costo_total - self.monto_pagado
+
     def save(self, *args, **kwargs):
         # Primero guardar el tratamiento para obtener el PK
         super().save(*args, **kwargs)
         # Luego calcular y actualizar el costo total
         self.costo_total = self.calcular_costo_total()
-        # Guardar nuevamente con el costo total actualizado
-        super().save(update_fields=['costo_total'])
+        # Actualizar el estado de pago
+        self.pagado = self.monto_pendiente == 0
+        # Guardar nuevamente con los campos actualizados
+        super().save(update_fields=['costo_total', 'pagado'])
 
 class DetalleTratamiento(models.Model):
     tratamiento = models.ForeignKey(Tratamiento, on_delete=models.CASCADE, related_name='detalles')
-    procedimiento = models.ForeignKey(Procedimiento, on_delete=models.CASCADE)
+    procedimiento = models.ForeignKey(Procedimiento, on_delete=models.PROTECT)
     profesional = models.ForeignKey(
         'profesionales.Profesional', 
         on_delete=models.SET_NULL, 
@@ -89,9 +99,48 @@ class DetalleTratamiento(models.Model):
         self.fecha_actualizacion = timezone.now()
         
         # Si no hay profesional asignado, usar el profesional principal del tratamiento
-        if not self.profesional and self.tratamiento:
+        if not self.profesional and self.tratamiento and self.tratamiento.profesional:
             self.profesional = self.tratamiento.profesional
             
         super().save(*args, **kwargs)
-        # Actualizar costo total del tratamiento si es necesario
+        # Actualizar costo total del tratamiento
+        if self.tratamiento:
+            self.tratamiento.save()
+
+class Pago(models.Model):
+    METODO_CHOICES = [
+        ('EFECTIVO', 'Efectivo'),
+        ('TARJETA', 'Tarjeta'),
+        ('TRANSFERENCIA', 'Transferencia'),
+        ('OTRO', 'Otro')
+    ]
+    
+    ESTADO_CHOICES = [
+        ('PAGADO', 'Pagado'),
+        ('PENDIENTE', 'Pendiente'),
+        ('VENCIDO', 'Vencido')
+    ]
+    
+    tratamiento = models.ForeignKey(Tratamiento, on_delete=models.CASCADE, related_name='pagos_realizados')
+    fecha = models.DateField(default=timezone.now)
+    monto = models.DecimalField(max_digits=10, decimal_places=2)
+    metodo_pago = models.CharField(max_length=20, choices=METODO_CHOICES)
+    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='PAGADO')
+    referencia = models.CharField(max_length=100, blank=True)
+    notas = models.TextField(blank=True)
+    creado_por = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='pagos_creados')
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-fecha']
+        verbose_name = 'Pago'
+        verbose_name_plural = 'Pagos'
+
+    def __str__(self):
+        return f"Pago de {self.tratamiento.paciente.nombre_completo} - ${self.monto}"
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # Actualizar el estado de pago del tratamiento
         self.tratamiento.save() 

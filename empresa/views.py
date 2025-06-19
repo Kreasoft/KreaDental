@@ -25,7 +25,8 @@ def cambiar_empresa(request, empresa_id):
     # Verificar que el usuario tenga permiso para acceder a esta empresa
     if UsuarioEmpresa.objects.filter(usuario=request.user, empresa=empresa, activo=True).exists():
         request.session['empresa_id'] = str(empresa.id)
-        messages.success(request, f'Has seleccionado la empresa: {empresa.nombre_fantasia|default:empresa.razon_social}')
+        nombre_empresa = empresa.nombre_fantasia or empresa.razon_social
+        messages.success(request, f'Has seleccionado la empresa: {nombre_empresa}')
         return redirect('core:home')
     else:
         messages.error(request, 'No tienes permiso para acceder a esta empresa.')

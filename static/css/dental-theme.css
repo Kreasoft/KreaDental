@@ -1,15 +1,15 @@
 :root {
     /* Paleta Dental */
-    --dental-primary: #00A0B0;      /* Azul dental principal */
-    --dental-secondary: #6BB7C1;    /* Azul dental secundario */
-    --dental-accent: #B5E5E9;       /* Azul claro */
-    --dental-light: #E8F4F5;        /* Fondo claro */
-    --dental-dark: #006D77;         /* Azul oscuro */
-    --dental-success: #2A9D8F;      /* Verde */
-    --dental-warning: #E9C46A;      /* Amarillo */
-    --dental-danger: #E76F51;       /* Rojo */
-    --dental-text: #264653;         /* Texto principal */
-    --dental-text-light: #6C757D;   /* Texto secundario */
+    --dental-primary: #1A5276;      /* Azul principal */
+    --dental-secondary: #2874A6;    /* Azul secundario */
+    --dental-accent: #AED6F1;       /* Azul claro */
+    --dental-light: #E8F4FC;        /* Fondo claro */
+    --dental-dark: #154360;         /* Azul oscuro */
+    --dental-success: #2ecc71;      /* Verde */
+    --dental-warning: #f39c12;      /* Amarillo */
+    --dental-danger: #e74c3c;       /* Rojo */
+    --dental-text: #2C3E50;         /* Texto principal */
+    --dental-text-light: #7F8C8D;   /* Texto secundario */
 }
 
 /* Estilos de tarjetas */
@@ -26,12 +26,33 @@
     padding: 1.5rem;
 }
 
-.card-header h6 {
+.card-header .header-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.card-header .header-icon {
     color: var(--dental-primary);
-    font-size: 1.3rem;
+    font-size: 1.8rem;
+}
+
+.card-header .header-text {
+    flex: 1;
+}
+
+.card-header .header-title {
+    color: var(--dental-primary);
+    font-size: 1.5rem;
     font-weight: 600;
     margin: 0;
     font-family: 'Poppins', sans-serif;
+}
+
+.card-header .header-subtitle {
+    color: var(--dental-text-light);
+    font-size: 0.9rem;
+    margin: 0.25rem 0 0;
 }
 
 /* Estilos de formularios */

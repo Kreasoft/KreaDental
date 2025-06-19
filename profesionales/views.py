@@ -124,82 +124,62 @@ def lista_especialidades(request):
 
 @login_required
 def crear_especialidad(request):
-    data = {'form_is_valid': False}
     if request.method == 'POST':
         form = EspecialidadForm(request.POST)
         if form.is_valid():
             especialidad = form.save(commit=False)
-            especialidad.estado = True  # Por defecto activa
+            especialidad.estado = form.cleaned_data.get('estado', True)
             especialidad.save()
-            data['form_is_valid'] = True
-            especialidades = Especialidad.objects.all().order_by('nombre')
-            data['html_especialidad_list'] = render_to_string(
-                'profesionales/especialidades/partial_especialidad_list.html',
-                {'especialidades': especialidades}
-            )
+            messages.success(request, 'Especialidad creada exitosamente.')
+            return redirect('profesionales:lista_especialidades')
         else:
-            data['html_form'] = render_to_string(
-                'profesionales/especialidades/includes/partial_especialidad_create.html',
-                {'form': form},
-                request=request
-            )
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f'{field}: {error}')
     else:
         form = EspecialidadForm()
-        data['html_form'] = render_to_string(
-            'profesionales/especialidades/includes/partial_especialidad_create.html',
-            {'form': form},
-            request=request
-        )
-    return JsonResponse(data)
+    
+    context = {
+        'form': form,
+        'accion': 'Crear'
+    }
+    return render(request, 'profesionales/especialidades/crear_especialidad.html', context)
 
 @login_required
 def editar_especialidad(request, especialidad_id):
     especialidad = get_object_or_404(Especialidad, id=especialidad_id)
-    data = {'form_is_valid': False}
     
     if request.method == 'POST':
         form = EspecialidadForm(request.POST, instance=especialidad)
         if form.is_valid():
             form.save()
-            data['form_is_valid'] = True
-            especialidades = Especialidad.objects.all().order_by('nombre')
-            data['html_especialidad_list'] = render_to_string(
-                'profesionales/especialidades/partial_especialidad_list.html',
-                {'especialidades': especialidades}
-            )
+            messages.success(request, 'Especialidad actualizada exitosamente.')
+            return redirect('profesionales:lista_especialidades')
         else:
-            data['html_form'] = render_to_string(
-                'profesionales/especialidades/includes/partial_especialidad_update.html',
-                {'form': form, 'especialidad': especialidad},
-                request=request
-            )
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f'{field}: {error}')
     else:
         form = EspecialidadForm(instance=especialidad)
-        data['html_form'] = render_to_string(
-            'profesionales/especialidades/includes/partial_especialidad_update.html',
-            {'form': form, 'especialidad': especialidad},
-            request=request
-        )
-    return JsonResponse(data)
+    
+    context = {
+        'form': form,
+        'especialidad': especialidad,
+        'accion': 'Editar'
+    }
+    return render(request, 'profesionales/especialidades/editar_especialidad.html', context)
 
 @login_required
 def eliminar_especialidad(request, especialidad_id):
     especialidad = get_object_or_404(Especialidad, id=especialidad_id)
-    data = {'form_is_valid': False}
     
     if request.method == 'POST':
+        nombre = especialidad.nombre
         especialidad.delete()
-        data['form_is_valid'] = True
-        especialidades = Especialidad.objects.all().order_by('nombre')
-        data['html_especialidad_list'] = render_to_string(
-            'profesionales/especialidades/partial_especialidad_list.html',
-            {'especialidades': especialidades}
-        )
-    else:
-        context = {'especialidad': especialidad}
-        data['html_form'] = render_to_string(
-            'profesionales/especialidades/includes/partial_especialidad_delete.html',
-            context,
-            request=request
-        )
-    return JsonResponse(data) 
+        messages.success(request, f'Especialidad "{nombre}" eliminada exitosamente.')
+        return redirect('profesionales:lista_especialidades')
+    
+    context = {
+        'especialidad': especialidad
+    }
+    return render(request, 'profesionales/especialidades/confirmar_eliminar_especialidad.html', context) 

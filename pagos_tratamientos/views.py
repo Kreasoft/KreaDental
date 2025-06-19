@@ -1,12 +1,18 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import JsonResponse
-from django.db.models import Sum
+from django.http import JsonResponse, HttpResponse
+from django.db.models import Sum, Q
+from django.db.models.functions import Coalesce
+from django.db import models
 from django.utils import timezone
+from openpyxl import Workbook
+from openpyxl.styles import Font, Alignment, PatternFill
+from openpyxl.utils import get_column_letter
 from .models import PagoTratamiento, HistorialPago
 from tratamientos.models import Tratamiento
 from formas_pago.models import FormaPago
+from django.contrib.humanize.templatetags.humanize import intcomma
 
 @login_required
 def lista_pagos(request):
@@ -17,8 +23,19 @@ def lista_pagos(request):
     if tratamiento_id:
         pagos = pagos.filter(tratamiento_id=tratamiento_id)
         tratamiento = get_object_or_404(Tratamiento, id=tratamiento_id)
+        tratamientos_disponibles = None  # No mostrar la lista de tratamientos si ya se está viendo uno específico
     else:
         tratamiento = None
+        # Obtener tratamientos que tengan saldo pendiente (más flexible)
+        tratamientos_disponibles = Tratamiento.objects.annotate(
+            total_pagado=Sum('pagos__monto', filter=models.Q(pagos__estado='COMPLETADO'))
+        ).annotate(
+            saldo_pendiente=models.F('costo_total') - Coalesce(models.F('total_pagado'), 0, output_field=models.DecimalField())
+        ).filter(
+            saldo_pendiente__gt=0
+        ).exclude(
+            estado='COMPLETADO'  # Excluir tratamientos completados
+        ).order_by('-fecha_creacion')
     
     # Estadísticas
     total_pagos = pagos.filter(estado='COMPLETADO').aggregate(total=Sum('monto'))['total'] or 0
@@ -26,13 +43,18 @@ def lista_pagos(request):
     pagos_completados = pagos.filter(estado='COMPLETADO').count()
     pagos_anulados = pagos.filter(estado='ANULADO').count()
     
+    # Formatear números para el contexto
+    total_pagos_formatted = intcomma(int(total_pagos)) if total_pagos else '0'
+    
     context = {
         'pagos': pagos,
         'total_pagos': total_pagos,
+        'total_pagos_formatted': total_pagos_formatted,
         'pagos_pendientes': pagos_pendientes,
         'pagos_completados': pagos_completados,
         'pagos_anulados': pagos_anulados,
-        'tratamiento': tratamiento
+        'tratamiento': tratamiento,
+        'tratamientos_disponibles': tratamientos_disponibles
     }
     
     return render(request, 'pagos_tratamientos/lista_pagos.html', context)
@@ -71,7 +93,7 @@ def crear_pago(request, tratamiento_id):
             )
             
             messages.success(request, 'Pago registrado exitosamente.')
-            return redirect('detalle_tratamiento', tratamiento_id=tratamiento.id)
+            return redirect('tratamientos:detalle', pk=tratamiento.id)
             
         except ValueError as e:
             messages.error(request, str(e))
@@ -202,3 +224,86 @@ def editar_pago(request, pago_id):
     }
     
     return render(request, 'pagos_tratamientos/editar_pago.html', context)
+
+@login_required
+def exportar_pagos(request):
+    # Obtener los pagos
+    pagos = PagoTratamiento.objects.all().order_by('-fecha_pago')
+    
+    # Crear un nuevo libro de trabajo y seleccionar la hoja activa
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Pagos"
+    
+    # Estilos para el encabezado
+    header_font = Font(bold=True, color="FFFFFF")
+    header_fill = PatternFill(start_color="1A5276", end_color="1A5276", fill_type="solid")
+    
+    # Encabezados
+    headers = [
+        'ID', 'Fecha', 'Paciente', 'Tratamiento', 'Monto', 
+        'Método de Pago', 'Estado', 'Comprobante', 'Notas'
+    ]
+    
+    # Escribir encabezados
+    for col_num, header in enumerate(headers, 1):
+        cell = ws.cell(row=1, column=col_num, value=header)
+        cell.font = header_font
+        cell.fill = header_fill
+        cell.alignment = Alignment(horizontal='center')
+    
+    # Escribir datos
+    for row_num, pago in enumerate(pagos, 2):
+        ws.cell(row=row_num, column=1, value=pago.id)
+        ws.cell(row=row_num, column=2, value=pago.fecha_pago.strftime('%d/%m/%Y %H:%M'))
+        ws.cell(row=row_num, column=3, value=str(pago.tratamiento.paciente) if pago.tratamiento.paciente else '')
+        ws.cell(row=row_num, column=4, value=pago.tratamiento.get_tipo_display())
+        ws.cell(row=row_num, column=5, value=float(pago.monto))
+        ws.cell(row=row_num, column=6, value=str(pago.forma_pago) if pago.forma_pago else '')
+        ws.cell(row=row_num, column=7, value=pago.get_estado_display())
+        ws.cell(row=row_num, column=8, value=pago.comprobante or '')
+        ws.cell(row=row_num, column=9, value=pago.notas or '')
+    
+    # Ajustar el ancho de las columnas
+    for col in ws.columns:
+        max_length = 0
+        column = col[0].column_letter
+        for cell in col:
+            try:
+                if len(str(cell.value)) > max_length:
+                    max_length = len(str(cell.value))
+            except:
+                pass
+        adjusted_width = (max_length + 2) * 1.2
+        ws.column_dimensions[column].width = adjusted_width
+    
+    # Crear la respuesta HTTP
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = 'attachment; filename=pagos.xlsx'
+    
+    # Guardar el libro de trabajo en la respuesta
+    wb.save(response)
+    return response
+
+@login_required
+def resumen_tratamiento(request, pago_id):
+    """Vista para obtener el resumen de un tratamiento y sus pagos"""
+    pago = get_object_or_404(PagoTratamiento, id=pago_id)
+    tratamiento = pago.tratamiento
+    
+    # Obtener todos los pagos del tratamiento
+    pagos_tratamiento = tratamiento.pagos.filter(estado='COMPLETADO').order_by('fecha_pago')
+    total_pagado = pagos_tratamiento.aggregate(total=Sum('monto'))['total'] or 0
+    saldo_pendiente = tratamiento.costo_total - total_pagado
+    
+    context = {
+        'tratamiento': tratamiento,
+        'pagos': pagos_tratamiento,
+        'total_pagado': total_pagado,
+        'saldo_pendiente': saldo_pendiente,
+        'pago_actual': pago
+    }
+    
+    return render(request, 'pagos_tratamientos/resumen_tratamiento.html', context)

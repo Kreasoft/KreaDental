@@ -1,10 +1,12 @@
-{% extends 'core/base.html' %}
+{% extends 'base.html' %}
 {% load humanize %}
+{% load static %}
 
-{% block title %}Detalle de Cierre{% endblock %}
+{% block title %}Detalle de Cierre de Caja{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-print-css/css/bootstrap-print.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
 <style>
     /* Estilos generales */
     .container-fluid {
@@ -14,33 +16,109 @@
     
     .detail-card {
         background: white;
-        border-radius: 0.5rem;
-        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-        margin-bottom: 1rem;
-        padding: 1rem;
-    }
-    
-    .info-section {
+        border: 1px solid #AED6F1;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        padding: 1.75rem;
         margin-bottom: 1.5rem;
     }
     
-    .info-section h6 {
-        margin-bottom: 1rem;
+    .detail-card .card-header {
+        background-color: #E8F4FC;
+        border-bottom: 1px solid #AED6F1;
+        border-radius: 15px 15px 0 0 !important;
+        padding: 1.5rem;
+    }
+    
+    .detail-card .card-title {
+        color: #1A5276;
+        font-size: 1.5rem;
         font-weight: 600;
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+    }
+    
+    .detail-card .card-title i {
+        color: #2874A6;
+        opacity: 0.7;
+    }
+    
+    .info-section {
+        background: #E8F4FC;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .info-section h6 {
+        color: #1A5276;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 1rem;
     }
     
     .info-item {
         display: flex;
         justify-content: space-between;
-        margin-bottom: 0.5rem;
-        padding: 0.25rem 0;
+        align-items: center;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #AED6F1;
+    }
+    
+    .info-item:last-child {
+        border-bottom: none;
+    }
+    
+    .info-label {
+        color: #2874A6;
+        font-size: 0.875rem;
+    }
+    
+    .info-value {
+        color: #1A5276;
+        font-weight: 500;
     }
     
     .total-row {
-        border-top: 2px solid #dee2e6;
-        margin-top: 0.5rem;
-        padding-top: 0.5rem;
-        font-weight: bold;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 2px solid #AED6F1;
+        font-weight: 600;
+    }
+    
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        background: #E8F4FC;
+        color: #1A5276;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    
+    .btn-back:hover {
+        background: #AED6F1;
+        color: #1A5276;
+        transform: translateX(-2px);
+    }
+    
+    .badge {
+        padding: 0.5em 1em;
+        font-weight: 500;
+        border-radius: 9999px;
+    }
+    
+    .badge-abierto {
+        background-color: #007bff;
+        color: white;
+    }
+    
+    .badge-cerrado {
+        background-color: #5a99d4;
+        color: white;
     }
 
     /* Estilos de impresión */
@@ -91,112 +169,6 @@
             margin-bottom: 0.25rem !important;
         }
     }
-    .detail-card {
-        background: white;
-        border-radius: 1rem;
-        padding: 1.75rem;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        margin-bottom: 1.5rem;
-    }
-
-    .detail-card .card-header {
-        background: none;
-        border: none;
-        padding: 0 0 1rem 0;
-    }
-
-    .detail-card .card-title {
-        color: #2d3748;
-        font-size: 1.25rem;
-        font-weight: 600;
-        margin: 0;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
-
-    .detail-card .card-title i {
-        color: #4a5568;
-        opacity: 0.7;
-    }
-
-    .info-section {
-        background: #f7fafc;
-        border-radius: 0.5rem;
-        padding: 1rem;
-        margin-bottom: 1rem;
-    }
-
-    .info-section h6 {
-        color: #4a5568;
-        font-size: 0.875rem;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        margin-bottom: 1rem;
-    }
-
-    .info-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.5rem 0;
-        border-bottom: 1px solid #e2e8f0;
-    }
-
-    .info-item:last-child {
-        border-bottom: none;
-    }
-
-    .info-label {
-        color: #718096;
-        font-size: 0.875rem;
-    }
-
-    .info-value {
-        color: #2d3748;
-        font-weight: 500;
-    }
-
-    .total-row {
-        margin-top: 1rem;
-        padding-top: 1rem;
-        border-top: 2px solid #e2e8f0;
-        font-weight: 600;
-    }
-
-    .btn-back {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.5rem 1rem;
-        border-radius: 0.5rem;
-        background: #edf2f7;
-        color: #4a5568;
-        text-decoration: none;
-        transition: all 0.2s;
-    }
-
-    .btn-back:hover {
-        background: #e2e8f0;
-        color: #2d3748;
-        transform: translateX(-2px);
-    }
-
-    .badge {
-        padding: 0.5em 1em;
-        font-weight: 500;
-        border-radius: 9999px;
-    }
-
-    .badge-abierto {
-        background-color: #48bb78;
-        color: white;
-    }
-
-    .badge-cerrado {
-        background-color: #4299e1;
-        color: white;
-    }
 
     .table {
         margin-bottom: 0;
@@ -224,211 +196,150 @@
         background-color: #e53e3e;
         color: white;
     }
+
+    .btn-cerrar {
+        background-color: #1A5276;
+        border-color: #1A5276;
+        color: white;
+    }
+    .btn-cerrar:hover {
+        background-color: #2874A6;
+        border-color: #2874A6;
+        color: white;
+    }
+
+    .card {
+        border: 1px solid #AED6F1;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    }
+    .card-header {
+        background-color: #E8F4FC;
+        border-bottom: 1px solid #AED6F1;
+        border-radius: 15px 15px 0 0 !important;
+        padding: 1.5rem;
+    }
+    .card-header h4 {
+        color: #1A5276;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+    }
+    .card-body {
+        padding: 2rem;
+    }
+    .btn-primary {
+        background-color: #1A5276;
+        border-color: #1A5276;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        border-radius: 8px;
+        font-size: 0.9rem;
+    }
+    .btn-primary:hover {
+        background-color: #2874A6;
+        border-color: #2874A6;
+    }
+    .btn-warning {
+        background-color: #f39c12;
+        border-color: #f39c12;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+        border-radius: 8px;
+    }
+    .btn-warning:hover {
+        background-color: #d35400;
+        border-color: #d35400;
+    }
+    .btn-danger {
+        background-color: #e74c3c;
+        border-color: #e74c3c;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+        border-radius: 8px;
+    }
+    .btn-danger:hover {
+        background-color: #c0392b;
+        border-color: #c0392b;
+    }
+    .btn-sm {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+        border-radius: 8px;
+    }
+    .badge {
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+    .badge-abierto {
+        background-color: #007bff;
+        color: white;
+    }
+    .badge-cerrado {
+        background-color: #5a99d4;
+        color: white;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container-fluid">
-    <!-- Barra superior con botones -->
-    <div class="row mb-3">
-        <div class="col-12 d-flex justify-content-between align-items-center no-print">
-            <a href="{% url 'cierres_caja:lista_cierres' %}" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left me-2"></i>Volver
-            </a>
-            <div class="d-flex gap-2">
-                <button class="btn btn-outline-primary" onclick="exportToExcel()">
-                    <i class="fas fa-file-excel me-2"></i>Exportar
-                </button>
-                <button class="btn btn-outline-secondary" onclick="window.print()">
-                    <i class="fas fa-print me-2"></i>Imprimir
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Encabezado para impresión -->
-    <div class="text-center mb-3 d-none print-only">
-        <h3 class="mb-2">Cierre de Caja</h3>
-        <p class="mb-1">Fecha: {{ cierre.fecha|date:"d/m/Y" }}</p>
-        <p class="mb-0">Estado: {{ cierre.get_estado_display }}</p>
-    </div>
-
-    <div class="row">
-        <div class="col-lg-8">
-            <!-- Información principal -->
-            <div class="detail-card">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card">
                 <div class="card-header">
-                    <h5 class="card-title">
-                        <i class="fas fa-cash-register"></i>
-                        Cierre de Caja - {{ cierre.fecha|date:"d/m/Y" }}
-                    </h5>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-0"><i class="fas fa-cash-register me-2"></i>Detalle de Cierre de Caja</h4>
+                            <p class="text-muted mb-0">Información completa del cierre de caja</p>
+                        </div>
+                        <div>
+                            <a href="{% url 'cierres_caja:lista_cierres' %}" class="btn btn-primary">
+                                <i class="fas fa-arrow-left me-1"></i>Volver
+                            </a>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body">
-                    <!-- Información básica -->
-                    <div class="info-section mb-4">
-                        <h6>Información General</h6>
-                        <div class="info-item">
-                            <span class="info-label">Estado</span>
-                            <span class="badge badge-{{ cierre.estado|lower }}">
-                                {{ cierre.get_estado_display }}
-                            </span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Hora de Apertura</span>
-                            <span class="info-value">{{ cierre.hora_apertura|time:"H:i" }}</span>
-                        </div>
-                        {% if cierre.hora_cierre %}
-                        <div class="info-item">
-                            <span class="info-label">Hora de Cierre</span>
-                            <span class="info-value">{{ cierre.hora_cierre|time:"H:i" }}</span>
-                        </div>
-                        {% endif %}
-                        <div class="info-item">
-                            <span class="info-label">Usuario Apertura</span>
-                            <span class="info-value">{{ cierre.usuario_apertura.get_full_name }}</span>
-                        </div>
-                        {% if cierre.usuario_cierre %}
-                        <div class="info-item">
-                            <span class="info-label">Usuario Cierre</span>
-                            <span class="info-value">{{ cierre.usuario_cierre.get_full_name }}</span>
-                        </div>
-                        {% endif %}
-                    </div>
-
-                    <!-- Resumen de montos -->
-                    <div class="info-section mb-4">
-                        <h6>Resumen de Montos</h6>
-                        <div class="info-item">
-                            <span class="info-label">Monto Inicial</span>
-                            <span class="info-value">${{ cierre.monto_inicial|floatformat:0|intcomma }}</span>
-                        </div>
-                        {% if cierre.monto_final %}
-                        <div class="info-item">
-                            <span class="info-label">Monto Final</span>
-                            <span class="info-value">${{ cierre.monto_final|floatformat:0|intcomma }}</span>
-                        </div>
-                        {% endif %}
-                        
-                        <!-- Totales por forma de pago -->
-                        {% for pago in resumen_pagos %}
-                        <div class="info-item">
-                            <span class="info-label">
-                                {{ pago.forma_pago__nombre }}
-                                <small class="text-muted">({{ pago.cantidad }} pago{{ pago.cantidad|pluralize }})</small>
-                            </span>
-                            <span class="info-value">${{ pago.total|floatformat:0|intcomma }}</span>
-                        </div>
-                        {% endfor %}
-                        
-                        <div class="info-item total-row">
-                            <span class="info-label">Total del Día</span>
-                            <span class="info-value">${{ total_sistema|floatformat:0|intcomma }}</span>
-                        </div>
-                        
-                        {% if cierre.diferencia %}
-                        <div class="info-item">
-                            <span class="info-label">Diferencia</span>
-                            <span class="info-value {% if cierre.diferencia < 0 %}text-danger{% else %}text-success{% endif %}">
-                                ${{ cierre.diferencia|floatformat:0|intcomma }}
-                            </span>
-                        </div>
-                        {% endif %}
-                    </div>
-
-                    {% if cierre.observaciones %}
-                    <!-- Observaciones -->
-                    <div class="info-section">
-                        <h6>Observaciones</h6>
-                        <p class="mb-0">{{ cierre.observaciones|linebreaksbr }}</p>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- Lista de pagos -->
-            <div class="detail-card">
-                <div class="card-header">
-                    <h5 class="card-title">
-                        <i class="fas fa-money-bill-wave"></i>
-                        Pagos del Día
-                    </h5>
-                </div>
-                <div class="card-body p-0">
-                    {% if cierre.pagos.all %}
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Hora</th>
-                                    <th>Tratamiento</th>
-                                    <th>Forma de Pago</th>
-                                    <th>Monto</th>
-                                    <th>Estado</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for pago in cierre.pagos.all %}
-                                <tr>
-                                    <td>#{{ pago.id }}</td>
-                                    <td>{{ pago.fecha_pago|time:"H:i" }}</td>
-                                    <td>
-                                        <a href="{% url 'tratamientos:detalle_tratamiento' pago.tratamiento.id %}" 
-                                           class="text-decoration-none">
-                                            {{ pago.tratamiento }}
-                                        </a>
-                                    </td>
-                                    <td>{{ pago.forma_pago }}</td>
-                                    <td>${{ pago.monto|floatformat:0|intcomma }}</td>
-                                    <td>
-                                        <span class="badge badge-{{ pago.estado|lower }}">
-                                            {{ pago.get_estado_display }}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="info-section">
+                                <h6><i class="fas fa-info-circle me-2"></i>Información General</h6>
+                                <div class="info-item">
+                                    <span class="info-label">Fecha:</span>
+                                    <span class="info-value">{{ cierre.fecha|date:"d/m/Y" }}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Estado:</span>
+                                    <span class="info-value">
+                                        <span class="badge {% if cierre.estado == 'ABIERTO' %}badge-abierto{% else %}badge-cerrado{% endif %}">
+                                            {{ cierre.estado }}
                                         </span>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-section">
+                                <h6><i class="fas fa-money-bill-wave me-2"></i>Resumen Financiero</h6>
+                                <div class="info-item">
+                                    <span class="info-label">Total Ventas:</span>
+                                    <span class="info-value">${{ cierre.total_ventas|floatformat:2 }}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Total Gastos:</span>
+                                    <span class="info-value">${{ cierre.total_gastos|floatformat:2 }}</span>
+                                </div>
+                                <div class="info-item total-row">
+                                    <span class="info-label">Balance Final:</span>
+                                    <span class="info-value">${{ cierre.balance_final|floatformat:2 }}</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    {% else %}
-                    <div class="text-center py-5">
-                        <i class="fas fa-money-bill-wave fa-3x text-muted mb-3"></i>
-                        <p class="text-muted">No hay pagos registrados en este cierre</p>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
-        <!-- Información adicional -->
-        <div class="col-lg-4">
-            <div class="detail-card">
-                <div class="card-header">
-                    <h5 class="card-title">
-                        <i class="fas fa-info-circle"></i>
-                        Información Adicional
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <ul class="list-unstyled">
-                        <li class="mb-3">
-                            <i class="fas fa-info-circle text-info me-2"></i>
-                            Este cierre incluye todos los pagos realizados durante el día {{ cierre.fecha|date:"d/m/Y" }}.
-                        </li>
-                        {% if cierre.diferencia %}
-                            <li class="mb-3">
-                                <i class="fas fa-{% if cierre.diferencia < 0 %}exclamation{% else %}check{% endif %}-circle 
-                                          text-{% if cierre.diferencia < 0 %}warning{% else %}success{% endif %} me-2"></i>
-                                La diferencia de 
-                                ${{ cierre.diferencia|floatformat:0|intcomma }} 
-                                indica un {% if cierre.diferencia < 0 %}faltante{% else %}sobrante{% endif %} en caja.
-                            </li>
-                        {% endif %}
-                        <li class="mb-3">
-                            <i class="fas fa-calculator text-primary me-2"></i>
-                            El total del día incluye pagos en efectivo, tarjeta y transferencias.
-                        </li>
-                    </ul>
                 </div>
             </div>
         </div>

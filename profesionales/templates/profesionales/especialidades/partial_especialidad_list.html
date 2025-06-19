@@ -1,37 +1,51 @@
 {% for especialidad in especialidades %}
 <tr>
-    <td>{{ especialidad.nombre }}</td>
-    <td>{{ especialidad.descripcion }}</td>
     <td>
-        {% if especialidad.estado %}
-        <span class="badge badge-success">Activa</span>
+        <strong>{{ especialidad.nombre }}</strong>
+    </td>
+    <td>
+        {% if especialidad.descripcion %}
+            {{ especialidad.descripcion|truncatechars:100 }}
         {% else %}
-        <span class="badge badge-warning">Inactiva</span>
+            <span class="text-muted">Sin descripción</span>
         {% endif %}
     </td>
     <td>
-        <button type="button" 
-                class="btn btn-action btn-info js-update-especialidad" 
-                data-url="{% url 'profesionales:editar_especialidad' especialidad.id %}" 
-                title="Editar">
+        {% if especialidad.estado %}
+        <span class="badge badge-success">
+            <i class="fas fa-check-circle me-1"></i>Activa
+        </span>
+        {% else %}
+        <span class="badge badge-warning">
+            <i class="fas fa-times-circle me-1"></i>Inactiva
+        </span>
+        {% endif %}
+    </td>
+    <td>
+        <a href="{% url 'profesionales:editar_especialidad' especialidad.id %}" 
+           class="btn btn-action btn-info" 
+           title="Editar especialidad">
             <i class="fas fa-edit"></i>
-        </button>
-        <button type="button" 
-                class="btn btn-action btn-danger js-delete-especialidad" 
-                data-url="{% url 'profesionales:eliminar_especialidad' especialidad.id %}" 
-                title="Eliminar">
+        </a>
+        <a href="{% url 'profesionales:eliminar_especialidad' especialidad.id %}" 
+           class="btn btn-action btn-danger" 
+           title="Eliminar especialidad"
+           onclick="return confirmarEliminacion('{{ especialidad.nombre }}')">
             <i class="fas fa-trash-alt"></i>
-        </button>
+        </a>
     </td>
 </tr>
 {% empty %}
 <tr>
-    <td colspan="4" class="text-center py-4">
-        <i class="fas fa-stethoscope fa-3x text-muted mb-3 d-block"></i>
-        <p class="text-muted mb-0">No hay especialidades registradas</p>
-        <button type="button" class="btn btn-primary js-create-especialidad">
-            <i class="fas fa-plus me-2"></i>Agregar Especialidad
-        </button>
+    <td colspan="4" class="text-center py-5">
+        <div class="empty-state">
+            <i class="fas fa-stethoscope fa-4x"></i>
+            <h5>No hay especialidades registradas</h5>
+            <p>Comience agregando una nueva especialidad para organizar mejor los servicios dentales</p>
+            <a href="{% url 'profesionales:crear_especialidad' %}" class="btn btn-nuevo">
+                <i class="fas fa-plus me-2"></i>Agregar Especialidad
+            </a>
+        </div>
     </td>
 </tr>
 {% endfor %}

@@ -19,6 +19,12 @@
    - Optimizar consultas a la base de datos
    - Manejar errores de forma adecuada
 
+4. **Reglas para Modificaciones**
+   - Solo hacer cambios específicos que se soliciten
+   - No modificar nada sin autorización
+   - No eliminar o alterar archivos que puedan afectar otras funcionalidades
+   - Mantener los cambios enfocados en resolver el problema específico que se plantea
+
 ## Paleta de Colores
 ```css
 :root {

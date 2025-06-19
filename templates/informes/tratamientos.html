@@ -35,7 +35,7 @@
     </div>
     <div class="col-xl-6 col-md-6">
         <div class="stats-card">
-            <div class="stats-number">${{ total_ingresos|floatformat:2 }}</div>
+            <div class="stats-number">${{ total_ingresos|floatformat:0|intcomma }}</div>
             <div class="stats-label">Total Ingresos</div>
         </div>
     </div>
@@ -82,7 +82,7 @@
                     <td>{{ tratamiento.paciente.nombre }} {{ tratamiento.paciente.apellidos }}</td>
                     <td>{{ tratamiento.profesional.nombres }} {{ tratamiento.profesional.apellido_paterno }}</td>
                     <td>{{ tratamiento.get_estado_display }}</td>
-                    <td>${{ tratamiento.costo_total|floatformat:2 }}</td>
+                    <td>${{ tratamiento.costo_total|floatformat:0|intcomma }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
