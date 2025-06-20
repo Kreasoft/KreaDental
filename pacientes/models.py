@@ -26,6 +26,20 @@ class Paciente(models.Model):
     activo = models.BooleanField(default=True)
     prevision = models.ForeignKey(Prevision, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Previsión')
     empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='pacientes', null=True, blank=True)
+    
+    # Campos para compartición entre sucursales
+    compartir_entre_sucursales = models.BooleanField(
+        default=False, 
+        verbose_name='Compartir con otras sucursales',
+        help_text='Permite que otras sucursales vean este paciente'
+    )
+    empresas_compartidas = models.ManyToManyField(
+        Empresa, 
+        blank=True, 
+        related_name='pacientes_compartidos',
+        verbose_name='Sucursales con acceso',
+        help_text='Selecciona las sucursales que pueden ver este paciente'
+    )
 
     def __str__(self):
         return f"{self.nombre} {self.apellidos}"
@@ -36,6 +50,16 @@ class Paciente(models.Model):
 
     def nombre_completo(self):
         return f"{self.nombre} {self.apellidos}"
+
+    def es_compartido(self):
+        """Verifica si el paciente está compartido con otras sucursales"""
+        return self.compartir_entre_sucursales and self.empresas_compartidas.exists()
+
+    def puede_ver_empresa(self, empresa):
+        """Verifica si una empresa puede ver este paciente"""
+        if self.empresa == empresa:
+            return True
+        return self.compartir_entre_sucursales and empresa in self.empresas_compartidas.all()
 
     def save(self, *args, **kwargs):
         if self.nombre:

@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Eliminar Cita{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">Confirmar Eliminación</h3>
+                </div>
+                <div class="card-body">
+                    <p class="mb-4">¿Está seguro que desea eliminar la siguiente cita?</p>
+                    
+                    <ul class="list-group mb-4">
+                        <li class="list-group-item">
+                            <strong>Paciente:</strong> {{ cita.paciente }}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Profesional:</strong> {{ cita.profesional }}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Fecha:</strong> {{ cita.fecha }}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Hora:</strong> {{ cita.hora }}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Estado:</strong> {{ cita.get_estado_display }}
+                        </li>
+                    </ul>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash me-2"></i>Eliminar
+                        </button>
+                        <a href="{% url 'citas:lista_citas' %}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i>Cancelar
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

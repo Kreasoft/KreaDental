@@ -1,0 +1,376 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Cierres de Caja{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Gradientes para las tarjetas de estadísticas */
+    .bg-gradient-primary {
+        background: linear-gradient(45deg, #4e73df 0%, #224abe 100%);
+        color: white;
+    }
+
+    .bg-gradient-success {
+        background: linear-gradient(45deg, #1cc88a 0%, #13855c 100%);
+        color: white;
+    }
+
+    .bg-gradient-info {
+        background: linear-gradient(45deg, #36b9cc 0%, #258391 100%);
+        color: white;
+    }
+
+    .bg-gradient-warning {
+        background: linear-gradient(45deg, #f6c23e 0%, #dda20a 100%);
+        color: white;
+    }
+
+    /* Estilos para el ícono de fondo */
+    .page-icon {
+        position: absolute;
+        right: -2rem;
+        top: -2rem;
+        font-size: 15rem;
+        opacity: 0.03;
+        transform: rotate(15deg);
+        z-index: 0;
+        color: #2c3e50;
+    }
+
+    /* Estilos para el encabezado de página */
+    .page-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+
+    .page-description {
+        font-size: 1.1rem;
+        color: #64748b;
+        max-width: 800px;
+    }
+
+    /* Ajuste para el contenedor principal */
+    .container-fluid {
+        position: relative;
+        z-index: 1;
+    }
+
+    .stats-card {
+        position: relative;
+        padding: 1.75rem;
+        border-radius: 1rem;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        transition: all 0.3s ease;
+    }
+    
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .stats-icon {
+        position: absolute;
+        right: 1.5rem;
+        bottom: 1rem;
+        font-size: 4.5rem;
+        opacity: 0.15;
+        transform: rotate(-5deg);
+        transition: all 0.3s ease;
+    }
+
+    .stats-card:hover .stats-icon {
+        transform: rotate(0deg) scale(1.1);
+        opacity: 0.2;
+    }
+
+    .stats-number {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+        position: relative;
+        z-index: 1;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .stats-label {
+        font-size: 0.9rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        position: relative;
+        z-index: 1;
+        opacity: 0.9;
+    }
+
+    .content-card {
+        background: white;
+        border-radius: 1rem;
+        padding: 1.75rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        margin-bottom: 1.5rem;
+    }
+
+    .content-card .card-header {
+        background: none;
+        border: none;
+        padding: 0 0 1rem 0;
+    }
+
+    .content-card .card-title {
+        color: #2d3748;
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .content-card .card-title i {
+        color: #4a5568;
+        opacity: 0.7;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+    .table thead th {
+        background-color: #f7fafc;
+        color: #4a5568;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+    }
+
+    .badge {
+        padding: 0.5em 1em;
+        font-weight: 500;
+        border-radius: 9999px;
+    }
+
+    .badge-abierto {
+        background-color: #48bb78;
+        color: white;
+    }
+
+    .badge-cerrado {
+        background-color: #4299e1;
+        color: white;
+    }
+
+    .btn-icon {
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        transition: all 0.2s;
+    }
+
+    .btn-icon:hover {
+        transform: translateY(-2px);
+    }
+
+    .btn-add {
+        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+
+    .btn-add:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        color: white;
+    }
+
+    .btn-add i {
+        margin-right: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid position-relative overflow-hidden">
+    <!-- Ícono de fondo -->
+    <div class="page-icon">
+        <i class="fas fa-cash-register"></i>
+    </div>
+
+    <!-- Encabezado de página -->
+    <div class="page-header mb-4">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="page-title">
+                    <i class="fas fa-cash-register me-2"></i>
+                    Control de Cierres de Caja
+                </h1>
+                <p class="page-description mb-0">
+                    Gestiona los movimientos diarios de caja, registra aperturas y cierres, y mantén un control preciso de tus ingresos.
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                {% if not hay_caja_abierta %}
+                <a href="{% url 'cierres_caja:abrir_caja' %}" class="btn-add">
+                    <i class="fas fa-plus"></i>
+                    Abrir Nueva Caja
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Tarjetas de resumen -->
+    <div class="row mb-4">
+        <div class="col-md-6 col-lg-3">
+            <div class="stats-card bg-gradient-primary">
+                <div class="stats-icon">
+                    <i class="fas fa-cash-register"></i>
+                </div>
+                <div class="stats-number">
+                    {{ resumen_semana.cantidad_cierres|default:0 }}
+                </div>
+                <div class="stats-label">Cierres en el Período</div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="stats-card bg-gradient-success">
+                <div class="stats-icon">
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <div class="stats-number">
+                    ${{ resumen_semana.total_efectivo|default:0|floatformat:0|intcomma }}
+                </div>
+                <div class="stats-label">Total Efectivo</div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="stats-card bg-gradient-info">
+                <div class="stats-icon">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+                <div class="stats-number">
+                    ${{ resumen_semana.total_tarjeta|default:0|floatformat:0|intcomma }}
+                </div>
+                <div class="stats-label">Total Tarjetas</div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="stats-card bg-gradient-warning">
+                <div class="stats-icon">
+                    <i class="fas fa-exchange-alt"></i>
+                </div>
+                <div class="stats-number">
+                    ${{ resumen_semana.total_transferencia|default:0|floatformat:0|intcomma }}
+                </div>
+                <div class="stats-label">Total Transferencias</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-card">
+        <!-- Filtros -->
+        <div class="card-header">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label">Fecha Inicio</label>
+                    <input type="date" name="fecha_inicio" class="form-control form-control-sm" value="{{ fecha_inicio }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Fecha Fin</label>
+                    <input type="date" name="fecha_fin" class="form-control form-control-sm" value="{{ fecha_fin }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Estado</label>
+                    <select name="estado" class="form-select form-select-sm">
+                        <option value="">Todos</option>
+                        <option value="ABIERTO" {% if estado_filtro == 'ABIERTO' %}selected{% endif %}>Abierto</option>
+                        <option value="CERRADO" {% if estado_filtro == 'CERRADO' %}selected{% endif %}>Cerrado</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary btn-sm w-100">
+                        <i class="fas fa-filter me-1"></i> Filtrar
+                    </button>
+                </div>
+            </form>
+        </div>
+        <div class="card-body p-0">
+            {% if cierres %}
+            <div class="table-responsive">
+                <table class="table table-hover table-sm align-middle">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Apertura</th>
+                            <th>Cierre</th>
+                            <th>Monto Inicial</th>
+                            <th>Monto Final</th>
+                            <th>Total del Día</th>
+                            <th>Diferencia</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cierre in cierres %}
+                        <tr>
+                            <td>{{ cierre.fecha|date:"d/m/Y" }}</td>
+                            <td>{{ cierre.hora_apertura|time:"H:i" }}</td>
+                            <td>{{ cierre.hora_cierre|time:"H:i"|default:"-" }}</td>
+                            <td>${{ cierre.monto_inicial|floatformat:0|intcomma }}</td>
+                            <td>${{ cierre.monto_final|floatformat:0|default:"-"|intcomma }}</td>
+                            <td>
+                                ${{ cierre.total_efectivo|add:cierre.total_tarjeta|add:cierre.total_transferencia|floatformat:0|intcomma }}
+                            </td>
+                            <td>
+                                {% if cierre.diferencia %}
+                                    <span class="{% if cierre.diferencia < 0 %}text-danger{% else %}text-success{% endif %}">
+                                        ${{ cierre.diferencia|floatformat:0|intcomma }}
+                                    </span>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge badge-{{ cierre.estado|lower }}">
+                                    {{ cierre.get_estado_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{% url 'cierres_caja:detalle_cierre' cierre.id %}" 
+                                       class="btn btn-icon btn-light" title="Ver detalle">
+                                        <i class="fas fa-eye text-primary"></i>
+                                    </a>
+                                    {% if cierre.estado == 'ABIERTO' %}
+                                    <a href="{% url 'cierres_caja:cerrar_caja' cierre.id %}" 
+                                       class="btn btn-icon btn-light" title="Cerrar caja">
+                                        <i class="fas fa-lock text-success"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-cash-register fa-3x text-muted mb-3"></i>
+                <p class="text-muted">No hay cierres de caja registrados</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

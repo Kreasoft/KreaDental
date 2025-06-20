@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Crear Empresa{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card {
+        border: 1px solid #AED6F1;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    }
+    .card-header {
+        background-color: #E8F4FC;
+        border-bottom: 1px solid #AED6F1;
+        border-radius: 15px 15px 0 0 !important;
+        padding: 1.5rem;
+    }
+    .card-header h4 {
+        color: #1A5276;
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+    }
+    .form-label {
+        color: #1A5276;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+    .form-control {
+        border: 1px solid #AED6F1;
+        border-radius: 8px;
+        padding: 0.75rem;
+        transition: all 0.3s ease;
+    }
+    .form-control:focus {
+        border-color: #2874A6;
+        box-shadow: 0 0 0 0.2rem rgba(26, 82, 118, 0.1);
+    }
+    .btn-primary {
+        background-color: #1A5276;
+        border-color: #1A5276;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        border-radius: 8px;
+    }
+    .btn-primary:hover {
+        background-color: #2874A6;
+        border-color: #2874A6;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        <i class="fas fa-building me-2"></i>Crear Nueva Empresa
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Razón Social -->
+                        <div class="mb-3">
+                            <label for="razon_social" class="form-label">Razón Social *</label>
+                            <input type="text" class="form-control" id="razon_social" name="razon_social" required>
+                        </div>
+
+                        <!-- Nombre de Fantasía -->
+                        <div class="mb-3">
+                            <label for="nombre_fantasia" class="form-label">Nombre de Fantasía *</label>
+                            <input type="text" class="form-control" id="nombre_fantasia" name="nombre_fantasia" required>
+                        </div>
+
+                        <!-- RUT -->
+                        <div class="mb-3">
+                            <label for="ruc" class="form-label">RUT *</label>
+                            <input type="text" class="form-control" id="ruc" name="ruc" 
+                                   pattern="^\d{1,2}\.\d{3}\.\d{3}[-][0-9kK]$"
+                                   placeholder="12.345.678-9" required>
+                            <small class="form-text text-muted">Formato: 12.345.678-9</small>
+                        </div>
+
+                        <!-- Representante Legal -->
+                        <div class="mb-3">
+                            <label for="representante_legal" class="form-label">Representante Legal *</label>
+                            <input type="text" class="form-control" id="representante_legal" name="representante_legal" required>
+                        </div>
+
+                        <!-- Dirección -->
+                        <div class="mb-3">
+                            <label for="direccion" class="form-label">Dirección *</label>
+                            <textarea class="form-control" id="direccion" name="direccion" rows="2" required></textarea>
+                        </div>
+
+                        <!-- Contacto -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="telefono" class="form-label">Teléfono *</label>
+                                <input type="tel" class="form-control" id="telefono" name="telefono" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email *</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Crear Empresa
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

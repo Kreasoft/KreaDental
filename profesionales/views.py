@@ -20,16 +20,27 @@ def lista_profesionales(request):
     # Obtener la empresa actual del usuario
     empresa_actual = get_empresa_actual(request)
     
-    # Obtener todos los profesionales de la empresa actual y activos
+    # Obtener todos los profesionales: propios + compartidos conmigo
     profesionales = Profesional.objects.filter(
-        empresa=empresa_actual,
-        activo=True
-    ).select_related('especialidad').order_by('apellido_paterno', 'apellido_materno', 'nombres')
+        Q(empresa=empresa_actual, activo=True) | 
+        Q(empresas_compartidas=empresa_actual, compartir_entre_sucursales=True, activo=True)
+    ).distinct().select_related('especialidad').order_by('apellido_paterno', 'apellido_materno', 'nombres')
     
     # Estadísticas
     total_profesionales = profesionales.count()
     profesionales_activos = profesionales.filter(activo=True).count()
     profesionales_por_especialidad = profesionales.values('especialidad__nombre').annotate(total=Count('id'))
+    
+    # Profesionales compartidos
+    profesionales_compartidos = profesionales.filter(
+        empresas_compartidas=empresa_actual, 
+        compartir_entre_sucursales=True
+    ).count()
+    
+    # Profesionales propios
+    profesionales_propios = profesionales.filter(empresa=empresa_actual).count()
+    
+    # Citas del mes
     citas_mes = Cita.objects.filter(
         profesional__in=profesionales,
         fecha__month=timezone.now().month,
@@ -44,6 +55,8 @@ def lista_profesionales(request):
         'total_profesionales': total_profesionales,
         'profesionales_activos': profesionales_activos,
         'profesionales_por_especialidad': dict(profesionales_por_especialidad.values_list('especialidad__nombre', 'total')),
+        'profesionales_compartidos': profesionales_compartidos,
+        'profesionales_propios': profesionales_propios,
         'citas_mes': citas_mes,
         'especialidades': especialidades,
         'empresa_actual': empresa_actual,

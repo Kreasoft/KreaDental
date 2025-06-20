@@ -39,6 +39,20 @@ class Profesional(models.Model):
     activo = models.BooleanField(default=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
+    
+    # Campos para compartición entre sucursales
+    compartir_entre_sucursales = models.BooleanField(
+        default=False, 
+        verbose_name='Compartir con otras sucursales',
+        help_text='Permite que otras sucursales vean este profesional'
+    )
+    empresas_compartidas = models.ManyToManyField(
+        Empresa, 
+        blank=True, 
+        related_name='profesionales_compartidos',
+        verbose_name='Sucursales con acceso',
+        help_text='Selecciona las sucursales que pueden ver este profesional'
+    )
 
     class Meta:
         verbose_name = 'Profesional'
@@ -53,6 +67,16 @@ class Profesional(models.Model):
 
     def get_especialidades(self):
         return self.especialidad.nombre if self.especialidad else ''
+
+    def es_compartido(self):
+        """Verifica si el profesional está compartido con otras sucursales"""
+        return self.compartir_entre_sucursales and self.empresas_compartidas.exists()
+
+    def puede_ver_empresa(self, empresa):
+        """Verifica si una empresa puede ver este profesional"""
+        if self.empresa == empresa:
+            return True
+        return self.compartir_entre_sucursales and empresa in self.empresas_compartidas.all()
 
     def save(self, *args, **kwargs):
         self.nombres = self.nombres.upper() if self.nombres else ''

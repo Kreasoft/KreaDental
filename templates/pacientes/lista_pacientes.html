@@ -109,6 +109,15 @@
         color: white;
     }
 
+    .compartido-badge {
+        background-color: #3498db;
+        color: white;
+        padding: 0.2rem 0.4rem;
+        border-radius: 3px;
+        font-size: 0.75rem;
+        margin-left: 0.5rem;
+    }
+
     .search-box {
         border: 1px solid #AED6F1;
         border-radius: 8px;
@@ -123,6 +132,24 @@
     .text-muted {
         color: #7f8c8d !important;
     }
+
+    .stats-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .stats-card h4 {
+        color: white;
+        margin-bottom: 0.5rem;
+    }
+
+    .stats-card .stat-number {
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
 </style>
 {% endblock %}
 
@@ -130,6 +157,34 @@
 <div class="container-fluid">
     <div class="row justify-content-center">
         <div class="col-lg-10">
+            <!-- Estadísticas -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <h4><i class="fas fa-users me-2"></i>Total</h4>
+                        <div class="stat-number">{{ total_pacientes }}</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <h4><i class="fas fa-check-circle me-2"></i>Activos</h4>
+                        <div class="stat-number">{{ pacientes_activos }}</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <h4><i class="fas fa-home me-2"></i>Propios</h4>
+                        <div class="stat-number">{{ pacientes_propios }}</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <h4><i class="fas fa-share-alt me-2"></i>Compartidos</h4>
+                        <div class="stat-number">{{ pacientes_compartidos }}</div>
+                    </div>
+                </div>
+            </div>
+
             <div class="card">
                 <div class="card-header">
                     <div class="d-flex justify-content-between align-items-center">
@@ -164,14 +219,22 @@
                                     <th>Email</th>
                                     <th>Teléfono</th>
                                     <th>Estado</th>
+                                    <th>Origen</th>
                                     <th class="text-center">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for paciente in pacientes %}
                                 <tr>
-                                    <td>{{ paciente.rut }}</td>
-                                    <td>{{ paciente.nombre_completo }}</td>
+                                    <td>{{ paciente.documento }}</td>
+                                    <td>
+                                        {{ paciente.nombre_completo }}
+                                        {% if paciente.es_compartido %}
+                                            <span class="compartido-badge">
+                                                <i class="fas fa-share-alt me-1"></i>Compartido
+                                            </span>
+                                        {% endif %}
+                                    </td>
                                     <td>{{ paciente.email|default:"No especificado" }}</td>
                                     <td>{{ paciente.telefono|default:"No especificado" }}</td>
                                     <td>
@@ -183,17 +246,30 @@
                                             {% endif %}
                                         </span>
                                     </td>
+                                    <td>
+                                        {% if paciente.empresa == empresa_actual %}
+                                            <span class="text-success">
+                                                <i class="fas fa-home me-1"></i>Propio
+                                            </span>
+                                        {% else %}
+                                            <span class="text-info">
+                                                <i class="fas fa-share-alt me-1"></i>{{ paciente.empresa.nombre }}
+                                            </span>
+                                        {% endif %}
+                                    </td>
                                     <td class="text-center">
                                         <div class="btn-group">
                                             <a href="{% url 'pacientes:detalle_paciente' paciente.id %}" class="btn btn-primary btn-sm" title="Ver detalles">
                                                 <i class="fas fa-eye"></i>
                                             </a>
+                                            {% if paciente.empresa == empresa_actual %}
                                             <a href="{% url 'pacientes:editar_paciente' paciente.id %}" class="btn btn-warning btn-sm" title="Editar paciente">
                                                 <i class="fas fa-edit"></i>
                                             </a>
                                             <button type="button" class="btn btn-danger btn-sm" onclick="confirmarEliminacion({{ paciente.id }})" title="Eliminar paciente">
                                                 <i class="fas fa-trash"></i>
                                             </button>
+                                            {% endif %}
                                         </div>
                                     </td>
                                 </tr>

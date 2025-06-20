@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2>Pacientes
+            <a href="#" class="btn btn-primary js-create-paciente">
+                <i class="fas fa-plus"></i> Nuevo Paciente
+            </a>
+        </h2>
+    </div>
+    <div class="card-body">
+        <table class="table table-hover" id="paciente-table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>DNI</th>
+                    <th>Teléfono</th>
+                    <th>Email</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% include 'pacientes/includes/partial_paciente_list.html' %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal para crear/editar/eliminar -->
+<div class="modal fade" id="modal-paciente" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <!-- El contenido del modal se cargará dinámicamente -->
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Función para cargar el formulario en el modal
+    var loadForm = function(btn) {
+        var url = btn ? btn.attr("data-url") : "{% url 'pacientes:paciente_create' %}";
+        $.ajax({
+            url: url,
+            type: 'get',
+            dataType: 'json',
+            beforeSend: function() {
+                $("#modal-paciente").modal("show");
+            },
+            success: function(data) {
+                $("#modal-paciente .modal-content").html(data.html_form);
+            },
+            error: function(xhr, errmsg, err) {
+                console.log("Error:", xhr.status + ": " + xhr.responseText);
+                alert("Ocurrió un error al cargar el formulario");
+            }
+        });
+    };
+
+    // Función para manejar el envío del formulario
+    var saveForm = function(e) {
+        e.preventDefault();
+        var form = $(this);
+        $.ajax({
+            url: form.attr("action"),
+            data: form.serialize(),
+            type: form.attr("method"),
+            dataType: 'json',
+            success: function(data) {
+                if (data.form_is_valid) {
+                    $("#paciente-table tbody").html(data.html_paciente_list);
+                    $("#modal-paciente").modal("hide");
+                } else {
+                    $("#modal-paciente .modal-content").html(data.html_form);
+                }
+            },
+            error: function(xhr, errmsg, err) {
+                console.log("Error:", xhr.status + ": " + xhr.responseText);
+                alert("Ocurrió un error al guardar los cambios");
+            }
+        });
+        return false;
+    };
+
+    // Crear paciente
+    $(".js-create-paciente").click(function() {
+        loadForm();
+    });
+
+    // Editar paciente
+    $("#paciente-table").on("click", ".js-update-paciente", function() {
+        loadForm($(this));
+    });
+
+    // Eliminar paciente
+    $("#paciente-table").on("click", ".js-delete-paciente", function() {
+        loadForm($(this));
+    });
+
+    // Manejar envío del formulario
+    $("#modal-paciente").on("submit", ".js-paciente-form", saveForm);
+});
+</script>
+{% endblock %} 

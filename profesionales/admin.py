@@ -3,19 +3,32 @@ from .models import Profesional
 
 @admin.register(Profesional)
 class ProfesionalAdmin(admin.ModelAdmin):
-    list_display = ('nombres', 'apellido_paterno', 'apellido_materno', 'rut', 'especialidad', 'telefono', 'email', 'activo')
-    search_fields = ('nombres', 'apellido_paterno', 'apellido_materno', 'rut')
-    ordering = ('apellido_paterno', 'apellido_materno', 'nombres')
-    list_filter = ('activo', 'genero', 'especialidad')
+    list_display = ['nombre_completo', 'rut', 'email', 'especialidad', 'empresa', 'activo', 'es_compartido', 'compartir_entre_sucursales']
+    list_filter = ['activo', 'genero', 'especialidad', 'empresa', 'compartir_entre_sucursales', 'fecha_creacion']
+    search_fields = ['nombres', 'apellido_paterno', 'apellido_materno', 'rut', 'email']
+    readonly_fields = ['fecha_creacion', 'fecha_actualizacion']
+    filter_horizontal = ['empresas_compartidas']
+    
     fieldsets = (
         ('Información Personal', {
             'fields': ('rut', 'nombres', 'apellido_paterno', 'apellido_materno', 'fecha_nacimiento', 'genero')
         }),
-        ('Información de Contacto', {
+        ('Contacto', {
             'fields': ('telefono', 'email', 'direccion')
         }),
         ('Información Profesional', {
-            'fields': ('especialidad', 'usuario', 'activo')
+            'fields': ('especialidad', 'activo')
+        }),
+        ('Empresa', {
+            'fields': ('empresa',)
+        }),
+        ('Compartición entre Sucursales', {
+            'fields': ('compartir_entre_sucursales', 'empresas_compartidas'),
+            'description': 'Configuración para compartir este profesional con otras sucursales'
+        }),
+        ('Usuario del Sistema', {
+            'fields': ('usuario',),
+            'description': 'Usuario asociado para acceso al sistema'
         }),
     )
     

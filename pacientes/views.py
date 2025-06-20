@@ -26,8 +26,11 @@ def lista_pacientes(request):
         messages.error(request, 'No tienes una empresa asignada.')
         return redirect('home')
     
-    # Obtener pacientes de la empresa actual
-    pacientes = Paciente.objects.filter(empresa=empresa_actual).order_by('apellidos', 'nombre')
+    # Obtener pacientes: propios + compartidos conmigo
+    pacientes = Paciente.objects.filter(
+        Q(empresa=empresa_actual) | 
+        Q(empresas_compartidas=empresa_actual, compartir_entre_sucursales=True)
+    ).distinct().order_by('apellidos', 'nombre')
     
     # Estadísticas
     total_pacientes = pacientes.count()
@@ -36,6 +39,15 @@ def lista_pacientes(request):
     # Pacientes nuevos este mes
     primer_dia_mes = timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     pacientes_nuevos = pacientes.filter(fecha_registro__gte=primer_dia_mes).count()
+    
+    # Pacientes compartidos
+    pacientes_compartidos = pacientes.filter(
+        empresas_compartidas=empresa_actual, 
+        compartir_entre_sucursales=True
+    ).count()
+    
+    # Pacientes propios
+    pacientes_propios = pacientes.filter(empresa=empresa_actual).count()
     
     # Citas pendientes
     hoy = timezone.now()
@@ -53,6 +65,8 @@ def lista_pacientes(request):
         'total_pacientes': total_pacientes,
         'pacientes_activos': pacientes_activos,
         'pacientes_nuevos': pacientes_nuevos,
+        'pacientes_compartidos': pacientes_compartidos,
+        'pacientes_propios': pacientes_propios,
         'citas_pendientes': citas_pendientes,
         'previsiones': previsiones,
         'empresa_actual': empresa_actual,

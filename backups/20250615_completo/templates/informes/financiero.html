@@ -1,0 +1,176 @@
+{% extends 'informes/base_informes.html' %}
+{% load humanize %}
+
+{% block extra_css %}
+<style>
+    .stats-card {
+        position: relative;
+        padding: 1.5rem;
+        border-radius: 0.75rem;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s;
+    }
+    
+    .stats-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .stats-icon {
+        position: absolute;
+        right: 1rem;
+        bottom: 1rem;
+        font-size: 4rem;
+        opacity: 0.1;
+        color: inherit;
+    }
+
+    .stats-number {
+        font-size: 1.75rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .stats-label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .card-ingresos {
+        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        color: white;
+    }
+
+    .card-pagado {
+        background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+        color: white;
+    }
+
+    .card-pendiente {
+        background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+        color: white;
+    }
+
+    .card-tratamientos {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .stats-container {
+        background: white;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        margin-bottom: 1.5rem;
+    }
+
+    .stats-container h4 {
+        color: #2d3748;
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+    }
+
+    .table-stats thead th {
+        background-color: #f7fafc;
+        color: #4a5568;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block informe_titulo %}Informe Financiero{% endblock %}
+
+{% block acciones_encabezado %}
+<a href="?{{ request.GET.urlencode }}&export=excel" class="btn btn-success">
+    <i class="fas fa-file-excel"></i> Exportar a Excel
+</a>
+{% endblock %}
+
+{% block contenido_informe %}
+<!-- Tarjetas de resumen -->
+<div class="row">
+    <div class="col-xl-3 col-md-6">
+        <div class="stats-card card-ingresos">
+            <div class="stats-number">${{ ingresos_totales|default:0|floatformat:0|intcomma }}</div>
+            <div class="stats-label">Ingresos Totales</div>
+            <i class="fas fa-dollar-sign stats-icon"></i>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="stats-card card-pagado">
+            <div class="stats-number">${{ total_pagado|default:0|floatformat:0|intcomma }}</div>
+            <div class="stats-label">Total Pagado</div>
+            <i class="fas fa-check-circle stats-icon"></i>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="stats-card card-pendiente">
+            <div class="stats-number">${{ total_pendiente|default:0|floatformat:0|intcomma }}</div>
+            <div class="stats-label">Total Pendiente</div>
+            <i class="fas fa-clock stats-icon"></i>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="stats-card card-tratamientos">
+            <div class="stats-number">{{ num_tratamientos }}</div>
+            <div class="stats-label">Número de Tratamientos</div>
+            <i class="fas fa-clipboard-list stats-icon"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Gráficos -->
+<div class="row">
+    <div class="col-lg-6">
+        <div class="stats-container">
+            <h4>Ingresos por Día</h4>
+            <div class="chart-container">
+                {{ grafico_ingresos|safe }}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="stats-container">
+            <h4>Ingresos por Profesional</h4>
+            <div class="chart-container">
+                {{ grafico_profesionales|safe }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabla de ingresos por profesional -->
+<div class="stats-container">
+    <h4>Detalle de Ingresos por Profesional</h4>
+    <div class="table-responsive">
+        <table class="table table-bordered table-sm table-stats">
+            <thead>
+                <tr>
+                    <th>Profesional</th>
+                    <th>Número de Tratamientos</th>
+                    <th>Total Ingresos</th>
+                    <th>Promedio por Tratamiento</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for prof in ingresos_por_profesional %}
+                <tr>
+                    <td>{{ prof.profesional__nombres }} {{ prof.profesional__apellido_paterno }}</td>
+                    <td>{{ prof.num_tratamientos }}</td>
+                    <td>${{ prof.total|floatformat:2 }}</td>
+                    <td>${{ prof.promedio|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -4,6 +4,8 @@ from especialidades.models import Especialidad
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 import re
+from empresa.utils import get_empresa_actual
+from empresa.models import Empresa
 
 class ProfesionalForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -29,11 +31,25 @@ class ProfesionalForm(forms.ModelForm):
             empty_label='Seleccione una especialidad'
         )
 
+        # Obtener la empresa actual para filtrar las opciones de empresas compartidas
+        empresa_actual = None
+        if hasattr(self, 'request') and self.request:
+            empresa_actual = get_empresa_actual(self.request)
+        
+        if empresa_actual:
+            # Filtrar empresas compartidas para excluir la empresa actual
+            self.fields['empresas_compartidas'].queryset = Empresa.objects.filter(
+                activa=True
+            ).exclude(id=empresa_actual.id)
+        else:
+            self.fields['empresas_compartidas'].queryset = Empresa.objects.filter(activa=True)
+
     class Meta:
         model = Profesional
         fields = ['rut', 'nombres', 'apellido_paterno', 'apellido_materno', 
                  'fecha_nacimiento', 'genero', 'telefono', 'email', 
-                 'direccion', 'especialidad', 'activo']
+                 'direccion', 'especialidad', 'activo',
+                 'compartir_entre_sucursales', 'empresas_compartidas']
         
         # Especificar el formato de fecha para el input
         input_formats = {
@@ -76,16 +92,15 @@ class ProfesionalForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': 'correo@ejemplo.com'
             }),
-            'direccion': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Dirección completa'
-            }),
+            'direccion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'especialidad': forms.Select(attrs={
                 'class': 'form-select'
             }),
             'activo': forms.CheckboxInput(attrs={
                 'class': 'form-check-input'
-            })
+            }),
+            'compartir_entre_sucursales': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'empresas_compartidas': forms.SelectMultiple(attrs={'class': 'form-control'}),
         }
         labels = {
             'rut': 'RUT',
@@ -98,7 +113,9 @@ class ProfesionalForm(forms.ModelForm):
             'email': 'Correo Electrónico',
             'direccion': 'Dirección',
             'especialidad': 'Especialidad',
-            'activo': 'Activo'
+            'activo': 'Activo',
+            'compartir_entre_sucursales': 'Compartir entre sucursales',
+            'empresas_compartidas': 'Empresas Compartidas',
         }
 
     def clean_rut(self):

@@ -1,0 +1,337 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}{{ accion }} Caja{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-card {
+        background: white;
+        border-radius: 1rem;
+        padding: 1.75rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        margin-bottom: 1.5rem;
+    }
+
+    .form-card .card-header {
+        background: none;
+        border: none;
+        padding: 0 0 1rem 0;
+    }
+
+    .form-card .card-title {
+        color: #2d3748;
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .form-card .card-title i {
+        color: #4a5568;
+        opacity: 0.7;
+    }
+
+    .info-group {
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        background: #f7fafc;
+        border-radius: 0.5rem;
+    }
+
+    .info-label {
+        font-size: 0.875rem;
+        color: #718096;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.5rem;
+    }
+
+    .info-value {
+        font-size: 1rem;
+        color: #2d3748;
+        font-weight: 500;
+    }
+
+    .form-label {
+        font-size: 0.875rem;
+        color: #4a5568;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        border-radius: 0.5rem;
+        border: 1px solid #e2e8f0;
+        padding: 0.75rem;
+        transition: all 0.2s;
+    }
+
+    .form-control:focus {
+        border-color: #4299e1;
+        box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
+    }
+
+    .form-text {
+        font-size: 0.75rem;
+        color: #718096;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        background: #edf2f7;
+        color: #4a5568;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .btn-back:hover {
+        background: #e2e8f0;
+        color: #2d3748;
+        transform: translateX(-2px);
+    }
+
+    .resumen-pagos {
+        background: #f7fafc;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .resumen-pagos h6 {
+        color: #4a5568;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 1rem;
+    }
+
+    .resumen-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .resumen-item:last-child {
+        border-bottom: none;
+    }
+
+    .resumen-label {
+        color: #718096;
+        font-size: 0.875rem;
+    }
+
+    .resumen-value {
+        color: #2d3748;
+        font-weight: 500;
+    }
+
+    .total-row {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 2px solid #e2e8f0;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="mb-4">
+        <a href="{% url 'cierres_caja:lista_cierres' %}" class="btn-back">
+            <i class="fas fa-arrow-left"></i>
+            Volver a la lista
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="form-card">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <i class="fas fa-cash-register"></i>
+                        {{ accion }} Caja
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        {% if accion == 'Abrir' %}
+                            <div class="mb-3">
+                                <label for="id_monto_inicial" class="form-label">Monto Inicial</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    {{ form.monto_inicial }}
+                                </div>
+                                {% if form.monto_inicial.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.monto_inicial.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <!-- Resumen de pagos del día -->
+                            <div class="resumen-pagos mb-4">
+                                <h6>Resumen de Pagos del Día</h6>
+                                {% for resumen in resumen_pagos %}
+                                <div class="resumen-item">
+                                    <span class="resumen-label">
+                                        {{ resumen.forma_pago__nombre }}
+                                        <small class="text-muted">({{ resumen.cantidad }} pago{{ resumen.cantidad|pluralize }})</small>
+                                    </span>
+                                    <span class="resumen-value">${{ resumen.total|floatformat:0|intcomma }}</span>
+                                </div>
+                                {% endfor %}
+                                <div class="resumen-item total-row">
+                                    <span class="resumen-label">Total del Día</span>
+                                    <span class="resumen-value">${{ total_sistema|floatformat:0|intcomma }}</span>
+                                </div>
+                            </div>
+
+                            <!-- Lista detallada de pagos -->
+                            <div class="table-responsive mb-4">
+                                <table class="table table-sm table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Hora</th>
+                                            <th>Tratamiento</th>
+                                            <th>Forma de Pago</th>
+                                            <th class="text-end">Monto</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for pago in pagos_dia %}
+                                        <tr>
+                                            <td>{{ pago.fecha_pago|time:"H:i" }}</td>
+                                            <td>{{ pago.tratamiento }}</td>
+                                            <td>{{ pago.forma_pago }}</td>
+                                            <td class="text-end">${{ pago.monto|floatformat:0|intcomma }}</td>
+                                        </tr>
+                                        {% empty %}
+                                        <tr>
+                                            <td colspan="4" class="text-center text-muted">
+                                                No hay pagos registrados hoy
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Monto inicial -->
+                            <div class="info-group mb-4">
+                                <div class="resumen-item">
+                                    <span class="resumen-label">Monto Inicial</span>
+                                    <span class="resumen-value">${{ cierre.monto_inicial|floatformat:0|intcomma }}</span>
+                                </div>
+                            </div>
+
+                            <!-- Monto final -->
+                            <div class="mb-3">
+                                <label for="id_monto_final" class="form-label">Monto Final en Caja</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    {{ form.monto_final }}
+                                </div>
+                                {% if form.monto_final.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.monto_final.errors }}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">
+                                    Ingrese el monto total contado al cierre de caja
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <!-- Observaciones -->
+                        <div class="mb-4">
+                            <label for="id_observaciones" class="form-label">Observaciones</label>
+                            {{ form.observaciones }}
+                            {% if form.observaciones.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.observaciones.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-submit">
+                                <i class="fas fa-save me-2"></i>
+                                {{ accion }} Caja
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información adicional -->
+        <div class="col-lg-4">
+            <div class="form-card">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <i class="fas fa-info-circle"></i>
+                        Información Importante
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        {% if accion == 'Abrir' %}
+                            <li class="mb-3">
+                                <i class="fas fa-exclamation-circle text-warning me-2"></i>
+                                Ingrese el monto inicial con el que abre la caja.
+                            </li>
+                            <li class="mb-3">
+                                <i class="fas fa-info-circle text-info me-2"></i>
+                                Este monto será la base para calcular el cierre.
+                            </li>
+                        {% else %}
+                            <li class="mb-3">
+                                <i class="fas fa-exclamation-circle text-warning me-2"></i>
+                                Verifique que el monto final coincida con el efectivo en caja.
+                            </li>
+                            <li class="mb-3">
+                                <i class="fas fa-info-circle text-info me-2"></i>
+                                La diferencia se calculará automáticamente.
+                            </li>
+                            <li class="mb-3">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                Los pagos del día ya están incluidos en el resumen.
+                            </li>
+                        {% endif %}
+                        <li>
+                            <i class="fas fa-pencil-alt text-primary me-2"></i>
+                            Use las observaciones para registrar detalles importantes.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

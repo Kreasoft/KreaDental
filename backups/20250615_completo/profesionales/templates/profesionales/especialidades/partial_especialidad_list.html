@@ -1,0 +1,37 @@
+{% for especialidad in especialidades %}
+<tr>
+    <td>{{ especialidad.nombre }}</td>
+    <td>{{ especialidad.descripcion }}</td>
+    <td>
+        {% if especialidad.estado %}
+        <span class="badge badge-success">Activa</span>
+        {% else %}
+        <span class="badge badge-warning">Inactiva</span>
+        {% endif %}
+    </td>
+    <td>
+        <button type="button" 
+                class="btn btn-action btn-info js-update-especialidad" 
+                data-url="{% url 'profesionales:editar_especialidad' especialidad.id %}" 
+                title="Editar">
+            <i class="fas fa-edit"></i>
+        </button>
+        <button type="button" 
+                class="btn btn-action btn-danger js-delete-especialidad" 
+                data-url="{% url 'profesionales:eliminar_especialidad' especialidad.id %}" 
+                title="Eliminar">
+            <i class="fas fa-trash-alt"></i>
+        </button>
+    </td>
+</tr>
+{% empty %}
+<tr>
+    <td colspan="4" class="text-center py-4">
+        <i class="fas fa-stethoscope fa-3x text-muted mb-3 d-block"></i>
+        <p class="text-muted mb-0">No hay especialidades registradas</p>
+        <button type="button" class="btn btn-primary js-create-especialidad">
+            <i class="fas fa-plus me-2"></i>Agregar Especialidad
+        </button>
+    </td>
+</tr>
+{% endfor %}

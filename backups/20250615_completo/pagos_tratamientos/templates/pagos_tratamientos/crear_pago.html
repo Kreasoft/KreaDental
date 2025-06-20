@@ -1,0 +1,395 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Crear Pago{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-card {
+        background: white;
+        border-radius: 1rem;
+        padding: 1.75rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        margin-bottom: 1.5rem;
+    }
+
+    .card {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .card-header {
+        background: none;
+        border: none;
+        padding: 1rem;
+    }
+
+    .card-title {
+        color: #2d3748;
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .form-label {
+        font-weight: 500;
+        color: #4a5568;
+    }
+
+    .form-control {
+        border-radius: 0.5rem;
+        border: 1px solid #e2e8f0;
+        padding: 0.75rem;
+    }
+
+    .form-control:focus {
+        border-color: #4299e1;
+        box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
+    }
+
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        background: #edf2f7;
+        color: #4a5568;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .btn-back:hover {
+        background: #e2e8f0;
+        color: #2d3748;
+        transform: translateX(-2px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Información del Procedimiento -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Información del Procedimiento</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold">Procedimiento</h6>
+                            <p>{{ tratamiento.procedimiento.nombre }}</p>
+                            
+                            <h6 class="fw-bold mt-3">Descripción</h6>
+                            <p>{{ tratamiento.procedimiento.descripcion|default:'Sin descripción' }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="fw-bold">Costo Total</h6>
+                            <p>${{ tratamiento.costo_total|floatformat:0|intcomma }}</p>
+
+                            <h6 class="fw-bold mt-3">Saldo Pendiente</h6>
+                            <p class="text-danger">${{ saldo_pendiente|floatformat:0|intcomma }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botón Volver -->
+            <div class="mb-4">
+                <a href="{% url 'tratamientos:detalle_tratamiento' tratamiento.id %}" class="btn-back">
+                    <i class="fas fa-arrow-left"></i>
+                    Volver al tratamiento
+                </a>
+            </div>
+
+            <!-- Formulario de Pago -->
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-money-bill-wave me-2"></i>Registrar Pago</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="monto" class="form-label">Monto del Pago</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="monto" name="monto" 
+                                       required min="1" max="{{ saldo_pendiente }}">
+                            </div>
+                            <div class="form-text">Monto máximo: ${{ saldo_pendiente|floatformat:0|intcomma }}</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="forma_pago" class="form-label">Forma de Pago</label>
+                            <select class="form-select" id="forma_pago" name="forma_pago" required>
+                                <option value="">Seleccione una forma de pago</option>
+                                {% for forma in formas_pago %}
+                                <option value="{{ forma.id }}">{{ forma.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="comprobante" class="form-label">Número de Comprobante</label>
+                            <input type="text" class="form-control" id="comprobante" name="comprobante">
+                            <div class="form-text">Opcional: número de boleta, factura o transacción</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="notas" class="form-label">Notas</label>
+                            <textarea class="form-control" id="notas" name="notas" rows="3"></textarea>
+                            <div class="form-text">Opcional: agregue notas o comentarios sobre el pago</div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Registrar Pago
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const montoInput = document.getElementById('monto');
+        const formaPagoSelect = document.getElementById('forma_pago');
+        const form = document.querySelector('form');
+        const saldoPendiente = parseFloat('{{ saldo_pendiente }}');
+
+        // Validación del monto
+        if (montoInput) {
+            montoInput.addEventListener('input', function() {
+                const valor = this.value.trim();
+                const monto = parseFloat(valor);
+                
+                if (valor === '') {
+                    this.setCustomValidity('Por favor, ingrese un monto');
+                } else if (isNaN(monto) || monto <= 0) {
+                    this.setCustomValidity('El monto debe ser un número positivo');
+                } else if (monto > saldoPendiente) {
+                    this.setCustomValidity('El monto no puede superar el saldo pendiente');
+                } else {
+                    this.setCustomValidity('');
+                }
+                this.reportValidity();
+            });
+        }
+
+        // Validación de forma de pago
+        if (formaPagoSelect) {
+            formaPagoSelect.addEventListener('change', function() {
+                if (!this.value) {
+                    this.setCustomValidity('Por favor, seleccione una forma de pago');
+                } else {
+                    this.setCustomValidity('');
+                }
+                this.reportValidity();
+            });
+        }
+
+        // Validación del formulario completo
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                if (!form.checkValidity()) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            });
+        }
+    });
+</script>
+{% endblock %}
+{% load humanize %}
+
+{% block title %}Crear Pago{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-card {
+        background: white;
+        border-radius: 1rem;
+        padding: 1.75rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        margin-bottom: 1.5rem;
+    }
+
+    .card {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .card-header {
+        background: none;
+        border: none;
+        padding: 1rem;
+    }
+
+    .card-title {
+        color: #2d3748;
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .form-label {
+        font-weight: 500;
+        color: #4a5568;
+    }
+
+    .form-control {
+        border-radius: 0.5rem;
+        border: 1px solid #e2e8f0;
+        padding: 0.75rem;
+    }
+
+    .form-control:focus {
+        border-color: #4299e1;
+        box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
+    }
+
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        background: #edf2f7;
+        color: #4a5568;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .btn-back:hover {
+        background: #e2e8f0;
+        color: #2d3748;
+        transform: translateX(-2px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Información del Procedimiento -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Información del Procedimiento</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold">Procedimiento</h6>
+                            <p>{{ tratamiento.procedimiento.nombre }}</p>
+                            
+                            <h6 class="fw-bold mt-3">Descripción</h6>
+                            <p>{{ tratamiento.procedimiento.descripcion|default:'Sin descripción' }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="fw-bold">Costo Total</h6>
+                            <p>${{ tratamiento.costo_total|floatformat:0|intcomma }}</p>
+
+                            <h6 class="fw-bold mt-3">Saldo Pendiente</h6>
+                            <p class="text-danger">${{ saldo_pendiente|floatformat:0|intcomma }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulario de Pago -->
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-money-bill-wave me-2"></i>Registrar Pago</h5>
+                </div>
+                <div class="card-body">
+
+
+                    <!-- Formulario de Pago -->
+                    <form method="post" id="pagoForm">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="monto" class="form-label">Monto a Pagar</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="monto" name="monto" step="0.01" max="{{ saldo_pendiente }}" required>
+                            </div>
+                            <div class="form-text">Monto máximo: ${{ saldo_pendiente|floatformat:2 }}</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="forma_pago" class="form-label">Forma de Pago</label>
+                            <select class="form-select" id="forma_pago" name="forma_pago" required>
+                                <option value="">Seleccione una forma de pago</option>
+                                {% for forma in formas_pago %}
+                                <option value="{{ forma.id }}">{{ forma.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="comprobante" class="form-label">Número de Comprobante</label>
+                            <input type="text" class="form-control" id="comprobante" name="comprobante">
+                            <div class="form-text">Opcional: número de boleta, factura o transacción</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="notas" class="form-label">Notas</label>
+                            <textarea class="form-control" id="notas" name="notas" rows="3"></textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{% url 'tratamientos:detalle_tratamiento' tratamiento.id %}" class="btn btn-secondary">
+                                Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                Registrar Pago
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extrajs %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('pagoForm');
+    const montoInput = document.getElementById('monto');
+    const saldoPendiente = parseFloat('{{ saldo_pendiente }}');
+
+    // Validar monto máximo
+    montoInput.addEventListener('input', function() {
+        const monto = parseFloat(this.value);
+        if (monto > saldoPendiente) {
+            this.value = saldoPendiente;
+        }
+    });
+
+    // Animación de entrada
+    const card = document.querySelector('.card');
+    if (card) {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+
+        setTimeout(() => {
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, 100);
+    }
+});
+</script>
+{% endblock %}

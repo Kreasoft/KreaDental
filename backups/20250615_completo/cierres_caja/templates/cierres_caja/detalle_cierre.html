@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Detalle de Cierre{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Detalle del Cierre
+                    </h5>
+                    <a href="{% url 'cierres_caja:lista_cierres' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Volver
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Información General -->
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100">
+                                <div class="card-header">
+                                    <h6 class="mb-0">Información General</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="fw-bold">Fecha:</label>
+                                        <p>{{ cierre.fecha|date:"d/m/Y" }}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="fw-bold">Estado:</label>
+                                        <p>
+                                            <span class="badge {% if cierre.estado == 'ABIERTO' %}bg-success{% else %}bg-secondary{% endif %}">
+                                                {{ cierre.get_estado_display }}
+                                            </span>
+                                        </p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="fw-bold">Hora Apertura:</label>
+                                        <p>{{ cierre.hora_apertura|time:"H:i" }}</p>
+                                    </div>
+                                    {% if cierre.hora_cierre %}
+                                    <div class="mb-3">
+                                        <label class="fw-bold">Hora Cierre:</label>
+                                        <p>{{ cierre.hora_cierre|time:"H:i" }}</p>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Resumen Financiero -->
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100">
+                                <div class="card-header">
+                                    <h6 class="mb-0">Resumen Financiero</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="fw-bold">Monto Inicial:</label>
+                                        <p>${{ cierre.monto_inicial|floatformat:2 }}</p>
+                                    </div>
+                                    {% if cierre.estado == 'CERRADO' %}
+                                    <div class="mb-3">
+                                        <label class="fw-bold">Monto Final:</label>
+                                        <p>${{ cierre.monto_final|floatformat:2 }}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="fw-bold">Diferencia:</label>
+                                        <p class="{% if cierre.diferencia < 0 %}text-danger{% elif cierre.diferencia > 0 %}text-success{% endif %}">
+                                            ${{ cierre.diferencia|floatformat:2 }}
+                                        </p>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Desglose por Método de Pago -->
+                        {% if cierre.estado == 'CERRADO' %}
+                        <div class="col-md-12 mb-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="mb-0">Desglose por Método de Pago</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="card bg-light">
+                                                <div class="card-body text-center">
+                                                    <h6>Efectivo</h6>
+                                                    <h4>${{ cierre.total_efectivo|floatformat:2 }}</h4>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="card bg-light">
+                                                <div class="card-body text-center">
+                                                    <h6>Tarjeta</h6>
+                                                    <h4>${{ cierre.total_tarjeta|floatformat:2 }}</h4>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="card bg-light">
+                                                <div class="card-body text-center">
+                                                    <h6>Transferencia</h6>
+                                                    <h4>${{ cierre.total_transferencia|floatformat:2 }}</h4>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Pagos Registrados -->
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="mb-0">Pagos Registrados</h6>
+                                </div>
+                                <div class="card-body">
+                                    {% if cierre.pagos.all %}
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Hora</th>
+                                                    <th>Paciente</th>
+                                                    <th>Tratamiento</th>
+                                                    <th>Método</th>
+                                                    <th>Monto</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for pago in cierre.pagos.all %}
+                                                <tr>
+                                                    <td>{{ pago.fecha_pago|time:"H:i" }}</td>
+                                                    <td>{{ pago.tratamiento.paciente }}</td>
+                                                    <td>{{ pago.tratamiento.procedimiento }}</td>
+                                                    <td>{{ pago.forma_pago }}</td>
+                                                    <td>${{ pago.monto|floatformat:2 }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    {% else %}
+                                    <p class="text-muted mb-0">No hay pagos registrados para este cierre.</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

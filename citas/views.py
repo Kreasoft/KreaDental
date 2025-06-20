@@ -9,6 +9,7 @@ from pacientes.models import Paciente
 from datetime import datetime
 from empresa.utils import get_empresa_actual
 import json
+from django.db.models import Q
 
 @login_required
 def informes(request):
@@ -20,17 +21,17 @@ def calendario_citas(request):
     # Obtener la empresa actual del usuario
     empresa_actual = get_empresa_actual(request)
     
-    # Filtrar profesionales por empresa y estado activo
+    # Filtrar profesionales: propios + compartidos conmigo
     profesionales = Profesional.objects.filter(
-        empresa=empresa_actual,
-        activo=True
-    ).order_by('apellido_paterno', 'apellido_materno', 'nombres')
+        Q(empresa=empresa_actual, activo=True) | 
+        Q(empresas_compartidas=empresa_actual, compartir_entre_sucursales=True, activo=True)
+    ).distinct().order_by('apellido_paterno', 'apellido_materno', 'nombres')
     
-    # Filtrar pacientes por empresa y estado activo
+    # Filtrar pacientes: propios + compartidos conmigo
     pacientes = Paciente.objects.filter(
-        empresa=empresa_actual,
-        activo=True
-    ).order_by('apellidos', 'nombre')
+        Q(empresa=empresa_actual, activo=True) | 
+        Q(empresas_compartidas=empresa_actual, compartir_entre_sucursales=True, activo=True)
+    ).distinct().order_by('apellidos', 'nombre')
     
     profesional_id = request.GET.get('profesional')
     
@@ -40,15 +41,22 @@ def calendario_citas(request):
     form.fields['paciente'].queryset = pacientes
     
     if profesional_id:
-        form.fields['profesional'].initial = profesional_id
-
-    return render(request, 'citas/calendario_citas.html', {
+        try:
+            profesional_seleccionado = profesionales.get(id=profesional_id)
+        except Profesional.DoesNotExist:
+            profesional_seleccionado = None
+    else:
+        profesional_seleccionado = None
+    
+    context = {
         'form': form,
         'profesionales': profesionales,
         'pacientes': pacientes,
-        'profesional_seleccionado': get_object_or_404(Profesional, pk=profesional_id) if profesional_id else None,
-        'empresa_actual': empresa_actual
-    })
+        'profesional_seleccionado': profesional_seleccionado,
+        'empresa_actual': empresa_actual,
+    }
+    
+    return render(request, 'citas/calendario_citas.html', context)
 
 @login_required
 def guardar_cita(request):

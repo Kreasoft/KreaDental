@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-3">
+    <!-- Ícono de fondo -->
+    <div class="page-icon">
+        <i class="fas fa-flask"></i>
+    </div>
+
+    <!-- Encabezado -->
+    <div class="mb-4">
+        <h1 class="page-title">{{ titulo }}</h1>
+        <p class="page-description text-muted">
+            {% if laboratorio %}
+                Actualiza la información del laboratorio
+            {% else %}
+                Registra un nuevo laboratorio dental
+            {% endif %}
+        </p>
+    </div>
+
+    <!-- Formulario -->
+    <div class="card">
+        <div class="card-body">
+            <form method="post" class="needs-validation" novalidate>
+                {% csrf_token %}
+                
+                <div class="row g-4">
+                    <!-- Nombre -->
+                    <div class="col-md-6">
+                        <label for="{{ form.nombre.id_for_label }}" class="form-label">
+                            Nombre del Laboratorio
+                        </label>
+                        {{ form.nombre }}
+                        {% if form.nombre.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.nombre.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Contacto -->
+                    <div class="col-md-6">
+                        <label for="{{ form.contacto.id_for_label }}" class="form-label">
+                            Persona de Contacto
+                        </label>
+                        {{ form.contacto }}
+                        {% if form.contacto.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.contacto.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Teléfono -->
+                    <div class="col-md-6">
+                        <label for="{{ form.telefono.id_for_label }}" class="form-label">
+                            Teléfono
+                        </label>
+                        {{ form.telefono }}
+                        {% if form.telefono.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.telefono.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Email -->
+                    <div class="col-md-6">
+                        <label for="{{ form.email.id_for_label }}" class="form-label">
+                            Email
+                        </label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.email.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Dirección -->
+                    <div class="col-12">
+                        <label for="{{ form.direccion.id_for_label }}" class="form-label">
+                            Dirección
+                        </label>
+                        {{ form.direccion }}
+                        {% if form.direccion.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.direccion.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Botones -->
+                <div class="mt-4 d-flex justify-content-end gap-2">
+                    <a href="{% url 'lab_dental:lista_laboratorios' %}" class="btn btn-light">
+                        Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        {% if laboratorio %}
+                            Actualizar Laboratorio
+                        {% else %}
+                            Crear Laboratorio
+                        {% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Estilos específicos -->
+<style>
+    .page-icon {
+        position: absolute;
+        right: -2rem;
+        top: -2rem;
+        font-size: 15rem;
+        opacity: 0.03;
+        transform: rotate(15deg);
+        z-index: 0;
+    }
+
+    .page-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+
+    .page-description {
+        font-size: 1.1rem;
+        color: #6c757d;
+    }
+
+    .form-label {
+        font-weight: 500;
+        color: #2c3e50;
+    }
+</style>
+{% endblock %}

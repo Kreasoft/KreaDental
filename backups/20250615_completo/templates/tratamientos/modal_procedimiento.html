@@ -1,0 +1,62 @@
+{% load static %}
+
+<div class="modal fade" id="procedimientoModal" tabindex="-1" aria-labelledby="procedimientoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="procedimientoModalLabel">Agregar Procedimiento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="procedimientoForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Procedimiento</label>
+                            <select class="form-select select2-select" name="procedimiento" required>
+                                <option value="">Seleccione un procedimiento</option>
+                                {% for procedimiento in procedimientos %}
+                                <option value="{{ procedimiento.id }}" data-valor="{{ procedimiento.valor }}">
+                                    {{ procedimiento.nombre }} - ${{ procedimiento.valor }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div class="procedure-price mt-1"></div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Cantidad</label>
+                            <input type="number" class="form-control" name="cantidad" min="1" value="1" required>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Descuento %</label>
+                            <input type="number" class="form-control" name="descuento" min="0" max="100" step="0.01" value="0">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">Notas</label>
+                            <textarea class="form-control" name="notas" rows="2"></textarea>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="total-row">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <h5 class="mb-0">Subtotal:</h5>
+                                    </div>
+                                    <div class="col-md-4 text-end">
+                                        <h5 class="mb-0" id="subtotal-amount">$0.00</h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="guardarProcedimiento">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div> 
