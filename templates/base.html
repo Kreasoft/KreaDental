@@ -649,8 +649,8 @@
                         <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                             data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             {% if user.is_authenticated %}
-                                {% if empresa_actual and empresa_actual.logo %}
-                                    <img src="{{ empresa_actual.logo.url }}" class="img-profile rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">
+                                {% if user.avatar %}
+                                    <img src="{{ user.avatar.url }}" alt="Avatar de {{ user.get_full_name|default:user.username }}" class="img-profile rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">
                                 {% else %}
                                     <i class="fas fa-user-circle fa-fw me-2"></i>
                                 {% endif %}
@@ -688,7 +688,7 @@
                             <a class="dropdown-item d-flex align-items-center {% if empresa.id == empresa_actual.id %}active{% endif %}" 
                                href="{% url 'empresa:cambiar_empresa' empresa.id %}">
                                 {% if empresa.logo %}
-                                <img src="{{ empresa.logo.url }}" class="rounded me-2" style="width: 20px; height: 20px; object-fit: cover;">
+                                <img src="{{ empresa.logo.url }}" alt="Logo de {{ empresa.nombre }}" class="rounded me-2" style="width: 20px; height: 20px; object-fit: cover;">
                                 {% else %}
                                 <i class="fas fa-hospital text-muted me-2"></i>
                                 {% endif %}

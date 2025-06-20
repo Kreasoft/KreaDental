@@ -1,254 +1,376 @@
-{% extends 'base_auth.html' %}
+{% extends 'base_simple.html' %}
 {% load static %}
 
-{% block title %}Iniciar Sesión{% endblock %}
+{% block title %}Iniciar Sesión - KreaDental{% endblock %}
 
-{% block content %}
-<div class="login-background">
-    <div class="container-fluid h-100">
-        <div class="row h-100" style="padding-top: 8vh;">
-            <!-- Frases atractivas -->
-            <div class="col-md-6 text-white ps-5">
-                <div class="welcome-text">
-                    <h1 class="welcome-title mb-3">Bienvenido a la nueva era de la
-                        <span class="text-orange">gestión dental</span>
-                    </h1>
-                    <p class="welcome-text mb-1">Optimiza tu clínica dental con nuestra solución integral.
-                        <span class="text-info">Más eficiencia, menos preocupaciones.</span>
-                    </p>
-                    <p class="welcome-text mt-0">Gestiona pacientes, citas y laboratorios en un solo lugar.
-                        <span class="text-info">Todo lo que necesitas para crecer.</span>
-                    </p>
-                </div>
-            </div>
-
-            <!-- Panel de login -->
-            <div class="col-md-4 pe-4">
-                <div class="login-card">
-                    <!-- Logo y título -->
-                    <div class="text-center mb-4">
-                        {% if empresa_actual and empresa_actual.logo %}
-                            <img src="{{ empresa_actual.logo.url }}" alt="{{ empresa_actual.nombre_fantasia|default:empresa_actual.razon_social|default:'Logo' }}" class="login-logo mb-3">
-                        {% else %}
-                            <img src="{% static 'img/logo.png' %}" alt="KreaDental Cloud" class="login-logo mb-3">
-                        {% endif %}
-                        <h2 class="text-orange mb-3" style="font-size: 2.5rem; font-weight: 700;">
-                            {% if empresa_actual %}
-                                {{ empresa_actual.nombre_fantasia|default:empresa_actual.razon_social|default:"KreaDental Cloud" }}
-                            {% else %}
-                                KreaDental Cloud
-                            {% endif %}
-                        </h2>
-                        <p class="text-muted">Ingresa tus credenciales para continuar</p>
-                    </div>
-
-                    <!-- Formulario -->
-                    <form method="post" class="needs-validation" novalidate>
-                        {% csrf_token %}
-                        
-                        <!-- Usuario -->
-                        <div class="form-floating mb-4">
-                            <input type="text" class="form-control form-control-lg" id="username" name="username" placeholder="Usuario" required>
-                            <label for="username" style="padding-left: 1rem;">Usuario</label>
-                        </div>
-
-                        <!-- Contraseña -->
-                        <div class="form-floating mb-4">
-                            <input type="password" class="form-control form-control-lg" id="password" name="password" placeholder="Contraseña" required>
-                            <label for="password" style="padding-left: 1rem;">Contraseña</label>
-                        </div>
-
-                        <!-- Botón de ingreso -->
-                        <div class="d-grid mb-3">
-                            <button type="submit" class="btn btn-login btn-primary w-100">
-                                <i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesión
-                            </button>
-                        </div>
-
-                        <!-- Enlaces adicionales -->
-                        <div class="text-center mb-4">
-                            <a href="{% url 'password_reset' %}" class="text-muted me-3">
-                                <i class="fas fa-key me-1"></i>Recuperar contraseña
-                            </a>
-                            <a href="{% url 'register' %}" class="text-primary">
-                                <i class="fas fa-user-plus me-1"></i>Registrarse
-                            </a>
-                        </div>
-
-                        <!-- Mensajes de error -->
-                        {% if form.errors %}
-                        <div class="alert alert-danger" role="alert">
-                            <i class="fas fa-exclamation-circle me-2"></i>
-                            Usuario o contraseña incorrectos
-                        </div>
-                        {% endif %}
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
+{% block extra_css %}
 <style>
-    html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-    }
-
-    html, body {
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-    }
-
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@700;800;900&display=swap');
-
-    .welcome-title {
+    body {
+        background: linear-gradient(135deg, #1A5276 0%, #2874A6 100%);
+        min-height: 100vh;
         font-family: 'Poppins', sans-serif;
-        font-size: 3.5rem;
-        font-weight: 900;
-        line-height: 1.1;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-        letter-spacing: -1px;
     }
 
-    .welcome-text {
-        font-family: 'Nunito', -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-        font-size: 1.25rem;
-        font-weight: 400;
-        line-height: 1.5;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-    }
-
-    .text-orange {
-        color: #e65100 !important;
-        font-weight: 800;
-    }
-
-    .text-info {
-        color: #36b9cc !important;
-        font-weight: 600;
-    }
-
-    .login-background {
-        background: url('{% static "img/dental-treatment.jpg" %}');
-        background-size: cover;
-        background-position: center;
-        width: 100vw;
-        height: 100vh;
+    .login-container {
+        min-height: 100vh;
         display: flex;
         align-items: center;
-        position: fixed;
-        top: 0;
-        left: 0;
+        justify-content: center;
+        padding: 20px;
     }
 
     .login-card {
-        background: rgba(255, 255, 255, 0.45);
-        backdrop-filter: blur(15px);
+        background: white;
         border-radius: 20px;
-        padding: 3rem 2.5rem;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        overflow: hidden;
         width: 100%;
+        max-width: 1200px;
+        display: flex;
         min-height: 600px;
+    }
+
+    .image-section {
+        flex: 0 0 60%;
+        background: linear-gradient(135deg, #1A5276 0%, #2874A6 100%);
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+        color: white;
+        text-align: center;
+    }
+
+    .image-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('{% static "img/dental-treatment.jpg" %}') center/cover;
+        opacity: 0.3;
         z-index: 1;
-        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .image-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .image-content h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .image-content p {
+        font-size: 1.2rem;
+        margin-bottom: 30px;
+        opacity: 0.9;
+        line-height: 1.6;
+    }
+
+    .features {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        margin-top: 40px;
+    }
+
+    .feature {
+        text-align: center;
+    }
+
+    .feature i {
+        font-size: 2rem;
+        margin-bottom: 10px;
+        color: #AED6F1;
+    }
+
+    .feature h4 {
+        font-size: 1rem;
+        margin-bottom: 5px;
+    }
+
+    .feature p {
+        font-size: 0.9rem;
+        opacity: 0.8;
+    }
+
+    .form-section {
+        flex: 0 0 40%;
+        padding: 60px 40px;
         display: flex;
         flex-direction: column;
         justify-content: center;
     }
 
-    .login-logo {
-        max-width: 200px;
-        height: auto;
-        margin-bottom: 1rem;
-        filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+    .form-header {
+        text-align: center;
+        margin-bottom: 40px;
     }
 
-    .form-control {
-        background: rgba(255, 255, 255, 0.5);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 8px;
-        padding: 1.5rem 1rem 0.8rem;
-        font-size: 1.1rem;
-        height: auto;
-        transition: all 0.3s ease;
-        color: #2c3e50;
-    }
-
-    .form-control:focus {
-        background: rgba(255, 255, 255, 0.7);
-        border-color: rgba(255, 255, 255, 0.4);
-    }
-
-    .form-floating > label {
-        padding: 1rem;
-        color: #6e707e;
-    }
-
-    .form-floating > .form-control:focus ~ label,
-    .form-floating > .form-control:not(:placeholder-shown) ~ label {
-        transform: scale(0.85) translateY(-0.75rem) translateX(-0.15rem);
-        color: #4e73df;
-    }
-
-    .form-control:focus {
-        background: #fff;
-        box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
-        border-color: #4e73df;
-    }
-
-    .btn-login {
-        background: rgba(78, 115, 223, 0.9);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 8px;
-        padding: 1rem 1.5rem;
-        font-size: 1rem;
+    .form-header h2 {
+        color: #1A5276;
+        font-size: 2rem;
         font-weight: 600;
-        margin-top: 1rem;
-        transition: all 0.3s ease;
-        backdrop-filter: blur(4px);
+        margin-bottom: 10px;
     }
 
-    .btn-login:hover {
-        background: #36b9cc;
-        transform: translateY(-1px);
+    .form-header p {
+        color: #7f8c8d;
+        font-size: 1rem;
     }
 
     .form-group {
-        margin-bottom: 1rem;
-        position: relative;
+        margin-bottom: 25px;
     }
 
-    .form-group i {
-        position: absolute;
-        right: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #4e73df;
+    .form-label {
+        display: block;
+        margin-bottom: 8px;
+        color: #2c3e50;
+        font-weight: 500;
+        font-size: 0.95rem;
     }
 
-    .forgot-password {
-        color: #4e73df;
+    .form-control {
+        width: 100%;
+        padding: 15px 20px;
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #1A5276;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(26, 82, 118, 0.1);
+    }
+
+    .btn-login {
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(135deg, #1A5276 0%, #2874A6 100%);
+        border: none;
+        border-radius: 12px;
+        color: white;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 20px;
+    }
+
+    .btn-login:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(26, 82, 118, 0.3);
+    }
+
+    .form-footer {
+        text-align: center;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .form-footer p {
+        color: #7f8c8d;
         font-size: 0.9rem;
+    }
+
+    .form-footer a {
+        color: #1A5276;
         text-decoration: none;
-        transition: color 0.3s ease;
+        font-weight: 500;
     }
 
-    .forgot-password:hover {
-        color: #36b9cc;
-    }
-
-    .alert {
-        border-radius: 8px;
-        font-size: 0.9rem;
+    .form-footer a:hover {
+        text-decoration: underline;
     }
 
     .alert {
+        padding: 15px;
         border-radius: 10px;
+        margin-bottom: 20px;
+        font-size: 0.95rem;
+    }
+
+    .alert-danger {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+    .alert-success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .login-card {
+            flex-direction: column;
+            max-width: 500px;
+        }
+
+        .image-section {
+            flex: 0 0 40%;
+            padding: 30px 20px;
+        }
+
+        .image-content h1 {
+            font-size: 1.8rem;
+        }
+
+        .image-content p {
+            font-size: 1rem;
+        }
+
+        .features {
+            gap: 20px;
+        }
+
+        .form-section {
+            flex: 0 0 60%;
+            padding: 40px 30px;
+        }
+
+        .form-header h2 {
+            font-size: 1.5rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .login-container {
+            padding: 10px;
+        }
+
+        .image-section {
+            padding: 20px 15px;
+        }
+
+        .form-section {
+            padding: 30px 20px;
+        }
+
+        .features {
+            flex-direction: column;
+            gap: 15px;
+        }
     }
 </style>
+{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="login-card">
+        <!-- Sección de imagen (60%) -->
+        <div class="image-section">
+            <div class="image-content">
+                <div class="logo-container" style="margin-bottom: 30px;">
+                    <img src="{% static 'img/dentali-logo.png' %}" alt="Dentali Logo" style="max-width: 200px; height: auto; filter: brightness(0) invert(1);">
+                </div>
+                <h1>
+                    {% if empresa_actual %}
+                        {{ empresa_actual.nombre_fantasia|default:empresa_actual.razon_social|default:"KreaDental" }}
+                    {% else %}
+                        KreaDental
+                    {% endif %}
+                </h1>
+                <p>Sistema integral de gestión dental para clínicas y profesionales de la salud bucal</p>
+                
+                <div class="features">
+                    <div class="feature">
+                        <i class="fas fa-calendar-alt"></i>
+                        <h4>Gestión de Citas</h4>
+                        <p>Calendario inteligente</p>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-users"></i>
+                        <h4>Pacientes</h4>
+                        <p>Historial completo</p>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-chart-line"></i>
+                        <h4>Reportes</h4>
+                        <p>Análisis detallado</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección del formulario (40%) -->
+        <div class="form-section">
+            <div class="form-header">
+                <h2>Iniciar Sesión</h2>
+                <p>Ingresa tus credenciales para acceder al sistema</p>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% if form.errors %}
+                <div class="alert alert-danger">
+                    <strong>Error:</strong> Usuario o contraseña incorrectos.
+                </div>
+            {% endif %}
+
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="inputUsername" class="form-label">
+                        <i class="fas fa-user me-2"></i>Usuario
+                    </label>
+                    <input 
+                        class="form-control" 
+                        id="inputUsername" 
+                        type="text" 
+                        name="username" 
+                        placeholder="Ingresa tu usuario"
+                        required
+                        autocomplete="username"
+                    />
+                </div>
+
+                <div class="form-group">
+                    <label for="inputPassword" class="form-label">
+                        <i class="fas fa-lock me-2"></i>Contraseña
+                    </label>
+                    <input 
+                        class="form-control" 
+                        id="inputPassword" 
+                        type="password" 
+                        name="password" 
+                        placeholder="Ingresa tu contraseña"
+                        required
+                        autocomplete="current-password"
+                    />
+                </div>
+
+                <button class="btn-login" type="submit">
+                    <i class="fas fa-sign-in-alt me-2"></i>Ingresar al Sistema
+                </button>
+            </form>
+
+            <div class="form-footer">
+                <p>¿Necesitas ayuda? <a href="#">Contacta al administrador</a></p>
+                <p>&copy; 2025 KreaDental. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
