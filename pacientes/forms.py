@@ -2,6 +2,7 @@ from django import forms
 from .models import Paciente, HistorialClinico
 from profesionales.models import Profesional
 from datetime import datetime
+from empresa.utils import get_empresa_actual
 
 class PacienteForm(forms.ModelForm):
     fecha_nacimiento = forms.DateField(
@@ -49,4 +50,8 @@ class HistorialClinicoForm(forms.ModelForm):
             'observaciones': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'profesional': forms.Select(attrs={'class': 'form-select'}),
             'archivo': forms.FileInput(attrs={'class': 'form-control'})
-        } 
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Los querysets se filtran en las vistas que usan este formulario 

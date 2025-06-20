@@ -12,31 +12,44 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Cerrar el menú al hacer clic fuera de él
 document.addEventListener('click', function(e) {
-    const isClickInsideSidebar = sidebar.contains(e.target);
-    const isClickOnToggle = sidebarToggle.contains(e.target);
+    const sidebar = document.querySelector('.sidebar');
+    const sidebarToggle = document.querySelector('#sidebarToggle');
+    const content = document.querySelector('.content');
     
-    if (!isClickInsideSidebar && !isClickOnToggle && window.innerWidth < 768) {
-        document.body.classList.remove('sidebar-toggled');
-        sidebar.classList.remove('toggled');
-        content.style.paddingLeft = '0';
-    }
-});
-
-// Ajustar el padding del contenido cuando se redimensiona la ventana
-window.addEventListener('resize', function() {
-    if (window.innerWidth >= 768) {
-        content.style.paddingLeft = '250px';
-    } else {
-        if (!sidebar.classList.contains('toggled')) {
+    if (sidebar && sidebarToggle && content) {
+        const isClickInsideSidebar = sidebar.contains(e.target);
+        const isClickOnToggle = sidebarToggle.contains(e.target);
+        
+        if (!isClickInsideSidebar && !isClickOnToggle && window.innerWidth < 768) {
+            document.body.classList.remove('sidebar-toggled');
+            sidebar.classList.remove('toggled');
             content.style.paddingLeft = '0';
         }
     }
 });
 
+// Ajustar el padding del contenido cuando se redimensiona la ventana
+window.addEventListener('resize', function() {
+    const sidebar = document.querySelector('.sidebar');
+    const content = document.querySelector('.content');
+    
+    if (content) {
+        if (window.innerWidth >= 768) {
+            content.style.paddingLeft = '250px';
+        } else {
+            if (sidebar && !sidebar.classList.contains('toggled')) {
+                content.style.paddingLeft = '0';
+            }
+        }
+    }
+});
+
 // Inicializar tooltips
-var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-    return new bootstrap.Tooltip(tooltipTriggerEl);
+document.addEventListener('DOMContentLoaded', function() {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
 });
 
 // Función para actualizar el indicador de empresa actual
@@ -76,5 +89,44 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
+    });
+    
+    // Manejar la animación de los iconos de submenú
+    const collapseElements = document.querySelectorAll('[data-bs-toggle="collapse"]');
+    collapseElements.forEach(element => {
+        element.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-bs-target');
+            const targetElement = document.querySelector(targetId);
+            
+            if (targetElement) {
+                // Esperar a que la animación de Bootstrap termine
+                targetElement.addEventListener('shown.bs.collapse', function() {
+                    const icon = element.querySelector('.submenu-icon, .fa-chevron-down, .fa-angle-down');
+                    if (icon) {
+                        icon.style.transform = 'rotate(180deg)';
+                    }
+                }, { once: true });
+                
+                targetElement.addEventListener('hidden.bs.collapse', function() {
+                    const icon = element.querySelector('.submenu-icon, .fa-chevron-down, .fa-angle-down');
+                    if (icon) {
+                        icon.style.transform = 'rotate(0deg)';
+                    }
+                }, { once: true });
+            }
+        });
+    });
+    
+    // Inicializar el estado de los iconos basado en los menús ya expandidos
+    collapseElements.forEach(element => {
+        const targetId = element.getAttribute('data-bs-target');
+        const targetElement = document.querySelector(targetId);
+        
+        if (targetElement && targetElement.classList.contains('show')) {
+            const icon = element.querySelector('.submenu-icon, .fa-chevron-down, .fa-angle-down');
+            if (icon) {
+                icon.style.transform = 'rotate(180deg)';
+            }
+        }
     });
 });

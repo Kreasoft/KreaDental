@@ -156,7 +156,7 @@
                                                 <strong>{{ empresa.nombre_fantasia|default:empresa.razon_social }}</strong>
                                             </div>
                                         </td>
-                                        <td>{{ empresa.ruc }}</td>
+                                        <td>{{ empresa.rut }}</td>
                                         <td>{{ empresa.razon_social }}</td>
                                         <td>
                                             <i class="fas fa-phone text-muted me-1"></i>
@@ -167,7 +167,7 @@
                                             {{ empresa.email|default:"No especificado" }}
                                         </td>
                                         <td>
-                                            {% if empresa.activo %}
+                                            {% if empresa.activa %}
                                                 <span class="badge bg-success">
                                                     <i class="fas fa-check-circle me-1"></i>Activa
                                                 </span>
@@ -178,15 +178,23 @@
                                             {% endif %}
                                         </td>
                                         <td class="text-center">
-                                            {% if empresa.id|stringformat:'s' != request.session.empresa_id %}
-                                                <a href="{% url 'empresa:cambiar_empresa' empresa.id %}" class="btn btn-primary btn-sm" title="Seleccionar empresa">
-                                                    <i class="fas fa-check me-1"></i>Seleccionar
+                                            <div class="btn-group" role="group">
+                                                {% if empresa.id|stringformat:'s' != request.session.empresa_id %}
+                                                    <a href="{% url 'empresa:cambiar_empresa' empresa.id %}" class="btn btn-primary btn-sm" title="Seleccionar empresa">
+                                                        <i class="fas fa-check me-1"></i>Seleccionar
+                                                    </a>
+                                                {% else %}
+                                                    <span class="badge bg-info">
+                                                        <i class="fas fa-check-circle me-1"></i>Actual
+                                                    </span>
+                                                {% endif %}
+                                                <a href="{% url 'empresa:listar_sucursales' empresa.id %}" class="btn btn-info btn-sm ms-1" title="Gestionar sucursales">
+                                                    <i class="fas fa-building me-1"></i>Sucursales
                                                 </a>
-                                            {% else %}
-                                                <span class="badge bg-info">
-                                                    <i class="fas fa-check-circle me-1"></i>Actual
-                                                </span>
-                                            {% endif %}
+                                                <a href="{% url 'empresa:editar_empresa' empresa.id %}" class="btn btn-warning btn-sm ms-1" title="Editar empresa">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                            </div>
                                         </td>
                                     </tr>
                                     {% endfor %}

@@ -2,30 +2,33 @@ from django.contrib import admin
 from django.urls import path, reverse
 from django.utils.html import format_html
 from django.shortcuts import redirect
-from .models import Empresa, UsuarioEmpresa
+from .models import Empresa, Sucursal, UsuarioEmpresa, PermisoUsuario
 
 # Personalizar el sitio de administración
 admin_site = admin.AdminSite(name='admin')
 
 @admin.register(Empresa)
 class EmpresaAdmin(admin.ModelAdmin):
-    list_display = ('razon_social', 'nombre_fantasia', 'ruc', 'email', 'telefono', 'activo')
-    search_fields = ('razon_social', 'nombre_fantasia', 'ruc')
-    list_filter = ('activo',)
-    ordering = ('razon_social',)
-    readonly_fields = ('fecha_creacion', 'fecha_actualizacion')
+    list_display = ['nombre_fantasia', 'razon_social', 'rut', 'telefono', 'email', 'activa', 'created_at']
+    list_filter = ['activa', 'created_at']
+    search_fields = ['nombre_fantasia', 'razon_social', 'rut', 'email']
+    readonly_fields = ['created_at', 'updated_at']
     fieldsets = (
-        ('Información de la Empresa', {
-            'fields': ('razon_social', 'nombre_fantasia', 'ruc', 'email', 'telefono', 'web')
+        ('Información Básica', {
+            'fields': ('razon_social', 'nombre_fantasia', 'rut')
         }),
-        ('Dirección', {
-            'fields': ('direccion',)
+        ('Contacto', {
+            'fields': ('direccion', 'telefono', 'email', 'sitio_web')
         }),
-        ('Información Legal', {
-            'fields': ('representante_legal', 'fecha_inicio_licencia', 'fecha_fin_licencia')
+        ('Imagen', {
+            'fields': ('logo',)
         }),
-        ('Configuración', {
-            'fields': ('logo', 'activo', 'fecha_creacion', 'fecha_actualizacion')
+        ('Estado', {
+            'fields': ('activa',)
+        }),
+        ('Fechas', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
         }),
     )
 
@@ -46,18 +49,65 @@ class EmpresaAdmin(admin.ModelAdmin):
             'all': ('admin/css/empresa_admin.css',)
         }
 
-@admin.register(UsuarioEmpresa)
-class UsuarioEmpresaAdmin(admin.ModelAdmin):
-    list_display = ('usuario', 'empresa', 'es_administrador', 'activo')
-    list_filter = ('es_administrador', 'activo', 'empresa')
-    search_fields = ('usuario__username', 'empresa__razon_social')
-    ordering = ('empresa', 'usuario')
-    readonly_fields = ('fecha_creacion', 'fecha_actualizacion')
+@admin.register(Sucursal)
+class SucursalAdmin(admin.ModelAdmin):
+    list_display = ['nombre', 'empresa', 'telefono', 'email', 'es_principal', 'activa', 'created_at']
+    list_filter = ['empresa', 'es_principal', 'activa', 'created_at']
+    search_fields = ['nombre', 'empresa__nombre_fantasia', 'direccion', 'telefono']
+    readonly_fields = ['created_at', 'updated_at']
     fieldsets = (
-        ('Información de Usuario', {
-            'fields': ('usuario', 'empresa', 'es_administrador')
+        ('Información Básica', {
+            'fields': ('empresa', 'nombre')
+        }),
+        ('Contacto', {
+            'fields': ('direccion', 'telefono', 'email')
+        }),
+        ('Horarios', {
+            'fields': ('horario_apertura', 'horario_cierre')
         }),
         ('Estado', {
-            'fields': ('activo', 'fecha_creacion', 'fecha_actualizacion')
+            'fields': ('activa', 'es_principal')
+        }),
+        ('Fechas', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+@admin.register(UsuarioEmpresa)
+class UsuarioEmpresaAdmin(admin.ModelAdmin):
+    list_display = ['usuario', 'empresa', 'sucursal', 'tipo_usuario', 'activo', 'fecha_inicio']
+    list_filter = ['empresa', 'sucursal', 'tipo_usuario', 'activo', 'fecha_inicio']
+    search_fields = ['usuario__username', 'usuario__first_name', 'usuario__last_name', 'empresa__nombre_fantasia']
+    readonly_fields = ['created_at', 'updated_at']
+    fieldsets = (
+        ('Usuario y Empresa', {
+            'fields': ('usuario', 'empresa', 'sucursal')
+        }),
+        ('Rol y Estado', {
+            'fields': ('tipo_usuario', 'activo')
+        }),
+        ('Fechas', {
+            'fields': ('fecha_inicio', 'fecha_fin', 'created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+@admin.register(PermisoUsuario)
+class PermisoUsuarioAdmin(admin.ModelAdmin):
+    list_display = ['usuario_empresa', 'modulo', 'puede_ver', 'puede_crear', 'puede_editar', 'puede_eliminar']
+    list_filter = ['modulo', 'puede_ver', 'puede_crear', 'puede_editar', 'puede_eliminar']
+    search_fields = ['usuario_empresa__usuario__username', 'modulo']
+    readonly_fields = ['created_at', 'updated_at']
+    fieldsets = (
+        ('Permisos', {
+            'fields': ('usuario_empresa', 'modulo')
+        }),
+        ('Acciones Permitidas', {
+            'fields': ('puede_ver', 'puede_crear', 'puede_editar', 'puede_eliminar', 'puede_exportar')
+        }),
+        ('Fechas', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
         }),
     ) 

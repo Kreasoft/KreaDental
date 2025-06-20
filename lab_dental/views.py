@@ -118,12 +118,42 @@ def crear_trabajo(request):
             
             messages.success(request, 'Trabajo de laboratorio creado exitosamente.')
             return redirect('lab_dental:detalle_trabajo', pk=trabajo.pk)
+        else:
+            # Agregar mensajes de error para debugging
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f'Error en {field}: {error}')
     else:
         form = TrabajoLaboratorioForm()
     
     return render(request, 'lab_dental/form_trabajo.html', {
         'form': form,
-        'titulo': 'Crear Trabajo de Laboratorio'
+        'titulo': 'Crear Trabajo de Laboratorio',
+        'debug': True
+    })
+
+@login_required
+def editar_trabajo(request, pk):
+    trabajo = get_object_or_404(TrabajoLaboratorio, pk=pk)
+    if request.method == 'POST':
+        form = TrabajoLaboratorioForm(request.POST, instance=trabajo)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Trabajo de laboratorio actualizado exitosamente.')
+            return redirect('lab_dental:detalle_trabajo', pk=trabajo.pk)
+        else:
+            # Agregar mensajes de error para debugging
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f'Error en {field}: {error}')
+    else:
+        form = TrabajoLaboratorioForm(instance=trabajo)
+    
+    return render(request, 'lab_dental/form_trabajo.html', {
+        'form': form,
+        'titulo': 'Editar Trabajo de Laboratorio',
+        'trabajo': trabajo,
+        'debug': True
     })
 
 @login_required
@@ -143,8 +173,12 @@ def detalle_trabajo(request, pk):
             trabajo.estado = seguimiento.estado
             trabajo.save()
             
-            messages.success(request, 'Seguimiento agregado exitosamente.')
+            messages.success(request, f'Seguimiento agregado exitosamente. Estado cambiado a: {seguimiento.get_estado_display()}')
             return redirect('lab_dental:detalle_trabajo', pk=trabajo.pk)
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f'Error en {field}: {error}')
     else:
         form = SeguimientoTrabajoForm()
     

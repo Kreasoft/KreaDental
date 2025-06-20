@@ -3,31 +3,130 @@
 
 {% block title %}Mi Perfil{% endblock %}
 
+{% block extra_css %}
+<style>
+    .card {
+        border: 1px solid #AED6F1;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    }
+
+    .card-header {
+        background-color: #E8F4FC;
+        border-bottom: 1px solid #AED6F1;
+        border-radius: 15px 15px 0 0 !important;
+        padding: 1.5rem;
+    }
+
+    .card-header h4 {
+        color: #1A5276;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    .btn-primary {
+        background-color: #1A5276;
+        border-color: #1A5276;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        border-radius: 8px;
+        font-size: 0.9rem;
+    }
+
+    .btn-primary:hover {
+        background-color: #2874A6;
+        border-color: #2874A6;
+    }
+
+    .btn-secondary {
+        background-color: #7f8c8d;
+        border-color: #7f8c8d;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        border-radius: 8px;
+        font-size: 0.9rem;
+    }
+
+    .btn-secondary:hover {
+        background-color: #6c757d;
+        border-color: #6c757d;
+    }
+
+    .text-muted {
+        color: #7f8c8d !important;
+    }
+
+    .profile-info h5 {
+        color: #1A5276;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .profile-info p {
+        color: #2874A6;
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+    }
+
+    .profile-info strong {
+        color: #1A5276;
+        font-weight: 600;
+    }
+
+    .avatar-container {
+        background-color: #E8F4FC;
+        border-radius: 50%;
+        padding: 1rem;
+        display: inline-block;
+        margin-bottom: 1rem;
+    }
+
+    .img-thumbnail {
+        border: 3px solid #AED6F1;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+    }
+
+    .img-thumbnail:hover {
+        transform: scale(1.05);
+        border-color: #2874A6;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container py-4">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">Mi Perfil</h4>
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0"><i class="fas fa-user me-2"></i>Mi Perfil</h4>
                 </div>
                 <div class="card-body">
-                    <div class="row mb-3">
+                    <div class="row mb-4">
                         <div class="col-md-4 text-center">
-                            {% if user.avatar %}
-                                <img src="{{ user.avatar.url }}" class="img-thumbnail rounded-circle mb-2" style="max-width: 120px;">
-                            {% else %}
-                                <img src="{% static 'img/default-avatar.png' %}" class="img-thumbnail rounded-circle mb-2" style="max-width: 120px;">
-                            {% endif %}
+                            <div class="avatar-container">
+                                {% if user.avatar %}
+                                    <img src="{{ user.avatar.url }}" class="img-thumbnail" style="max-width: 120px;">
+                                {% else %}
+                                    <img src="{% static 'img/default-avatar.png' %}" class="img-thumbnail" style="max-width: 120px;">
+                                {% endif %}
+                            </div>
                         </div>
-                        <div class="col-md-8">
+                        <div class="col-md-8 profile-info">
                             <h5>{{ user.get_full_name }}</h5>
-                            <p class="mb-1"><strong>Email:</strong> {{ user.email }}</p>
-                            <p class="mb-1"><strong>Teléfono:</strong> {{ user.telefono }}</p>
-                            <p class="mb-1"><strong>Fecha de nacimiento:</strong> {{ user.fecha_nacimiento|date:'d/m/Y' }}</p>
-                            <p class="mb-1"><strong>Dirección:</strong> {{ user.direccion }}</p>
-                            <p class="mb-1"><strong>Ciudad:</strong> {{ user.ciudad }}</p>
-                            <p class="mb-1"><strong>País:</strong> {{ user.pais }}</p>
+                            <p><strong>Email:</strong> {{ user.email }}</p>
+                            <p><strong>Teléfono:</strong> {{ user.telefono|default:"No especificado" }}</p>
+                            <p><strong>Fecha de nacimiento:</strong> {{ user.fecha_nacimiento|date:'d/m/Y'|default:"No especificada" }}</p>
+                            <p><strong>Dirección:</strong> {{ user.direccion|default:"No especificada" }}</p>
+                            <p><strong>Ciudad:</strong> {{ user.ciudad|default:"No especificada" }}</p>
+                            <p><strong>País:</strong> {{ user.pais|default:"No especificado" }}</p>
                         </div>
                     </div>
                     <div class="d-flex justify-content-end">

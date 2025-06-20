@@ -127,7 +127,20 @@ def home(request):
     citas_pendientes = Cita.objects.filter(estado='PENDIENTE').count()
     
     # Obtener la empresa actual
-    empresa_actual = Empresa.objects.filter(activo=True).first()
+    empresa_actual = Empresa.objects.filter(activa=True).first()
+    
+    # Obtener la sucursal activa del usuario
+    sucursal_activa = None
+    if empresa_actual:
+        # Buscar la sucursal activa del usuario en esta empresa
+        usuario_empresa = UsuarioEmpresa.objects.filter(
+            usuario=request.user,
+            empresa=empresa_actual,
+            activo=True
+        ).first()
+        
+        if usuario_empresa and usuario_empresa.sucursal:
+            sucursal_activa = usuario_empresa.sucursal
     
     # Obtener las próximas citas
     proximas_citas = Cita.objects.filter(
@@ -144,6 +157,7 @@ def home(request):
         'pacientes_mes': pacientes_mes,
         'citas_pendientes': citas_pendientes,
         'empresa_actual': empresa_actual,
+        'sucursal_activa': sucursal_activa,
         'proximas_citas': proximas_citas,
     }
     

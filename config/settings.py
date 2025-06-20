@@ -15,6 +15,7 @@ ALLOWED_HOSTS = []
 
 # Application definition
 INSTALLED_APPS = [
+    'jazzmin',  # Debe ir antes de django.contrib.admin
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -68,6 +69,8 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'empresa.context_processors.empresa_actual',
+                'empresa.context_processors.sucursal_actual',
+                'empresa.context_processors.sucursales_disponibles',
             ],
         },
     },
@@ -141,3 +144,167 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'core:home'
 LOGOUT_REDIRECT_URL = 'login'
+
+# Configuración del Admin de Django
+ADMIN_SITE_HEADER = "KreaDental Cloud - Administración"
+ADMIN_SITE_TITLE = "KreaDental Cloud"
+ADMIN_INDEX_TITLE = "Panel de Administración"
+
+# Configuración de templates del admin
+ADMIN_TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates', 'admin')
+
+# Configuración de Jazzmin
+JAZZMIN_SETTINGS = {
+    # Título del sitio
+    "site_title": "KreaDental Cloud",
+    "site_header": "KreaDental Cloud",
+    "site_brand": "KreaDental Cloud",
+    "site_logo": None,
+    "site_logo_classes": "img-circle",
+    "site_icon": None,
+    
+    # Colores del tema dental
+    "brand_colour": "#1A5276",  # Dental primary
+    "accent": "accent-primary",
+    "navbar": "navbar-dark",
+    "no_navbar_border": False,
+    "navbar_fixed": False,
+    "layout_boxed": False,
+    "footer_fixed": False,
+    "sidebar_fixed": False,
+    "sidebar": "sidebar-dark-primary",
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": False,
+    "sidebar_nav_compact_style": False,
+    "sidebar_nav_legacy_style": False,
+    "sidebar_nav_flat_style": False,
+    "theme": "cosmo",
+    "dark_mode_theme": None,
+    "button_classes": {
+        "primary": "btn-primary",
+        "secondary": "btn-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success"
+    },
+    
+    # Personalización del menú
+    "show_sidebar": True,
+    "navigation_expanded": True,
+    "icons": {
+        "auth": "fas fa-users-cog",
+        "auth.user": "fas fa-user",
+        "auth.Group": "fas fa-users",
+        "admin.LogEntry": "fas fa-file",
+        "citas.Cita": "fas fa-calendar-alt",
+        "pacientes.Paciente": "fas fa-user-injured",
+        "profesionales.Profesional": "fas fa-user-md",
+        "especialidades.Especialidad": "fas fa-stethoscope",
+        "procedimientos.Procedimiento": "fas fa-tooth",
+        "tratamientos.Tratamiento": "fas fa-teeth",
+        "pagos_tratamientos.PagoTratamiento": "fas fa-credit-card",
+        "informes": "fas fa-chart-bar",
+        "prevision.Prevision": "fas fa-shield-alt",
+        "formas_pago.FormaPago": "fas fa-money-bill-wave",
+        "cierres_caja.CierreCaja": "fas fa-cash-register",
+        "configuracion.ConfiguracionEmpresa": "fas fa-cog",
+        "lab_dental.Laboratorio": "fas fa-flask",
+        "usuarios.Usuario": "fas fa-user-circle",
+        "empresa.Empresa": "fas fa-building",
+        "empresa.Sucursal": "fas fa-map-marker-alt",
+    },
+    
+    # Orden de las aplicaciones
+    "order_with_respect_to": [
+        "auth",
+        "citas",
+        "pacientes", 
+        "profesionales",
+        "especialidades",
+        "procedimientos",
+        "tratamientos",
+        "pagos_tratamientos",
+        "informes",
+        "prevision",
+        "formas_pago",
+        "cierres_caja",
+        "configuracion",
+        "lab_dental",
+        "usuarios",
+        "empresa",
+    ],
+    
+    # Personalización de la barra superior
+    "show_ui_builder": True,
+    "changeform_format": "horizontal_tabs",
+    "changeform_format_overrides": {
+        "auth.user": "collapsible",
+        "auth.group": "vertical_tabs",
+    },
+    
+    # Textos personalizados
+    "welcome_sign": "Bienvenido a KreaDental Cloud",
+    "copyright": "KreaDental Cloud Ltd",
+    "search_model": ["auth.User", "pacientes.Paciente"],
+    
+    # Configuración de usuario
+    "user_avatar": None,
+    "show_full_result_count": False,
+    "show_ui_builder": True,
+    
+    # Colores personalizados del tema dental
+    "custom_css": "css/jazzmin-dental-theme.css",
+    "custom_js": None,
+    "show_ui_builder": True,
+    
+    # Configuración de colores específicos
+    "navbar_color": "#1A5276",  # Dental primary
+    "navbar_fixed": False,
+    "layout_boxed": False,
+    "footer_fixed": False,
+    "sidebar_fixed": False,
+    "sidebar": "sidebar-dark-primary",
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": False,
+    "sidebar_nav_compact_style": False,
+    "sidebar_nav_legacy_style": False,
+    "sidebar_nav_flat_style": False,
+    "theme": "cosmo",
+    "dark_mode_theme": None,
+}
+
+# Configuración de UI Builder de Jazzmin con colores del tema dental
+JAZZMIN_UI_TWEAKS = {
+    "navbar_small_text": False,
+    "footer_small_text": False,
+    "body_small_text": False,
+    "brand_small_text": False,
+    "brand_colour": "#1A5276",  # Dental primary
+    "accent": "accent-primary",
+    "navbar": "navbar-dark",
+    "no_navbar_border": False,
+    "navbar_fixed": False,
+    "layout_boxed": False,
+    "footer_fixed": False,
+    "sidebar_fixed": False,
+    "sidebar": "sidebar-dark-primary",
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": False,
+    "sidebar_nav_compact_style": False,
+    "sidebar_nav_legacy_style": False,
+    "sidebar_nav_flat_style": False,
+    "theme": "cosmo",
+    "dark_mode_theme": None,
+    "button_classes": {
+        "primary": "btn-primary",
+        "secondary": "btn-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success"
+    }
+}

@@ -57,29 +57,58 @@
     .btn-primary {
         background-color: #1A5276;
         border-color: #1A5276;
-        padding: 0.6rem 1.2rem;
-        font-weight: 500;
+        color: white;
         border-radius: 8px;
-        font-size: 0.95rem;
+        font-weight: 500;
+        font-size: 0.9rem;
+        padding: 0.5rem 1.2rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(26,82,118,0.08);
     }
-
     .btn-primary:hover {
         background-color: #2874A6;
         border-color: #2874A6;
+        color: white;
+        box-shadow: 0 4px 12px rgba(26,82,118,0.15);
+        transform: translateY(-1px);
     }
-
+    .btn-warning {
+        background-color: #f39c12;
+        border-color: #f39c12;
+        color: white;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 0.9rem;
+        padding: 0.5rem 1.2rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(243,156,18,0.08);
+    }
+    .btn-warning:hover {
+        background-color: #d35400;
+        border-color: #d35400;
+        color: white;
+        box-shadow: 0 4px 12px rgba(243,156,18,0.15);
+        transform: translateY(-1px);
+    }
     .btn-light {
         background-color: #f8f9fa;
-        border-color: #dee2e6;
-        padding: 0.6rem 1.2rem;
-        font-weight: 500;
+        border: 1px solid #dee2e6;
+        color: #1A5276;
         border-radius: 8px;
-        font-size: 0.95rem;
+        font-weight: 500;
+        font-size: 0.9rem;
+        padding: 0.5rem 1.2rem;
+        transition: all 0.3s ease;
     }
-
     .btn-light:hover {
         background-color: #e9ecef;
-        border-color: #dee2e6;
+        color: #1A5276;
+        border-color: #bfc9d1;
+        transform: translateY(-1px);
+    }
+    .btn-sm {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
     }
 
     .form-control {
@@ -188,162 +217,154 @@
     .text-primary {
         color: #1A5276 !important;
     }
+
+    .text-warning {
+        color: #f39c12 !important;
+    }
+
+    .text-danger {
+        color: #e74c3c !important;
+    }
+
+    .search-box {
+        border: 1px solid #AED6F1;
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+    }
+
+    .search-box:focus {
+        border-color: #2874A6;
+        box-shadow: 0 0 0 0.2rem rgba(40, 116, 166, 0.25);
+    }
+
+    .estado-badge {
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .estado-activo {
+        background-color: #2ecc71;
+        color: white;
+    }
+
+    .estado-inactivo {
+        background-color: #e74c3c;
+        color: white;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid px-4 py-3">
-    <!-- Ícono de fondo -->
-    <div class="page-icon">
-        <i class="fas fa-teeth"></i>
-    </div>
-
-    <!-- Encabezado -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="page-title">
-                <i class="fas fa-flask"></i>
-                Trabajos de Laboratorio
-            </h1>
-            <p class="page-description">Gestiona los trabajos enviados a laboratorios</p>
-        </div>
-        <a href="{% url 'lab_dental:crear_trabajo' %}" class="btn btn-primary">
-            <i class="fas fa-plus me-2"></i>Nuevo Trabajo
-        </a>
-    </div>
-
-    <!-- Filtros y búsqueda -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <form method="get" class="row g-3">
-                <div class="col-md-6">
-                    <div class="input-group">
-                        <span class="input-group-text">
-                            <i class="fas fa-search"></i>
-                        </span>
-                        <input type="text" name="q" class="form-control" 
-                               placeholder="Buscar por paciente, laboratorio o tipo..." 
-                               value="{{ query|default:'' }}">
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <select name="estado" class="form-select">
-                        <option value="">Todos los estados</option>
-                        {% for estado_value, estado_label in estados %}
-                            <option value="{{ estado_value }}" 
-                                    {% if estado_value == estado_seleccionado %}selected{% endif %}>
-                                {{ estado_label }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="fas fa-filter me-2"></i>Filtrar
-                    </button>
-                </div>
-                {% if query or estado_seleccionado %}
-                    <div class="col-12">
-                        <a href="{% url 'lab_dental:lista_trabajos' %}" class="btn btn-light">
-                            <i class="fas fa-times me-2"></i>Limpiar filtros
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-0"><i class="fas fa-flask me-2"></i>Trabajos de Laboratorio</h3>
+                            <p class="text-muted mb-0">Gestiona los trabajos enviados a laboratorios</p>
+                        </div>
+                        <a href="{% url 'lab_dental:crear_trabajo' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Nuevo Trabajo
                         </a>
                     </div>
-                {% endif %}
-            </form>
-        </div>
-    </div>
+                </div>
 
-    <!-- Lista de trabajos -->
-    <div class="card">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead>
-                        <tr>
-                            <th>Paciente</th>
-                            <th>Laboratorio</th>
-                            <th>Tipo</th>
-                            <th>Estado</th>
-                            <th>Fecha Envío</th>
-                            <th>Fecha Est. Entrega</th>
-                            <th>Costo</th>
-                            <th class="text-end">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for trabajo in trabajos %}
-                        <tr>
-                            <td>{{ trabajo.paciente }}</td>
-                            <td>{{ trabajo.laboratorio }}</td>
-                            <td>{{ trabajo.get_tipo_trabajo_display }}</td>
-                            <td>
-                                <span class="badge badge-{{ trabajo.estado|lower }}">
-                                    {{ trabajo.get_estado_display }}
-                                </span>
-                            </td>
-                            <td>{{ trabajo.fecha_envio|default:"-" }}</td>
-                            <td>{{ trabajo.fecha_estimada_entrega }}</td>
-                            <td>${{ trabajo.costo }}</td>
-                            <td class="text-end">
-                                <div class="btn-group">
-                                    <a href="{% url 'lab_dental:detalle_trabajo' pk=trabajo.pk %}" 
-                                       class="btn btn-icon btn-light" title="Ver detalles">
-                                        <i class="fas fa-eye text-primary"></i>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="8" class="text-center py-4">
-                                <div class="text-muted">
-                                    <i class="fas fa-info-circle me-2"></i>
-                                    No hay trabajos registrados
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                <div class="card-body">
+                    <!-- Filtros y búsqueda -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <form method="get" class="d-flex">
+                                <input type="text" name="q" class="form-control search-box me-2" 
+                                       placeholder="Buscar por paciente, laboratorio o tipo..." 
+                                       value="{{ query|default:'' }}">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search me-2"></i>Buscar
+                                </button>
+                            </form>
+                        </div>
+                        <div class="col-md-4">
+                            <select name="estado" class="form-select">
+                                <option value="">Todos los estados</option>
+                                {% for estado_value, estado_label in estados %}
+                                    <option value="{{ estado_value }}" 
+                                            {% if estado_value == estado_seleccionado %}selected{% endif %}>
+                                        {{ estado_label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        {% if query or estado_seleccionado %}
+                            <div class="col-md-2">
+                                <a href="{% url 'lab_dental:lista_trabajos' %}" class="btn btn-light">
+                                    <i class="fas fa-times me-2"></i>Limpiar
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Paciente</th>
+                                    <th>Laboratorio</th>
+                                    <th>Tipo</th>
+                                    <th>Estado</th>
+                                    <th>Fecha Envío</th>
+                                    <th>Fecha Est. Entrega</th>
+                                    <th>Costo</th>
+                                    <th class="text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for trabajo in trabajos %}
+                                <tr>
+                                    <td>{{ trabajo.paciente }}</td>
+                                    <td>{{ trabajo.laboratorio }}</td>
+                                    <td>{{ trabajo.get_tipo_trabajo_display }}</td>
+                                    <td>
+                                        <span class="estado-badge {% if trabajo.estado == 'ENTREGADO' %}estado-activo{% else %}estado-inactivo{% endif %}">
+                                            {{ trabajo.get_estado_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ trabajo.fecha_envio|default:"-" }}</td>
+                                    <td>{{ trabajo.fecha_estimada_entrega }}</td>
+                                    <td>${{ trabajo.costo }}</td>
+                                    <td class="text-center">
+                                        <div class="btn-group gap-2">
+                                            <a href="{% url 'lab_dental:detalle_trabajo' pk=trabajo.pk %}"
+                                               class="btn btn-primary btn-sm d-flex align-items-center justify-content-center"
+                                               title="Ver detalles">
+                                                <i class="fas fa-eye me-1"></i> Ver
+                                            </a>
+                                            <a href="{% url 'lab_dental:editar_trabajo' pk=trabajo.pk %}"
+                                               class="btn btn-warning btn-sm d-flex align-items-center justify-content-center"
+                                               title="Editar trabajo">
+                                                <i class="fas fa-edit me-1"></i> Editar
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="8" class="text-center py-4">
+                                        <div class="text-muted">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            No hay trabajos registrados
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-
-    <!-- Paginación -->
-    {% if trabajos.has_other_pages %}
-    <div class="d-flex justify-content-center mt-4">
-        <nav aria-label="Navegación de páginas">
-            <ul class="pagination">
-                {% if trabajos.has_previous %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ trabajos.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if estado_seleccionado %}&estado={{ estado_seleccionado }}{% endif %}" aria-label="Anterior">
-                            <i class="fas fa-chevron-left"></i>
-                        </a>
-                    </li>
-                {% endif %}
-
-                {% for num in trabajos.paginator.page_range %}
-                    {% if trabajos.number == num %}
-                        <li class="page-item active">
-                            <span class="page-link">{{ num }}</span>
-                        </li>
-                    {% else %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}{% if estado_seleccionado %}&estado={{ estado_seleccionado }}{% endif %}">{{ num }}</a>
-                        </li>
-                    {% endif %}
-                {% endfor %}
-
-                {% if trabajos.has_next %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ trabajos.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if estado_seleccionado %}&estado={{ estado_seleccionado }}{% endif %}" aria-label="Siguiente">
-                            <i class="fas fa-chevron-right"></i>
-                        </a>
-                    </li>
-                {% endif %}
-            </ul>
-        </nav>
-    </div>
-    {% endif %}
 </div>
 {% endblock %}

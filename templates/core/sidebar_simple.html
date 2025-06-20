@@ -55,9 +55,11 @@
         <!-- Reportes -->
         <li class="menu-category">Reportes</li>
         <li>
-            <a href="#" class="{% if 'informes' in request.path %}active{% endif %}" data-bs-toggle="collapse" data-bs-target="#collapseInformes">
-                <i class="fas fa-chart-bar"></i>Informes
-                <i class="fas fa-chevron-down ms-auto"></i>
+            <a href="#" class="d-flex align-items-center justify-content-between {% if 'informes' in request.path %}active{% endif %}" data-bs-toggle="collapse" data-bs-target="#collapseInformes">
+                <div>
+                    <i class="fas fa-chart-bar"></i>Informes
+                </div>
+                <i class="fas fa-chevron-down submenu-icon"></i>
             </a>
             <div class="collapse {% if 'informes' in request.path %}show{% endif %}" id="collapseInformes">
                 <ul class="nav flex-column ms-3 mt-2">

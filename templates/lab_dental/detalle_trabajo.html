@@ -105,10 +105,10 @@
     }
 
     .timeline-content {
-        background-color: #fff;
-        border: 1px solid #AED6F1;
-        border-radius: 0.5rem;
+        background: white;
         padding: 1rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
 
     .timeline-content .badge {
@@ -239,19 +239,25 @@
                         <div class="row g-3">
                             <div class="col-md-4">
                                 <label for="{{ form.estado.id_for_label }}" class="form-label">
-                                    Nuevo Estado
+                                    <i class="fas fa-exchange-alt me-1"></i>Nuevo Estado
                                 </label>
                                 {{ form.estado }}
+                                {% if form.estado.errors %}
+                                    <div class="text-danger small">{{ form.estado.errors.0 }}</div>
+                                {% endif %}
                             </div>
                             <div class="col-md-8">
                                 <label for="{{ form.notas.id_for_label }}" class="form-label">
-                                    Notas del Seguimiento
+                                    <i class="fas fa-comment me-1"></i>Notas del Seguimiento
                                 </label>
                                 {{ form.notas }}
+                                {% if form.notas.errors %}
+                                    <div class="text-danger small">{{ form.notas.errors.0 }}</div>
+                                {% endif %}
                             </div>
                             <div class="col-12">
                                 <button type="submit" class="btn btn-primary">
-                                    Agregar Seguimiento
+                                    <i class="fas fa-save me-1"></i>Agregar Seguimiento
                                 </button>
                             </div>
                         </div>
@@ -378,4 +384,25 @@
         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
 </style>
+
+<script>
+function probarSeguimiento() {
+    // Llenar automáticamente el formulario con datos de prueba
+    const estadoSelect = document.querySelector('select[name="estado"]');
+    const notasTextarea = document.querySelector('textarea[name="notas"]');
+    
+    if (estadoSelect && notasTextarea) {
+        // Seleccionar el siguiente estado disponible
+        const currentEstado = '{{ trabajo.estado }}';
+        const estados = Array.from(estadoSelect.options).map(opt => opt.value);
+        const currentIndex = estados.indexOf(currentEstado);
+        const nextIndex = (currentIndex + 1) % estados.length;
+        
+        estadoSelect.selectedIndex = nextIndex;
+        notasTextarea.value = `Prueba de cambio de estado: ${estadoSelect.options[nextIndex].text} - ${new Date().toLocaleString()}`;
+        
+        console.log('Formulario de prueba llenado automáticamente');
+    }
+}
+</script>
 {% endblock %}

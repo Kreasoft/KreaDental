@@ -1,7 +1,10 @@
 from django import forms
 from .models import Cita
 from datetime import datetime, time, timedelta
+from empresa.utils import get_empresa_actual
 import re
+from profesionales.models import Profesional
+from pacientes.models import Paciente
 
 class CitaForm(forms.ModelForm):
     class Meta:
@@ -61,6 +64,10 @@ class CitaForm(forms.ModelForm):
         self.fields['fecha'].required = True
         self.fields['hora'].required = True
         self.fields['duracion'].required = True
+        
+        # Filtrar profesionales y pacientes por empresa actual
+        # Obtener la empresa actual (esto se maneja en la vista)
+        # Los querysets se filtran en la vista que pasa el formulario
 
     def clean_fecha(self):
         fecha = self.cleaned_data.get('fecha')

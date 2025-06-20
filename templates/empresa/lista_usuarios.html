@@ -1,0 +1,327 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Usuarios de la Empresa{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
+<style>
+    .card {
+        border: 1px solid #AED6F1;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    }
+
+    .card-header {
+        background-color: #E8F4FC;
+        border-bottom: 1px solid #AED6F1;
+        border-radius: 15px 15px 0 0 !important;
+        padding: 1.5rem;
+    }
+
+    .card-header h3 {
+        color: #1A5276;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    .table {
+        border: 1px solid #AED6F1;
+        border-radius: 8px;
+    }
+
+    .table th {
+        background-color: #E8F4FC;
+        color: #1A5276;
+        font-weight: 600;
+        border-bottom: 1px solid #AED6F1;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 0.85rem;
+        padding: 0.5rem;
+    }
+
+    .table td {
+        border-bottom: 1px solid #E8F4FC;
+        vertical-align: middle;
+        font-size: 0.9rem;
+        padding: 0.5rem;
+    }
+
+    .btn-primary {
+        background-color: #1A5276;
+        border-color: #1A5276;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        border-radius: 8px;
+        font-size: 0.9rem;
+    }
+
+    .btn-primary:hover {
+        background-color: #2874A6;
+        border-color: #2874A6;
+    }
+
+    .btn-warning {
+        background-color: #f39c12;
+        border-color: #f39c12;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+    }
+
+    .btn-warning:hover {
+        background-color: #d35400;
+        border-color: #d35400;
+    }
+
+    .btn-danger {
+        background-color: #e74c3c;
+        border-color: #e74c3c;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+    }
+
+    .btn-danger:hover {
+        background-color: #c0392b;
+        border-color: #c0392b;
+    }
+
+    .estado-badge {
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .estado-activo {
+        background-color: #2ecc71;
+        color: white;
+    }
+
+    .estado-inactivo {
+        background-color: #e74c3c;
+        color: white;
+    }
+
+    .tipo-usuario-badge {
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .tipo-admin {
+        background-color: #9b59b6;
+        color: white;
+    }
+
+    .tipo-supervisor {
+        background-color: #3498db;
+        color: white;
+    }
+
+    .tipo-usuario {
+        background-color: #95a5a6;
+        color: white;
+    }
+
+    .search-box {
+        border: 1px solid #AED6F1;
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+    }
+
+    .search-box:focus {
+        border-color: #2874A6;
+        box-shadow: 0 0 0 0.2rem rgba(40, 116, 166, 0.25);
+    }
+
+    .text-muted {
+        color: #7f8c8d !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-0"><i class="fas fa-users me-2"></i>Usuarios de la Empresa</h3>
+                            <p class="text-muted mb-0">Gestione los usuarios de la empresa. Puede agregar nuevos usuarios, editar información existente y asignar roles y permisos.</p>
+                        </div>
+                        <a href="{% url 'empresa:crear_usuario_empresa' empresa.id %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Nuevo Usuario
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Barra de búsqueda -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <form method="get" class="d-flex">
+                                <input type="text" name="q" class="form-control search-box me-2" placeholder="Buscar por nombre, email o username..." value="{{ request.GET.q }}">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search me-2"></i>Buscar
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Nombre Completo</th>
+                                    <th>Email</th>
+                                    <th>Tipo de Usuario</th>
+                                    <th>Estado</th>
+                                    <th class="text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for usuario in usuarios %}
+                                <tr>
+                                    <td>{{ usuario.usuario.username }}</td>
+                                    <td>{{ usuario.usuario.get_full_name|default:usuario.usuario.username }}</td>
+                                    <td>{{ usuario.usuario.email|default:"No especificado" }}</td>
+                                    <td>
+                                        <span class="tipo-usuario-badge 
+                                            {% if usuario.usuario.is_superuser %}tipo-admin
+                                            {% elif usuario.usuario.is_staff %}tipo-supervisor
+                                            {% else %}tipo-usuario{% endif %}">
+                                            {% if usuario.usuario.is_superuser %}
+                                                <i class="fas fa-crown me-1"></i>Administrador
+                                            {% elif usuario.usuario.is_staff %}
+                                                <i class="fas fa-user-shield me-1"></i>Supervisor
+                                            {% else %}
+                                                <i class="fas fa-user me-1"></i>Usuario
+                                            {% endif %}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="estado-badge {% if usuario.activo %}estado-activo{% else %}estado-inactivo{% endif %}">
+                                            {% if usuario.activo %}
+                                                <i class="fas fa-check-circle me-1"></i>Activo
+                                            {% else %}
+                                                <i class="fas fa-times-circle me-1"></i>Inactivo
+                                            {% endif %}
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group">
+                                            <a href="{% url 'empresa:editar_usuario_empresa' empresa.id usuario.id %}" class="btn btn-warning btn-sm" title="Editar usuario">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-danger btn-sm" onclick="confirmarEliminacion({{ usuario.id }})" title="Eliminar usuario">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-4">
+                                        <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                                        <h5 class="text-muted">No hay usuarios registrados</h5>
+                                        <p class="text-muted">Comience agregando un nuevo usuario</p>
+                                        <a href="{% url 'empresa:crear_usuario_empresa' empresa.id %}" class="btn btn-primary">
+                                            <i class="fas fa-plus me-2"></i>Agregar Usuario
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {% if usuarios.has_other_pages %}
+                    <nav aria-label="Navegación de páginas" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            {% if usuarios.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ usuarios.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" aria-label="Anterior">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            {% endif %}
+
+                            {% for num in usuarios.paginator.page_range %}
+                                {% if usuarios.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                                {% else %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ num }}</a>
+                                </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if usuarios.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ usuarios.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" aria-label="Siguiente">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+<script>
+    // Configuración base de Toast
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true
+    });
+
+    // Mostrar mensajes de Django
+    {% if messages %}
+        {% for message in messages %}
+            Toast.fire({
+                icon: '{{ message.tags }}',
+                title: '{{ message }}'
+            });
+        {% endfor %}
+    {% endif %}
+
+    function confirmarEliminacion(usuarioId) {
+        Swal.fire({
+            title: '¿Está seguro?',
+            text: "Esta acción no se puede deshacer",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#e74c3c',
+            cancelButtonColor: '#95a5a6',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = `/empresas/{{ empresa.id }}/usuarios/${usuarioId}/eliminar/`;
+            }
+        });
+    }
+</script>
+{% endblock %} 

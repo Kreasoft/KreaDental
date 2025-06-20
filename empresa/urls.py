@@ -21,6 +21,21 @@ urlpatterns = [
     
     # Gestión de empresas
     path('editar/<int:empresa_id>/', login_required(views.editar_empresa), name='editar_empresa'),
-    path('desactivar/<int:empresa_id>/', login_required(views.desactivar_empresa), name='desactivar_empresa'),
+    path('eliminar/<int:empresa_id>/', login_required(views.eliminar_empresa), name='eliminar_empresa'),
     path('configuracion/', views.configuracion_empresa, name='configuracion_empresa'),
+    
+    # Gestión de sucursales
+    path('<int:empresa_id>/sucursales/', login_required(views.listar_sucursales), name='listar_sucursales'),
+    path('<int:empresa_id>/sucursales/crear/', login_required(views.crear_sucursal), name='crear_sucursal'),
+    path('<int:empresa_id>/sucursales/<int:sucursal_id>/editar/', login_required(views.editar_sucursal), name='editar_sucursal'),
+    path('<int:empresa_id>/sucursales/<int:sucursal_id>/eliminar/', login_required(views.eliminar_sucursal), name='eliminar_sucursal'),
+    
+    # Usuarios
+    path('<int:empresa_id>/usuarios/', views.listar_usuarios_empresa, name='listar_usuarios_empresa'),
+    path('<int:empresa_id>/usuarios/crear/', views.crear_usuario_empresa, name='crear_usuario_empresa'),
+    path('<int:empresa_id>/usuarios/<int:usuario_empresa_id>/editar/', views.editar_usuario_empresa, name='editar_usuario_empresa'),
+    path('<int:empresa_id>/usuarios/<int:usuario_empresa_id>/eliminar/', views.eliminar_usuario_empresa, name='eliminar_usuario_empresa'),
+    
+    # Cambiar sucursal
+    path('cambiar-sucursal/<int:sucursal_id>/', views.cambiar_sucursal, name='cambiar_sucursal'),
 ]

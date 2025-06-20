@@ -242,9 +242,11 @@
                 <!-- Reportes -->
                 <li class="menu-category">Reportes</li>
                 <li>
-                    <a href="#" class="{% if 'informes' in request.path %}active{% endif %}" data-bs-toggle="collapse" data-bs-target="#collapseInformes">
-                        <i class="fas fa-chart-bar"></i>Informes
-                        <i class="fas fa-chevron-down ms-auto"></i>
+                    <a href="#" class="d-flex align-items-center justify-content-between {% if 'informes' in request.path %}active{% endif %}" data-bs-toggle="collapse" data-bs-target="#collapseInformes">
+                        <div>
+                            <i class="fas fa-chart-bar"></i>Informes
+                        </div>
+                        <i class="fas fa-chevron-down submenu-icon"></i>
                     </a>
                     <div class="collapse {% if 'informes' in request.path %}show{% endif %}" id="collapseInformes">
                         <ul class="nav flex-column ms-3 mt-2">
@@ -275,10 +277,12 @@
                 <!-- Configuración -->
                 <li class="menu-category">Configuración</li>
                 <li>
-                    <a href="#" class="{% if 'configuracion' in request.path or 'previsiones' in request.path or 'formas-pago' in request.path %}active{% endif %}" 
+                    <a href="#" class="d-flex align-items-center justify-content-between {% if 'configuracion' in request.path or 'previsiones' in request.path or 'formas-pago' in request.path %}active{% endif %}" 
                        data-bs-toggle="collapse" data-bs-target="#collapseConfiguracion">
-                        <i class="fas fa-cog"></i>Configuración
-                        <i class="fas fa-chevron-down ms-auto"></i>
+                        <div>
+                            <i class="fas fa-cog"></i>Configuración
+                        </div>
+                        <i class="fas fa-chevron-down submenu-icon"></i>
                     </a>
                     <div class="collapse {% if 'configuracion' in request.path or 'previsiones' in request.path or 'formas-pago' in request.path %}show{% endif %}" 
                          id="collapseConfiguracion">
@@ -305,9 +309,11 @@
                 <!-- Usuario -->
                 <li class="menu-category">Usuario</li>
                 <li>
-                    <a href="#" class="{% if 'usuario' in request.path %}active{% endif %}" data-bs-toggle="collapse" data-bs-target="#collapseUsuario">
-                        <i class="fas fa-user"></i>{{ user.username }}
-                        <i class="fas fa-chevron-down ms-auto"></i>
+                    <a href="#" class="d-flex align-items-center justify-content-between {% if 'usuario' in request.path %}active{% endif %}" data-bs-toggle="collapse" data-bs-target="#collapseUsuario">
+                        <div>
+                            <i class="fas fa-user"></i>{{ user.username }}
+                        </div>
+                        <i class="fas fa-chevron-down submenu-icon"></i>
                     </a>
                     <div class="collapse {% if 'usuario' in request.path %}show{% endif %}" id="collapseUsuario">
                         <ul class="nav flex-column ms-3 mt-2">

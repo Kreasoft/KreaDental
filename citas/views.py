@@ -7,6 +7,7 @@ from .forms import CitaForm
 from profesionales.models import Profesional
 from pacientes.models import Paciente
 from datetime import datetime
+from empresa.utils import get_empresa_actual
 import json
 
 @login_required
@@ -16,10 +17,27 @@ def informes(request):
 
 @login_required
 def calendario_citas(request):
-    profesionales = Profesional.objects.all()
-    pacientes = Paciente.objects.all()
+    # Obtener la empresa actual del usuario
+    empresa_actual = get_empresa_actual(request)
+    
+    # Filtrar profesionales por empresa y estado activo
+    profesionales = Profesional.objects.filter(
+        empresa=empresa_actual,
+        activo=True
+    ).order_by('apellido_paterno', 'apellido_materno', 'nombres')
+    
+    # Filtrar pacientes por empresa y estado activo
+    pacientes = Paciente.objects.filter(
+        empresa=empresa_actual,
+        activo=True
+    ).order_by('apellidos', 'nombre')
+    
     profesional_id = request.GET.get('profesional')
+    
+    # Crear el formulario con los querysets filtrados
     form = CitaForm()
+    form.fields['profesional'].queryset = profesionales
+    form.fields['paciente'].queryset = pacientes
     
     if profesional_id:
         form.fields['profesional'].initial = profesional_id
@@ -28,7 +46,8 @@ def calendario_citas(request):
         'form': form,
         'profesionales': profesionales,
         'pacientes': pacientes,
-        'profesional_seleccionado': get_object_or_404(Profesional, pk=profesional_id) if profesional_id else None
+        'profesional_seleccionado': get_object_or_404(Profesional, pk=profesional_id) if profesional_id else None,
+        'empresa_actual': empresa_actual
     })
 
 @login_required
@@ -38,6 +57,9 @@ def guardar_cita(request):
         print("Datos recibidos:", request.POST)
         
         try:
+            # Obtener la empresa actual del usuario
+            empresa_actual = get_empresa_actual(request)
+            
             # Obtener el ID de la cita si existe (para edición)
             cita_id = request.POST.get('cita_id')
             instance = None
@@ -46,6 +68,21 @@ def guardar_cita(request):
             
             # Obtener datos del formulario
             form = CitaForm(request.POST, instance=instance)
+            
+            # Filtrar los querysets por empresa
+            profesionales = Profesional.objects.filter(
+                empresa=empresa_actual,
+                activo=True
+            ).order_by('apellido_paterno', 'apellido_materno', 'nombres')
+            
+            pacientes = Paciente.objects.filter(
+                empresa=empresa_actual,
+                activo=True
+            ).order_by('apellidos', 'nombre')
+            
+            form.fields['profesional'].queryset = profesionales
+            form.fields['paciente'].queryset = pacientes
+            
             print("Formulario creado")
             
             if form.is_valid():
@@ -125,12 +162,18 @@ def guardar_cita(request):
 @login_required
 def obtener_citas(request):
     try:
+        # Obtener la empresa actual del usuario
+        empresa_actual = get_empresa_actual(request)
+        
         profesional_id = request.GET.get('profesional')
         estado = request.GET.get('estado')
         fecha_inicio = request.GET.get('start')
         fecha_fin = request.GET.get('end')
         
-        citas = Cita.objects.select_related('paciente', 'profesional').all()
+        # Filtrar citas por empresa actual
+        citas = Cita.objects.select_related('paciente', 'profesional').filter(
+            profesional__empresa=empresa_actual
+        )
         
         if profesional_id:
             citas = citas.filter(profesional_id=profesional_id)
@@ -193,7 +236,14 @@ def obtener_citas(request):
 @login_required
 def lista_citas(request):
     """Vista para mostrar el calendario de citas"""
-    citas = Cita.objects.select_related('paciente', 'profesional').all()
+    # Obtener la empresa actual del usuario
+    empresa_actual = get_empresa_actual(request)
+    
+    # Filtrar citas por empresa actual
+    citas = Cita.objects.select_related('paciente', 'profesional').filter(
+        profesional__empresa=empresa_actual
+    )
+    
     return render(request, 'citas/lista_citas.html', {
         'citas': citas
     })
@@ -201,8 +251,26 @@ def lista_citas(request):
 @login_required
 def crear_cita(request):
     """Vista para crear una nueva cita"""
+    # Obtener la empresa actual del usuario
+    empresa_actual = get_empresa_actual(request)
+    
+    # Filtrar profesionales y pacientes por empresa
+    profesionales = Profesional.objects.filter(
+        empresa=empresa_actual,
+        activo=True
+    ).order_by('apellido_paterno', 'apellido_materno', 'nombres')
+    
+    pacientes = Paciente.objects.filter(
+        empresa=empresa_actual,
+        activo=True
+    ).order_by('apellidos', 'nombre')
+    
     if request.method == 'POST':
         form = CitaForm(request.POST)
+        # Establecer los querysets filtrados
+        form.fields['profesional'].queryset = profesionales
+        form.fields['paciente'].queryset = pacientes
+        
         if form.is_valid():
             try:
                 cita = form.save()
@@ -237,6 +305,9 @@ def crear_cita(request):
         if request.GET.get('hora'):
             initial['hora'] = request.GET.get('hora')
         form = CitaForm(initial=initial)
+        # Establecer los querysets filtrados
+        form.fields['profesional'].queryset = profesionales
+        form.fields['paciente'].queryset = pacientes
     
     return render(request, 'citas/form_cita.html', {
         'form': form,
@@ -246,9 +317,29 @@ def crear_cita(request):
 @login_required
 def editar_cita(request, cita_id):
     """Vista para editar una cita existente"""
-    cita = get_object_or_404(Cita, id=cita_id)
+    # Obtener la empresa actual del usuario
+    empresa_actual = get_empresa_actual(request)
+    
+    # Obtener la cita y verificar que pertenezca a la empresa actual
+    cita = get_object_or_404(Cita, id=cita_id, profesional__empresa=empresa_actual)
+    
+    # Filtrar profesionales y pacientes por empresa
+    profesionales = Profesional.objects.filter(
+        empresa=empresa_actual,
+        activo=True
+    ).order_by('apellido_paterno', 'apellido_materno', 'nombres')
+    
+    pacientes = Paciente.objects.filter(
+        empresa=empresa_actual,
+        activo=True
+    ).order_by('apellidos', 'nombre')
+    
     if request.method == 'POST':
         form = CitaForm(request.POST, instance=cita)
+        # Establecer los querysets filtrados
+        form.fields['profesional'].queryset = profesionales
+        form.fields['paciente'].queryset = pacientes
+        
         if form.is_valid():
             try:
                 cita = form.save()
@@ -278,6 +369,9 @@ def editar_cita(request, cita_id):
             messages.error(request, 'Por favor corrija los errores en el formulario.')
     else:
         form = CitaForm(instance=cita)
+        # Establecer los querysets filtrados
+        form.fields['profesional'].queryset = profesionales
+        form.fields['paciente'].queryset = pacientes
     
     return render(request, 'citas/form_cita.html', {
         'form': form,
@@ -288,7 +382,12 @@ def editar_cita(request, cita_id):
 @login_required
 def eliminar_cita(request, cita_id):
     """Vista para eliminar una cita existente"""
-    cita = get_object_or_404(Cita, id=cita_id)
+    # Obtener la empresa actual del usuario
+    empresa_actual = get_empresa_actual(request)
+    
+    # Obtener la cita y verificar que pertenezca a la empresa actual
+    cita = get_object_or_404(Cita, id=cita_id, profesional__empresa=empresa_actual)
+    
     if request.method == 'POST':
         try:
             cita.delete()

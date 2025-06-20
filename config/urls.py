@@ -16,6 +16,11 @@ def get_empresa_config():
 def test_format(request):
     return render(request, 'test_format.html')
 
+# Personalización del Admin de Django
+admin.site.site_header = settings.ADMIN_SITE_HEADER
+admin.site.site_title = settings.ADMIN_SITE_TITLE
+admin.site.index_title = settings.ADMIN_INDEX_TITLE
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('core.urls')),

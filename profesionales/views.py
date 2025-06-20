@@ -20,8 +20,11 @@ def lista_profesionales(request):
     # Obtener la empresa actual del usuario
     empresa_actual = get_empresa_actual(request)
     
-    # Obtener todos los profesionales de la empresa actual
-    profesionales = Profesional.objects.filter(empresa=empresa_actual).select_related('especialidad')
+    # Obtener todos los profesionales de la empresa actual y activos
+    profesionales = Profesional.objects.filter(
+        empresa=empresa_actual,
+        activo=True
+    ).select_related('especialidad').order_by('apellido_paterno', 'apellido_materno', 'nombres')
     
     # Estadísticas
     total_profesionales = profesionales.count()
@@ -80,7 +83,11 @@ def nuevo_profesional(request):
 
 @login_required
 def editar_profesional(request, pk):
-    profesional = get_object_or_404(Profesional, id=pk)
+    # Obtener la empresa actual del usuario
+    empresa_actual = get_empresa_actual(request)
+    
+    # Obtener el profesional y verificar que pertenezca a la empresa actual
+    profesional = get_object_or_404(Profesional, id=pk, empresa=empresa_actual)
     
     if request.method == 'POST':
         form = ProfesionalForm(request.POST, instance=profesional)
@@ -96,13 +103,18 @@ def editar_profesional(request, pk):
         'form': form,
         'accion': 'Editar',
         'especialidades': especialidades,
-        'empresa_actual': get_empresa_actual(request),  # Agregar empresa actual al contexto
+        'empresa_actual': empresa_actual,
     }
     return render(request, 'profesionales/form_profesional.html', context)
 
 @login_required
 def eliminar_profesional(request, pk):
-    profesional = get_object_or_404(Profesional, pk=pk)
+    # Obtener la empresa actual del usuario
+    empresa_actual = get_empresa_actual(request)
+    
+    # Obtener el profesional y verificar que pertenezca a la empresa actual
+    profesional = get_object_or_404(Profesional, pk=pk, empresa=empresa_actual)
+    
     if request.method == 'POST':
         if profesional.usuario:  # Verificar si tiene usuario asociado
             profesional.usuario.delete()  # Eliminar el usuario asociado

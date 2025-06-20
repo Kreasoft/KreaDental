@@ -13,14 +13,14 @@ from .models import Paciente, HistorialClinico, Profesional
 from .forms import PacienteForm, HistorialClinicoForm
 from prevision.models import Prevision
 from tratamientos.models import Tratamiento
+from empresa.utils import get_empresa_actual
 import json
 import logging
 
 @login_required
 def lista_pacientes(request):
-    # Obtener la empresa actual del usuario a través de UsuarioEmpresa
-    usuario_empresa = request.user.usuarioempresa_set.filter(activo=True).first()
-    empresa_actual = usuario_empresa.empresa if usuario_empresa else None
+    # Obtener la empresa actual del usuario
+    empresa_actual = get_empresa_actual(request)
     
     if not empresa_actual:
         messages.error(request, 'No tienes una empresa asignada.')
@@ -63,8 +63,7 @@ def lista_pacientes(request):
 @login_required
 def nuevo_paciente(request):
     # Obtener la empresa actual del usuario
-    usuario_empresa = request.user.usuarioempresa_set.filter(activo=True).first()
-    empresa_actual = usuario_empresa.empresa if usuario_empresa else None
+    empresa_actual = get_empresa_actual(request)
     
     if not empresa_actual:
         messages.error(request, 'No tienes una empresa asignada.')
@@ -99,8 +98,7 @@ def nuevo_paciente(request):
 @login_required
 def editar_paciente(request, pk):
     # Obtener la empresa actual del usuario
-    usuario_empresa = request.user.usuarioempresa_set.filter(activo=True).first()
-    empresa_actual = usuario_empresa.empresa if usuario_empresa else None
+    empresa_actual = get_empresa_actual(request)
     
     if not empresa_actual:
         messages.error(request, 'No tienes una empresa asignada.')
@@ -231,8 +229,21 @@ def cambiar_estado_paciente(request, pk):
 @login_required
 def agregar_historial(request, paciente_id):
     paciente = get_object_or_404(Paciente, id=paciente_id)
+    
+    # Obtener la empresa actual del usuario
+    empresa_actual = get_empresa_actual(request)
+    
+    # Filtrar profesionales por empresa y estado activo
+    profesionales = Profesional.objects.filter(
+        empresa=empresa_actual,
+        activo=True
+    ).order_by('apellido_paterno', 'apellido_materno', 'nombres')
+    
     if request.method == 'POST':
         form = HistorialClinicoForm(request.POST, request.FILES)
+        # Establecer el queryset filtrado
+        form.fields['profesional'].queryset = profesionales
+        
         if form.is_valid():
             historial = form.save(commit=False)
             historial.paciente = paciente
@@ -245,6 +256,9 @@ def agregar_historial(request, paciente_id):
             return redirect('pacientes:editar_paciente', pk=paciente.id)
     else:
         form = HistorialClinicoForm()
+        # Establecer el queryset filtrado
+        form.fields['profesional'].queryset = profesionales
+    
     return render(request, 'pacientes/agregar_historial.html', {
         'form': form,
         'paciente': paciente
@@ -253,14 +267,30 @@ def agregar_historial(request, paciente_id):
 @login_required
 def editar_historial(request, pk):
     historial = get_object_or_404(HistorialClinico, id=pk)
+    
+    # Obtener la empresa actual del usuario
+    empresa_actual = get_empresa_actual(request)
+    
+    # Filtrar profesionales por empresa y estado activo
+    profesionales = Profesional.objects.filter(
+        empresa=empresa_actual,
+        activo=True
+    ).order_by('apellido_paterno', 'apellido_materno', 'nombres')
+    
     if request.method == 'POST':
         form = HistorialClinicoForm(request.POST, request.FILES, instance=historial)
+        # Establecer el queryset filtrado
+        form.fields['profesional'].queryset = profesionales
+        
         if form.is_valid():
             form.save()
             messages.success(request, 'Registro clínico actualizado exitosamente.')
             return redirect('pacientes:editar_paciente', pk=historial.paciente.id)
     else:
         form = HistorialClinicoForm(instance=historial)
+        # Establecer el queryset filtrado
+        form.fields['profesional'].queryset = profesionales
+    
     return render(request, 'pacientes/editar_historial.html', {
         'form': form,
         'historial': historial
@@ -343,8 +373,7 @@ def buscar_pacientes(request):
 @login_required
 def detalle_paciente(request, pk):
     # Obtener la empresa actual del usuario
-    usuario_empresa = request.user.usuarioempresa_set.filter(activo=True).first()
-    empresa_actual = usuario_empresa.empresa if usuario_empresa else None
+    empresa_actual = get_empresa_actual(request)
     
     if not empresa_actual:
         messages.error(request, 'No tienes una empresa asignada.')

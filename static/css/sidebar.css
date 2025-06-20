@@ -262,16 +262,36 @@ body {
     margin-left: auto;
     font-size: 0.8rem;
     opacity: 0.7;
+    flex-shrink: 0;
 }
 
-/* Rotar el ícono cuando el menú está contraído */
-.sidebar-menu .collapsed .fa-chevron-down,
-.sidebar-menu .collapsed .fa-angle-down,
-.sidebar-menu .collapsed .submenu-icon {
-    transform: rotate(-90deg);
+/* Rotar el ícono cuando el menú está expandido */
+.sidebar-menu li a[aria-expanded="true"] .fa-chevron-down,
+.sidebar-menu li a[aria-expanded="true"] .fa-angle-down,
+.sidebar-menu li a[aria-expanded="true"] .submenu-icon {
+    transform: rotate(180deg);
 }
 
-/* Estilo para los enlaces activos */
+/* Estilos para los enlaces con submenús */
+.sidebar-menu > li > a[data-bs-toggle="collapse"] {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.sidebar-menu > li > a[data-bs-toggle="collapse"] > div {
+    display: flex;
+    align-items: center;
+}
+
+.sidebar-menu > li > a[data-bs-toggle="collapse"] > div > i:first-child {
+    width: 1.5rem;
+    text-align: center;
+    margin-right: 0.5rem;
+    font-size: 1rem;
+}
+
+/* Estilos para los enlaces activos */
 .sidebar-menu > li > a.active,
 .sidebar-menu > li > a:hover {
     background-color: rgba(255, 255, 255, 0.1);
