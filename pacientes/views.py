@@ -26,33 +26,53 @@ def lista_pacientes(request):
         messages.error(request, 'No tienes una empresa asignada.')
         return redirect('home')
     
+    # Obtener el término de búsqueda
+    query = request.GET.get('q', '')
+    
     # Obtener pacientes: propios + compartidos conmigo
     pacientes = Paciente.objects.filter(
         Q(empresa=empresa_actual) | 
         Q(empresas_compartidas=empresa_actual, compartir_entre_sucursales=True)
-    ).distinct().order_by('apellidos', 'nombre')
+    ).distinct()
     
-    # Estadísticas
-    total_pacientes = pacientes.count()
-    pacientes_activos = pacientes.filter(activo=True).count()
+    # Aplicar filtro de búsqueda si existe
+    if query:
+        pacientes = pacientes.filter(
+            Q(nombre__icontains=query) |
+            Q(apellidos__icontains=query) |
+            Q(documento__icontains=query) |
+            Q(email__icontains=query)
+        )
+    
+    # Ordenar por apellidos y nombre
+    pacientes = pacientes.order_by('apellidos', 'nombre')
+    
+    # Estadísticas (sin filtro de búsqueda)
+    pacientes_todos = Paciente.objects.filter(
+        Q(empresa=empresa_actual) | 
+        Q(empresas_compartidas=empresa_actual, compartir_entre_sucursales=True)
+    ).distinct()
+    
+    total_pacientes = pacientes_todos.count()
+    pacientes_activos = pacientes_todos.filter(activo=True).count()
     
     # Pacientes nuevos este mes
     primer_dia_mes = timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-    pacientes_nuevos = pacientes.filter(fecha_registro__gte=primer_dia_mes).count()
+    pacientes_nuevos = pacientes_todos.filter(fecha_registro__gte=primer_dia_mes).count()
     
     # Pacientes compartidos
-    pacientes_compartidos = pacientes.filter(
+    pacientes_compartidos = pacientes_todos.filter(
         empresas_compartidas=empresa_actual, 
         compartir_entre_sucursales=True
     ).count()
     
     # Pacientes propios
-    pacientes_propios = pacientes.filter(empresa=empresa_actual).count()
+    pacientes_propios = pacientes_todos.filter(empresa=empresa_actual).count()
     
     # Citas pendientes
     hoy = timezone.now()
     citas_pendientes = Tratamiento.objects.filter(
-        paciente__in=pacientes,
+        paciente__in=pacientes_todos,
         fecha_inicio__gte=hoy,
         estado='PENDIENTE'
     ).count()
@@ -70,6 +90,7 @@ def lista_pacientes(request):
         'citas_pendientes': citas_pendientes,
         'previsiones': previsiones,
         'empresa_actual': empresa_actual,
+        'query': query,  # Para mantener el término de búsqueda en el formulario
     }
     
     return render(request, 'pacientes/lista_pacientes.html', context)
@@ -383,6 +404,66 @@ def buscar_pacientes(request):
     logger.info(f"Respuesta: {response_data}")
     
     return JsonResponse(response_data)
+
+@login_required
+def detalle_paciente(request, pk):
+    # Obtener la empresa actual del usuario
+    empresa_actual = get_empresa_actual(request)
+    
+    if not empresa_actual:
+        messages.error(request, 'No tienes una empresa asignada.')
+        return redirect('home')
+
+    paciente = get_object_or_404(Paciente, pk=pk, empresa=empresa_actual)
+    # Usar el related_name correcto
+    historiales = paciente.historiales_clinicos.all().order_by('-fecha')
+    
+    context = {
+        'paciente': paciente,
+        'historiales': historiales,
+        'empresa_actual': empresa_actual,
+    }
+    
+    return render(request, 'pacientes/detalle_paciente.html', context)
+
+@login_required
+def obtener_pacientes(request):
+    """API para obtener lista de pacientes para selects"""
+    try:
+        # Obtener la empresa actual del usuario
+        empresa_actual = get_empresa_actual(request)
+        
+        if not empresa_actual:
+            return JsonResponse({
+                'pacientes': []
+            })
+        
+        # Obtener pacientes: propios + compartidos conmigo
+        pacientes = Paciente.objects.filter(
+            Q(empresa=empresa_actual) | 
+            Q(empresas_compartidas=empresa_actual, compartir_entre_sucursales=True)
+        ).distinct().order_by('apellidos', 'nombre')
+        
+        # Convertir a formato JSON
+        data = {
+            'pacientes': [
+                {
+                    'id': paciente.id,
+                    'nombre': paciente.nombre,
+                    'apellidos': paciente.apellidos,
+                    'rut': paciente.documento
+                }
+                for paciente in pacientes
+            ]
+        }
+        
+        return JsonResponse(data)
+    except Exception as e:
+        import traceback
+        return JsonResponse({
+            'error': str(e),
+            'traceback': traceback.format_exc()
+        }, status=500)
 
 @login_required
 def detalle_paciente(request, pk):
