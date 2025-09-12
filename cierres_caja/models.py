@@ -47,5 +47,10 @@ class CierreCaja(models.Model):
         verbose_name_plural = 'Cierres de Caja'
         ordering = ['-fecha', '-hora_apertura']
     
+    @property
+    def saldo_final(self):
+        """Calcula el saldo final del cierre de caja"""
+        return self.monto_inicial + self.total_efectivo + self.total_tarjeta + self.total_transferencia + self.diferencia
+    
     def __str__(self):
         return f'Cierre de caja {self.fecha} - {self.get_estado_display()}'

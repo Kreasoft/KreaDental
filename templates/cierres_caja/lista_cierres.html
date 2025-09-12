@@ -21,9 +21,9 @@
                             </h4>
                             <small class="opacity-75">Gestión de cierres de caja del sistema</small>
                         </div>
-                        <a href="{% url 'cierres_caja:crear' %}" class="btn btn-light">
+                        <a href="{% url 'cierres_caja:abrir_caja' %}" class="btn btn-light">
                             <i class="fas fa-plus me-1"></i>
-                            Nuevo Cierre
+                            Abrir Caja
                         </a>
                     </div>
                 </div>
@@ -154,7 +154,7 @@
                                     {% for cierre in cierres %}
                                     <tr>
                                         <td>{{ cierre.id }}</td>
-                                        <td>{{ cierre.fecha|date:"d/m/Y H:i" }}</td>
+                                        <td>{{ cierre.fecha|date:"d/m/Y" }} {{ cierre.hora_apertura|time:"H:i" }}</td>
                                         <td>{{ cierre.usuario.get_full_name|default:cierre.usuario.username }}</td>
                                         <td class="text-success">${{ cierre.total_ingresos|floatformat:0|intcomma }}</td>
                                         <td class="text-danger">${{ cierre.total_egresos|floatformat:0|intcomma }}</td>
@@ -170,12 +170,12 @@
                                         </td>
                                         <td>
                                             <div class="btn-group" role="group">
-                                                <a href="{% url 'cierres_caja:detalle' cierre.id %}" class="btn btn-info btn-sm" title="Ver Detalle">
+                                                <a href="{% url 'cierres_caja:detalle_cierre' cierre.id %}" class="btn btn-info btn-sm" title="Ver Detalle">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
                                                 {% if cierre.estado == 'ABIERTO' %}
-                                                    <a href="{% url 'cierres_caja:editar' cierre.id %}" class="btn btn-warning btn-sm" title="Editar">
-                                                        <i class="fas fa-edit"></i>
+                                                    <a href="{% url 'cierres_caja:cerrar_caja' cierre.id %}" class="btn btn-warning btn-sm" title="Cerrar Caja">
+                                                        <i class="fas fa-lock"></i>
                                                     </a>
                                                 {% endif %}
                                             </div>
@@ -221,9 +221,9 @@
                             <i class="fas fa-cash-register fa-3x text-muted mb-3"></i>
                             <h5 class="text-muted">No hay cierres de caja registrados</h5>
                             <p class="text-muted">Comienza creando tu primer cierre de caja</p>
-                            <a href="{% url 'cierres_caja:crear' %}" class="btn btn-primary">
+                            <a href="{% url 'cierres_caja:abrir_caja' %}" class="btn btn-primary">
                                 <i class="fas fa-plus me-1"></i>
-                                Crear Cierre de Caja
+                                Abrir Caja
                             </a>
                         </div>
                     {% endif %}

@@ -19,8 +19,8 @@ def lista_cierres(request):
     fin_semana = inicio_semana + timedelta(days=6)
 
     # Obtener parámetros de filtrado
-    fecha_inicio = request.GET.get('fecha_inicio', inicio_semana.strftime('%Y-%m-%d'))
-    fecha_fin = request.GET.get('fecha_fin', fin_semana.strftime('%Y-%m-%d'))
+    fecha_inicio = request.GET.get('fecha_desde', inicio_semana.strftime('%Y-%m-%d'))
+    fecha_fin = request.GET.get('fecha_hasta', fin_semana.strftime('%Y-%m-%d'))
     estado = request.GET.get('estado', '')
 
     # Filtrar cierres
@@ -36,23 +36,30 @@ def lista_cierres(request):
     # Ordenar por fecha y hora
     cierres = cierres.order_by('-fecha', '-hora_apertura')
 
-    # Calcular resumen de la semana
-    resumen_semana = cierres.aggregate(
-        total_efectivo=Sum('total_efectivo'),
-        total_tarjeta=Sum('total_tarjeta'),
-        total_transferencia=Sum('total_transferencia'),
-        cantidad_cierres=Count('id')
-    )
+    # Calcular estadísticas
+    total_cierres = cierres.count()
+    
+    # Calcular totales por separado
+    total_efectivo = cierres.aggregate(total=Sum('total_efectivo'))['total'] or Decimal('0')
+    total_tarjeta = cierres.aggregate(total=Sum('total_tarjeta'))['total'] or Decimal('0')
+    total_transferencia = cierres.aggregate(total=Sum('total_transferencia'))['total'] or Decimal('0')
+    total_ingresos = total_efectivo + total_tarjeta + total_transferencia
+    
+    total_egresos = Decimal('0')  # Por ahora no hay egresos en el modelo
+    saldo_actual = total_ingresos - total_egresos
 
     hay_caja_abierta = CierreCaja.objects.filter(estado='ABIERTO').exists()
 
     return render(request, 'cierres_caja/lista_cierres.html', {
         'cierres': cierres,
         'hay_caja_abierta': hay_caja_abierta,
-        'fecha_inicio': fecha_inicio,
-        'fecha_fin': fecha_fin,
-        'estado_filtro': estado,
-        'resumen_semana': resumen_semana
+        'fecha_desde': fecha_inicio,
+        'fecha_hasta': fecha_fin,
+        'estado': estado,
+        'total_cierres': total_cierres,
+        'total_ingresos': total_ingresos,
+        'total_egresos': total_egresos,
+        'saldo_actual': saldo_actual
     })
 
 @login_required
