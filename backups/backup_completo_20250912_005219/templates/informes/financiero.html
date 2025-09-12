@@ -1,0 +1,348 @@
+{% extends 'informes/base_informes.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/dental-theme.css' %}">
+<style>
+    body, .container-fluid, .dental-card, .dental-header, .dental-btn, .dental-stats-card, .dental-stats-number, .dental-stats-label, .dental-table, .dental-chart-container, .breadcrumb, .breadcrumb-item {
+        font-family: 'Poppins', sans-serif !important;
+    }
+
+    /* Usar las variables CSS del tema dental */
+    .dental-stats-card {
+        position: relative;
+        padding: 2rem;
+        border-radius: 15px;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .dental-stats-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    }
+
+    .dental-stats-icon {
+        position: absolute;
+        right: 1.5rem;
+        bottom: 1.5rem;
+        font-size: 4.5rem;
+        opacity: 0.15;
+        color: inherit;
+        transition: all 0.3s ease;
+    }
+
+    .dental-stats-card:hover .dental-stats-icon {
+        transform: scale(1.1);
+        opacity: 0.2;
+    }
+
+    .dental-stats-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+        position: relative;
+        z-index: 1;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .dental-stats-label {
+        font-size: 1rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        position: relative;
+        z-index: 1;
+        opacity: 0.9;
+    }
+
+    .dental-card-ingresos {
+        background: linear-gradient(135deg, var(--dental-success) 0%, var(--dental-success) 100%);
+        color: white;
+    }
+
+    .dental-card-pagado {
+        background: linear-gradient(135deg, var(--dental-primary) 0%, var(--dental-secondary) 100%);
+        color: white;
+    }
+
+    .dental-card-pendiente {
+        background: linear-gradient(135deg, var(--dental-warning) 0%, var(--dental-warning) 100%);
+        color: white;
+    }
+
+    .dental-card-tratamientos {
+        background: linear-gradient(135deg, var(--dental-secondary) 0%, var(--dental-secondary) 100%);
+        color: white;
+    }
+
+    .dental-stats-container {
+        background: rgba(255, 255, 255, 0.98);
+        border: 1px solid var(--dental-accent);
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+        margin-bottom: 2rem;
+        transition: all 0.3s ease;
+    }
+
+    .dental-stats-container:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .dental-stats-container h4 {
+        color: var(--dental-primary);
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .dental-stats-container h4::before {
+        content: '';
+        width: 4px;
+        height: 24px;
+        background: linear-gradient(135deg, var(--dental-primary) 0%, var(--dental-accent) 100%);
+        border-radius: 2px;
+    }
+
+    .dental-chart-container {
+        position: relative;
+        height: 400px;
+        margin-bottom: 1rem;
+        border-radius: 10px;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.5);
+        padding: 1rem;
+    }
+
+    .dental-table {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .dental-table thead th {
+        background: linear-gradient(135deg, var(--dental-primary) 0%, var(--dental-dark) 100%);
+        color: white;
+        font-weight: 600;
+        padding: 1rem;
+        border: none;
+        font-size: 0.95rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .dental-table tbody td {
+        padding: 1rem;
+        border-bottom: 1px solid var(--dental-accent);
+        font-weight: 500;
+        color: var(--dental-text);
+    }
+
+    .dental-table tbody tr:hover {
+        background-color: var(--dental-light);
+        transform: scale(1.01);
+        transition: all 0.2s ease;
+    }
+
+    .dental-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .dental-export-btn {
+        background: linear-gradient(135deg, var(--dental-success) 0%, var(--dental-success) 100%);
+        border: none;
+        border-radius: 10px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        color: white;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(39, 174, 96, 0.2);
+    }
+
+    .dental-export-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(39, 174, 96, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+
+    .dental-export-btn i {
+        margin-right: 0.5rem;
+    }
+
+    .dental-summary-section {
+        background: linear-gradient(135deg, var(--dental-light) 0%, rgba(255, 255, 255, 0.8) 100%);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border: 1px solid var(--dental-accent);
+    }
+
+    .dental-summary-title {
+        color: var(--dental-primary);
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+
+    .dental-summary-subtitle {
+        color: var(--dental-text-light);
+        font-size: 1rem;
+        text-align: center;
+        margin-bottom: 2rem;
+        opacity: 0.8;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .fade-in-up {
+        animation: fadeInUp 0.6s ease forwards;
+    }
+
+    .dental-stats-card:nth-child(1) { animation-delay: 0.1s; }
+    .dental-stats-card:nth-child(2) { animation-delay: 0.2s; }
+    .dental-stats-card:nth-child(3) { animation-delay: 0.3s; }
+    .dental-stats-card:nth-child(4) { animation-delay: 0.4s; }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .dental-stats-card {
+            padding: 1.5rem;
+        }
+        
+        .dental-stats-number {
+            font-size: 2rem;
+        }
+        
+        .dental-stats-icon {
+            font-size: 3rem;
+        }
+        
+        .dental-stats-container {
+            padding: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block informe_titulo %}
+<i class="fas fa-chart-line"></i>Informe Financiero Completo
+{% endblock %}
+
+{% block informe_subtitulo %}
+Análisis detallado de ingresos, pagos y rendimiento financiero del período seleccionado
+{% endblock %}
+
+{% block acciones_encabezado %}
+<a href="?{{ request.GET.urlencode }}&export=excel" class="dental-export-btn">
+    <i class="fas fa-file-excel"></i>Exportar a Excel
+</a>
+{% endblock %}
+
+{% block contenido_informe %}
+<!-- Tarjetas de resumen -->
+<div class="row fade-in-up">
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="dental-stats-card dental-card-ingresos">
+            <div class="dental-stats-number">${{ ingresos_totales|default:0|floatformat:0|intcomma }}</div>
+            <div class="dental-stats-label">Ingresos Totales</div>
+            <i class="fas fa-dollar-sign dental-stats-icon"></i>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="dental-stats-card dental-card-pagado">
+            <div class="dental-stats-number">${{ total_pagado|default:0|floatformat:0|intcomma }}</div>
+            <div class="dental-stats-label">Total Pagado</div>
+            <i class="fas fa-check-circle dental-stats-icon"></i>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="dental-stats-card dental-card-pendiente">
+            <div class="dental-stats-number">${{ total_pendiente|default:0|floatformat:0|intcomma }}</div>
+            <div class="dental-stats-label">Total Pendiente</div>
+            <i class="fas fa-clock dental-stats-icon"></i>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="dental-stats-card dental-card-tratamientos">
+            <div class="dental-stats-number">{{ num_tratamientos|default:0 }}</div>
+            <div class="dental-stats-label">Tratamientos Realizados</div>
+            <i class="fas fa-clipboard-list dental-stats-icon"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Gráficos -->
+<div class="row fade-in-up">
+    <div class="col-lg-6 mb-4">
+        <div class="dental-stats-container">
+            <h4><i class="fas fa-chart-area me-2"></i>Ingresos por Día</h4>
+            <div class="dental-chart-container">
+                {{ grafico_ingresos|safe }}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 mb-4">
+        <div class="dental-stats-container">
+            <h4><i class="fas fa-user-md me-2"></i>Ingresos por Profesional</h4>
+            <div class="dental-chart-container">
+                {{ grafico_profesionales|safe }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabla de ingresos por profesional -->
+<div class="dental-stats-container fade-in-up">
+    <h4><i class="fas fa-table me-2"></i>Detalle de Ingresos por Profesional</h4>
+    <div class="table-responsive">
+        <table class="table dental-table">
+            <thead>
+                <tr>
+                    <th><i class="fas fa-user-md me-2"></i>Profesional</th>
+                    <th><i class="fas fa-clipboard-list me-2"></i>Tratamientos</th>
+                    <th><i class="fas fa-dollar-sign me-2"></i>Total Ingresos</th>
+                    <th><i class="fas fa-chart-line me-2"></i>Promedio por Tratamiento</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for prof in ingresos_por_profesional %}
+                <tr>
+                    <td><strong>{{ prof.profesional__nombres }} {{ prof.profesional__apellido_paterno }}</strong></td>
+                    <td><span class="badge bg-primary">{{ prof.num_tratamientos }}</span></td>
+                    <td><strong>${{ prof.total|floatformat:0|intcomma }}</strong></td>
+                    <td>${{ prof.promedio|floatformat:0|intcomma }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center text-muted">
+                        <i class="fas fa-info-circle me-2"></i>No hay datos disponibles para el período seleccionado
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

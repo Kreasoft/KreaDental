@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mi Perfil{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card {
+        border: 1px solid #AED6F1;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    }
+
+    .card-header {
+        background-color: #E8F4FC;
+        border-bottom: 1px solid #AED6F1;
+        border-radius: 15px 15px 0 0 !important;
+        padding: 1.5rem;
+    }
+
+    .card-header h4 {
+        color: #1A5276;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    .btn-primary {
+        background-color: #1A5276;
+        border-color: #1A5276;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        border-radius: 8px;
+        font-size: 0.9rem;
+    }
+
+    .btn-primary:hover {
+        background-color: #2874A6;
+        border-color: #2874A6;
+    }
+
+    .btn-secondary {
+        background-color: #7f8c8d;
+        border-color: #7f8c8d;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        border-radius: 8px;
+        font-size: 0.9rem;
+    }
+
+    .btn-secondary:hover {
+        background-color: #6c757d;
+        border-color: #6c757d;
+    }
+
+    .text-muted {
+        color: #7f8c8d !important;
+    }
+
+    .profile-info h5 {
+        color: #1A5276;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .profile-info p {
+        color: #2874A6;
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+    }
+
+    .profile-info strong {
+        color: #1A5276;
+        font-weight: 600;
+    }
+
+    .avatar-container {
+        background-color: #E8F4FC;
+        border-radius: 50%;
+        padding: 1rem;
+        display: inline-block;
+        margin-bottom: 1rem;
+    }
+
+    .img-thumbnail {
+        border: 3px solid #AED6F1;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+    }
+
+    .img-thumbnail:hover {
+        transform: scale(1.05);
+        border-color: #2874A6;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0"><i class="fas fa-user me-2"></i>Mi Perfil</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-4 text-center">
+                            <div class="avatar-container">
+                                {% if user.avatar %}
+                                    <img src="{{ user.avatar.url }}" class="img-thumbnail" style="max-width: 120px;">
+                                {% else %}
+                                    <img src="{% static 'img/default-avatar.png' %}" class="img-thumbnail" style="max-width: 120px;">
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-8 profile-info">
+                            <h5>{{ user.get_full_name }}</h5>
+                            <p><strong>Email:</strong> {{ user.email }}</p>
+                            <p><strong>Teléfono:</strong> {{ user.telefono|default:"No especificado" }}</p>
+                            <p><strong>Fecha de nacimiento:</strong> {{ user.fecha_nacimiento|date:'d/m/Y'|default:"No especificada" }}</p>
+                            <p><strong>Dirección:</strong> {{ user.direccion|default:"No especificada" }}</p>
+                            <p><strong>Ciudad:</strong> {{ user.ciudad|default:"No especificada" }}</p>
+                            <p><strong>País:</strong> {{ user.pais|default:"No especificado" }}</p>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <a href="{% url 'usuarios:editar_perfil' %}" class="btn btn-primary me-2">
+                            <i class="fas fa-edit me-1"></i>Editar Perfil
+                        </a>
+                        <a href="{% url 'usuarios:cambiar_password' %}" class="btn btn-secondary">
+                            <i class="fas fa-key me-1"></i>Cambiar Contraseña
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

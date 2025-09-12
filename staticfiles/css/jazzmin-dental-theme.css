@@ -152,8 +152,8 @@
 
 /* Tablas con estilo dental */
 .table thead th {
-    background-color: var(--dental-bg-light) !important;
-    color: var(--dental-primary) !important;
+    background-color: #1A5276 !important;
+    color: #ffffff !important;
     font-weight: 600 !important;
     border-bottom: 1px solid var(--dental-light) !important;
     text-transform: uppercase !important;

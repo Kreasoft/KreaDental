@@ -65,8 +65,8 @@
 }
 
 .table th {
-    background-color: var(--light-color);
-    color: var(--primary-color);
+    background-color: #1A5276;
+    color: #ffffff;
     font-weight: 600;
     padding: 1rem;
     border-bottom: 2px solid var(--accent-color);

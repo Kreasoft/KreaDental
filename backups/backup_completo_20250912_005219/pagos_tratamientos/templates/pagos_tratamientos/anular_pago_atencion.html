@@ -1,0 +1,235 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Anular Pago de Atención{% endblock %}
+
+{% block extra_css %}
+<style>
+    .pago-info {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .form-section {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-control, .form-select {
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #e74c3c;
+        box-shadow: 0 0 0 0.2rem rgba(231, 76, 60, 0.25);
+    }
+    
+    .btn-danger {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        border: none;
+        border-radius: 10px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+    }
+    
+    .btn-secondary {
+        border-radius: 10px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+    }
+    
+    .info-card {
+        background: #f8f9fa;
+        border-left: 4px solid #e74c3c;
+        padding: 1rem;
+        border-radius: 0 10px 10px 0;
+        margin-bottom: 1rem;
+    }
+    
+    .warning-alert {
+        background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+        border: 1px solid #ffeaa7;
+        color: #856404;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="mb-1">
+                        <i class="fas fa-ban text-danger me-2"></i>
+                        Anular Pago de Atención
+                    </h2>
+                    <p class="text-muted mb-0">Esta acción no se puede deshacer</p>
+                </div>
+                <div>
+                    <a href="{% url 'pagos_tratamientos:lista_pagos_atenciones' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Volver
+                    </a>
+                </div>
+            </div>
+
+            <!-- Información del Pago -->
+            <div class="pago-info">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h4 class="mb-3">
+                            <i class="fas fa-credit-card me-2"></i>
+                            Información del Pago a Anular
+                        </h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="mb-2"><strong>Paciente:</strong> {{ pago.cita.paciente.nombre_completo }}</p>
+                                <p class="mb-2"><strong>RUT:</strong> {{ pago.cita.paciente.rut }}</p>
+                                <p class="mb-2"><strong>Profesional:</strong> {{ pago.cita.profesional.nombre_completo }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-2"><strong>Fecha Atención:</strong> {{ pago.cita.fecha|date:"d/m/Y" }}</p>
+                                <p class="mb-2"><strong>Hora:</strong> {{ pago.cita.hora|time:"H:i" }}</p>
+                                <p class="mb-2"><strong>Motivo:</strong> {{ pago.cita.motivo }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <div class="info-card">
+                            <h6 class="mb-2">Estado del Pago</h6>
+                            <span class="badge bg-success fs-6">{{ pago.get_estado_display }}</span>
+                            <hr class="my-2">
+                            <h6 class="mb-2">Monto</h6>
+                            <span class="badge bg-info fs-6">${{ pago.monto|floatformat:0 }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Advertencia -->
+            <div class="warning-alert">
+                <h6 class="alert-heading">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    ¡Atención! Esta acción es irreversible
+                </h6>
+                <p class="mb-0">
+                    Al anular este pago, se marcará como "ANULADO" y no se podrá revertir. 
+                    Asegúrate de que esta es la acción correcta antes de continuar.
+                </p>
+            </div>
+
+            <!-- Formulario de Anulación -->
+            <div class="form-section">
+                <h5 class="mb-4">
+                    <i class="fas fa-ban me-2"></i>
+                    Confirmar Anulación del Pago
+                </h5>
+                
+                <form id="formAnularPago" method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="motivo" class="form-label">Motivo de la Anulación</label>
+                        <textarea id="motivo" name="motivo" class="form-control" rows="4" 
+                                  placeholder="Describe el motivo por el cual se anula este pago (opcional pero recomendado)"></textarea>
+                        <div class="form-text">Este motivo quedará registrado en el historial del pago</div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{% url 'pagos_tratamientos:lista_pagos_atenciones' %}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-danger" id="btnAnular">
+                            <i class="fas fa-ban me-2"></i>Anular Pago
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Enviar formulario
+        $('#formAnularPago').on('submit', function(e) {
+            e.preventDefault();
+            
+            // Mostrar confirmación adicional
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: 'Esta acción no se puede deshacer. El pago será marcado como ANULADO.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, anular pago',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Mostrar loading
+                    Swal.fire({
+                        title: 'Procesando...',
+                        text: 'Anulando el pago',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                    
+                    $.ajax({
+                        url: '{% url "pagos_tratamientos:anular_pago_atencion" pago.id %}',
+                        method: 'POST',
+                        data: $(this).serialize(),
+                        success: function(response) {
+                            if (response.status === 'success') {
+                                Swal.fire({
+                                    title: '¡Anulado!',
+                                    text: response.message,
+                                    icon: 'success',
+                                    confirmButtonText: 'Continuar'
+                                }).then(() => {
+                                    window.location.href = '{% url "pagos_tratamientos:lista_pagos_atenciones" %}';
+                                });
+                            } else {
+                                Swal.fire('Error', response.message, 'error');
+                            }
+                        },
+                        error: function() {
+                            Swal.fire('Error', 'Ocurrió un error al anular el pago', 'error');
+                        }
+                    });
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
+
+

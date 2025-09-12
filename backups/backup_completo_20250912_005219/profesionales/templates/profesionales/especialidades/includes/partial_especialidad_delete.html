@@ -1,0 +1,14 @@
+<form method="post" action="{% url 'profesionales:eliminar_especialidad' especialidad.id %}" class="js-especialidad-form">
+  {% csrf_token %}
+  <div class="modal-header">
+    <h5 class="modal-title">Confirmar eliminación</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  </div>
+  <div class="modal-body">
+    <p>¿Está seguro que desea eliminar la especialidad "{{ especialidad.nombre }}"?</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+  </div>
+</form> 

@@ -1,0 +1,139 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link href="{% static 'fullcalendar/main.css' %}" rel="stylesheet">
+<style>
+    .estado-pendiente { background-color: #ffc107; border-color: #ffc107; }
+    .estado-confirmada { background-color: #28a745; border-color: #28a745; }
+    .estado-cancelada { background-color: #dc3545; border-color: #dc3545; }
+    .estado-completada { background-color: #6c757d; border-color: #6c757d; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Calendario de Citas</h2>
+    
+    <!-- Botón para crear nueva cita -->
+    <div class="mb-3">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCita">
+            Nueva Cita
+        </button>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <label for="filtro_profesional" class="form-label">Filtrar por Profesional:</label>
+            <select id="filtro_profesional" class="form-select">
+                <option value="">Todos los profesionales</option>
+                {% for profesional in profesionales %}
+                    <option value="{{ profesional.id }}">{{ profesional }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <!-- Calendario -->
+    <div id="calendar"></div>
+
+    <!-- Modal para crear/editar cita -->
+    <div class="modal fade" id="modalCita" tabindex="-1" aria-labelledby="modalCitaLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalCitaLabel">Nueva Cita</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formCita" method="post" action="{% url 'citas:crear_cita' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="fecha" class="form-label">Fecha</label>
+                            <input type="date" class="form-control" id="fecha" name="fecha" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="hora" class="form-label">Hora</label>
+                            <input type="time" class="form-control" id="hora" name="hora" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="paciente" class="form-label">Paciente</label>
+                            <select class="form-select" id="paciente" name="paciente" required>
+                                <option value="">Seleccione un paciente</option>
+                                {% for paciente in pacientes %}
+                                    <option value="{{ paciente.id }}">{{ paciente }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="profesional_select" class="form-label">Profesional</label>
+                            <select class="form-select" id="profesional_select" name="profesional" required>
+                                <option value="">Seleccione un profesional</option>
+                                {% for profesional in profesionales %}
+                                    <option value="{{ profesional.id }}">{{ profesional }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="motivo" class="form-label">Motivo</label>
+                            <textarea class="form-control" id="motivo" name="motivo" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="duracion" class="form-label">Duración</label>
+                            <select class="form-select" id="duracion" name="duracion" required>
+                                <option value="15">15 minutos</option>
+                                <option value="30" selected>30 minutos</option>
+                                <option value="45">45 minutos</option>
+                                <option value="60">1 hora</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" form="formCita" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'fullcalendar/main.js' %}"></script>
+<script src="{% static 'fullcalendar/es.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'es',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        events: function(info, successCallback, failureCallback) {
+            var profesionalId = document.getElementById('filtro_profesional').value;
+            var url = "{% url 'citas:api_citas' %}";
+            if (profesionalId) {
+                url += '?profesional=' + profesionalId;
+            }
+            fetch(url)
+                .then(response => response.json())
+                .then(data => successCallback(data))
+                .catch(error => failureCallback(error));
+        },
+        eventClick: function(info) {
+            window.location.href = "/citas/editar/" + info.event.id + "/";
+        }
+    });
+    calendar.render();
+
+    // Manejar cambios en el filtro de profesionales
+    document.getElementById('filtro_profesional').addEventListener('change', function() {
+        calendar.refetchEvents();
+    });
+});
+</script>
+{% endblock %} 

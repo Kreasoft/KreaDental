@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Procedimientos - TEST{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h1 style="color: red; text-align: center;">¡TEMPLATE COMPLETAMENTE NUEVO!</h1>
+                </div>
+                <div class="card-body">
+                    <div style="background: red; color: white; padding: 20px; text-align: center; font-size: 24px; font-weight: bold;">
+                        ESTE ES UN TEMPLATE COMPLETAMENTE NUEVO
+                    </div>
+                    <p style="text-align: center; font-size: 18px;">
+                        Fecha y hora: {{ now }}
+                    </p>
+                    <p style="text-align: center; font-size: 18px;">
+                        Si ves esto, el template se está actualizando correctamente.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

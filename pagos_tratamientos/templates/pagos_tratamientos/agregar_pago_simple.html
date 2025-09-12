@@ -1,0 +1,417 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+{% load utils %}
+
+{% block title %}Agregar Pago - Simplificado{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
+<style>
+    .card {
+        border: 1px solid #AED6F1;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    }
+
+    .card-header {
+        background-color: #E8F4FC;
+        border-bottom: 1px solid #AED6F1;
+        border-radius: 15px 15px 0 0 !important;
+        padding: 1.5rem;
+    }
+
+    .card-header h3 {
+        color: #1A5276;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    .form-label {
+        color: #1A5276;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control, .form-select {
+        border: 1px solid #AED6F1;
+        border-radius: 8px;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.9rem;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #1A5276;
+        box-shadow: 0 0 0 0.2rem rgba(26, 82, 118, 0.25);
+    }
+
+    .btn-primary {
+        background-color: #1A5276;
+        border-color: #1A5276;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        border-radius: 8px;
+        font-size: 0.9rem;
+    }
+
+    .btn-primary:hover {
+        background-color: #2874A6;
+        border-color: #2874A6;
+    }
+
+    .tratamiento-card {
+        border: 1px solid #AED6F1;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 0.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background-color: #f8f9fa;
+    }
+
+    .tratamiento-card:hover {
+        border-color: #1A5276;
+        background-color: #E8F4FC;
+    }
+
+    .tratamiento-card.selected {
+        border-color: #1A5276;
+        background-color: #E8F4FC;
+    }
+
+    .saldo-info {
+        background-color: #d4edda;
+        border: 1px solid #c3e6cb;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+
+    .saldo-info h6 {
+        color: #155724;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .saldo-info .saldo-amount {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #0d4a1a;
+    }
+
+    .page-header {
+        background-color: #E8F4FC;
+        border: 1px solid #AED6F1;
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .page-title {
+        color: #1A5276;
+        font-size: 2rem;
+        font-weight: 600;
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .page-subtitle {
+        color: #7f8c8d;
+        font-size: 1rem;
+        margin: 0.5rem 0 0 0;
+        font-weight: 400;
+    }
+
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 1rem;
+        }
+
+        .page-header {
+            padding: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Título Principal -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="page-header">
+                <h1 class="page-title">
+                    <i class="fas fa-credit-card me-3"></i>
+                    Gestión de Pagos
+                </h1>
+                <p class="page-subtitle">Registra pagos de tratamientos de forma rápida y eficiente</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card payment-form-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-plus-circle me-2"></i>Nuevo Pago</h3>
+                    <p class="mb-0 text-muted">Selecciona un tratamiento y registra el pago de forma rápida</p>
+                </div>
+                <div class="card-body p-4">
+                    <form id="pagoForm">
+                        {% csrf_token %}
+                        
+                        <!-- Paso 1: Seleccionar Tratamiento -->
+                        <div class="form-step">
+                            <label class="form-label">
+                                <i class="fas fa-stethoscope"></i>
+                                <span>1. Seleccionar Tratamiento</span>
+                            </label>
+                            <div class="row">
+                                {% for tratamiento in tratamientos %}
+                                <div class="col-md-6 mb-2">
+                                    <div class="tratamiento-card" data-tratamiento-id="{{ tratamiento.id }}" data-saldo="{{ tratamiento.saldo_pendiente|floatformat:2 }}">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h6 class="mb-1">{{ tratamiento.paciente.nombre_completo }}</h6>
+                                                <small class="text-muted">{{ tratamiento.procedimiento.nombre }}</small>
+                                                <br>
+                                                <small class="text-muted">Costo: ${{ tratamiento.costo_total|floatformat:0|intcomma }}</small>
+                                            </div>
+                                            <div class="text-end">
+                                                <span class="badge bg-warning">Saldo: ${{ tratamiento.saldo_pendiente|floatformat:0|intcomma }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <div class="col-12">
+                                    <div class="alert alert-info text-center">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        No hay tratamientos con saldo pendiente
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <input type="hidden" id="tratamiento_id" name="tratamiento_id">
+                        </div>
+
+                        <!-- Información del saldo seleccionado -->
+                        <div id="saldoInfo" class="saldo-info" style="display: none;">
+                            <h6><i class="fas fa-info-circle me-2"></i>Información del Tratamiento Seleccionado</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <small class="text-muted">Saldo Pendiente:</small>
+                                    <div class="saldo-amount" id="saldoAmount">$0</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <small class="text-muted">Monto Máximo:</small>
+                                    <div class="saldo-amount" id="montoMaximo">$0</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Paso 2: Monto del Pago -->
+                        <div class="form-step">
+                            <label for="monto" class="form-label">
+                                <i class="fas fa-dollar-sign"></i>
+                                <span>2. Monto del Pago</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="text" class="form-control" id="monto" name="monto" 
+                                       placeholder="Ingresa el monto" required>
+                            </div>
+                            <div class="form-text">El monto no puede exceder el saldo pendiente</div>
+                        </div>
+
+                        <!-- Paso 3: Forma de Pago -->
+                        <div class="form-step">
+                            <label for="forma_pago" class="form-label">
+                                <i class="fas fa-credit-card"></i>
+                                <span>3. Forma de Pago</span>
+                            </label>
+                            <select class="form-select" id="forma_pago" name="forma_pago" required>
+                                <option value="">Selecciona una forma de pago</option>
+                                {% for forma in formas_pago %}
+                                <option value="{{ forma.id }}">{{ forma.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Paso 4: Información Adicional (Opcional) -->
+                        <div class="form-step">
+                            <label for="comprobante" class="form-label">
+                                <i class="fas fa-receipt"></i>
+                                <span>4. Comprobante (Opcional)</span>
+                            </label>
+                            <input type="text" class="form-control" id="comprobante" name="comprobante" 
+                                   placeholder="Número de comprobante o referencia">
+                        </div>
+
+                        <div class="form-step">
+                            <label for="notas" class="form-label">
+                                <i class="fas fa-sticky-note"></i>
+                                <span>5. Notas (Opcional)</span>
+                            </label>
+                            <textarea class="form-control" id="notas" name="notas" rows="3" 
+                                      placeholder="Notas adicionales sobre el pago"></textarea>
+                        </div>
+
+                        <!-- Botones de Acción -->
+                        <div class="form-step">
+                            <div class="d-flex gap-3 justify-content-center">
+                                <button type="submit" class="btn btn-primary btn-lg px-4">
+                                    <i class="fas fa-save me-2"></i>Registrar Pago
+                                </button>
+                                <a href="{% url 'pagos_tratamientos:lista_pagos' %}" class="btn btn-outline-secondary btn-lg px-4">
+                                    <i class="fas fa-arrow-left me-2"></i>Volver a Pagos
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let tratamientoSeleccionado = null;
+    let saldoPendiente = 0;
+
+    // Seleccionar tratamiento
+    document.querySelectorAll('.tratamiento-card').forEach(card => {
+        card.addEventListener('click', function() {
+            // Remover selección anterior
+            document.querySelectorAll('.tratamiento-card').forEach(c => c.classList.remove('selected'));
+            
+            // Seleccionar actual
+            this.classList.add('selected');
+            
+            // Obtener datos
+            tratamientoSeleccionado = this.dataset.tratamientoId;
+            saldoPendiente = parseFloat(this.dataset.saldo);
+            
+            // Actualizar input hidden
+            document.getElementById('tratamiento_id').value = tratamientoSeleccionado;
+            
+    // Función para formatear números en formato chileno
+    function formatearNumeroChileno(numero) {
+        // Convertir a número y formatear con separadores de miles
+        const num = parseFloat(numero);
+        // Usar toLocaleString para formatear correctamente
+        return num.toLocaleString('es-CL', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2
+        });
+    }
+    
+    // Mostrar información del saldo
+    document.getElementById('saldoAmount').textContent = '$' + formatearNumeroChileno(saldoPendiente);
+    document.getElementById('montoMaximo').textContent = '$' + formatearNumeroChileno(saldoPendiente);
+    document.getElementById('saldoInfo').style.display = 'block';
+            
+            // Limpiar monto anterior
+            document.getElementById('monto').value = '';
+        });
+    });
+
+    // Formatear monto mientras se escribe
+    document.getElementById('monto').addEventListener('input', function(e) {
+        let value = e.target.value.replace(/[^\d.,]/g, '');
+        
+        // Permitir solo un punto decimal
+        let parts = value.split('.');
+        if (parts.length > 2) {
+            value = parts[0] + '.' + parts.slice(1).join('');
+        }
+        
+        if (value) {
+            // Convertir coma a punto para parseFloat
+            let numValue = value.replace(',', '.');
+            let num = parseFloat(numValue);
+            
+            if (!isNaN(num) && num > saldoPendiente) {
+                e.target.value = saldoPendiente.toString().replace('.', ',');
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Monto excedido',
+                    text: `El monto no puede exceder el saldo pendiente ($${formatearNumeroChileno(saldoPendiente)})`,
+                    timer: 3000
+                });
+            }
+        }
+    });
+
+    // Enviar formulario
+    document.getElementById('pagoForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (!tratamientoSeleccionado) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Por favor selecciona un tratamiento'
+            });
+            return;
+        }
+
+        const formData = new FormData(this);
+        
+        // Mostrar loading
+        Swal.fire({
+            title: 'Procesando pago...',
+            text: 'Por favor espera',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        fetch('{% url "pagos_tratamientos:agregar_pago_simple" %}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Pago registrado!',
+                    text: data.message,
+                    confirmButtonText: 'Ver Pagos'
+                }).then(() => {
+                    window.location.href = '{% url "pagos_tratamientos:lista_pagos" %}';
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.message
+                });
+            }
+        })
+        .catch(error => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error de conexión. Intenta nuevamente.'
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

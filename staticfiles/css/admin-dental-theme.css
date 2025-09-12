@@ -184,8 +184,8 @@ body #content .app-list a:active {
 }
 
 #changelist thead th {
-    background: var(--dental-bg-light) !important;
-    color: var(--dental-primary) !important;
+    background: #1A5276 !important;
+    color: #ffffff !important;
     font-weight: 600 !important;
     border-bottom: 1px solid var(--dental-light) !important;
     text-transform: uppercase !important;

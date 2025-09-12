@@ -1,0 +1,138 @@
+<!-- Sidebar -->
+<ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+    <!-- Sidebar - Brand -->
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{% url 'core:home' %}">
+        <div class="sidebar-brand-icon rotate-n-15">
+            <i class="fas fa-tooth"></i>
+        </div>
+        <div class="sidebar-brand-text mx-3">Sistema Dental Ver.1</div>
+    </a>
+
+    <!-- Espacio para la línea divisoria -->
+    <div style="height: 100px; display: block;"></div>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider my-0">
+
+    <!-- Nav Item - Dashboard -->
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'core:home' %}">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Dashboard</span>
+        </a>
+    </li>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider">
+
+    <!-- Nav Item - Citas -->
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'citas:lista_citas' %}">
+            <i class="fas fa-fw fa-calendar"></i>
+            <span>Calendario</span>
+        </a>
+    </li>
+
+    <!-- Nav Item - Tratamientos -->
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'tratamientos:lista' %}">
+            <i class="fas fa-fw fa-tooth"></i>
+            <span>Tratamientos</span>
+        </a>
+    </li>
+
+    <!-- Nav Item - Pacientes -->
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'pacientes:lista_pacientes' %}">
+            <i class="fas fa-fw fa-users"></i>
+            <span>Pacientes</span>
+        </a>
+    </li>
+
+    <!-- Nav Item - Profesionales -->
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'profesionales:lista_profesionales' %}">
+            <i class="fas fa-fw fa-user-md"></i>
+            <span>Profesionales</span>
+        </a>
+    </li>
+
+    <!-- Nav Item - Gestión de Pagos -->
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'pagos_tratamientos:lista_pagos' %}">
+            <i class="fas fa-money-bill-wave"></i>
+            <span>Gestión de Pagos</span>
+        </a>
+    </li>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider">
+
+    <!-- Heading -->
+    <div class="sidebar-heading">
+        Tablas del Sistema
+    </div>
+
+    <!-- Nav Item - Tablas del Sistema Menu -->
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseTablasSystem"
+            aria-expanded="true" aria-controls="collapseTablasSystem">
+            <i class="fas fa-fw fa-table"></i>
+            <span>Tablas del Sistema</span>
+        </a>
+        <div id="collapseTablasSystem" class="collapse" aria-labelledby="headingTablasSystem"
+            data-bs-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <h6 class="collapse-header">Configuraciones:</h6>
+                <a class="collapse-item" href="{% url 'formas_pago:lista_formas_pago' %}">
+                    <i class="fas fa-fw fa-credit-card mr-2"></i>Formas de Pago
+                </a>
+                <a class="collapse-item" href="{% url 'previsiones:lista_previsiones' %}">
+                    <i class="fas fa-fw fa-heartbeat mr-2"></i>Previsiones
+                </a>
+                <a class="collapse-item" href="{% url 'profesionales:lista_especialidades' %}">
+                    <i class="fas fa-fw fa-stethoscope mr-2"></i>Especialidades
+                </a>
+                <a class="collapse-item" href="{% url 'procedimientos:lista_procedimientos' %}">
+                    <i class="fas fa-fw fa-procedures mr-2"></i>Procedimientos
+                </a>
+            </div>
+        </div>
+    </li>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider">
+
+    <!-- Heading -->
+    <div class="sidebar-heading">
+        Usuario
+    </div>
+
+    <!-- Nav Item - Usuario Menu -->
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseUser"
+            aria-expanded="true" aria-controls="collapseUser">
+            <i class="fas fa-fw fa-user"></i>
+            <span>{{ request.user.username }}</span>
+            <i class="fas fa-chevron-down ms-auto"></i>
+        </a>
+        <div id="collapseUser" class="collapse" aria-labelledby="headingUser"
+            data-bs-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <h6 class="collapse-header">Opciones:</h6>
+                <a class="collapse-item" href="#">
+                    <i class="fas fa-fw fa-user-circle me-2"></i>Perfil
+                </a>
+                {% if user.is_staff %}
+                <a class="collapse-item" href="/admin/" target="_blank">
+                    <i class="fas fa-fw fa-tools me-2"></i>Administración
+                </a>
+                {% endif %}
+                <a class="collapse-item" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal">
+                    <i class="fas fa-fw fa-sign-out-alt me-2"></i>Cerrar Sesión
+                </a>
+            </div>
+        </div>
+    </li>
+</ul>
+<!-- End of Sidebar -->

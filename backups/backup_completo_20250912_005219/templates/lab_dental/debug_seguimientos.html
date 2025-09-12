@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+
+{% block title %}Debug Seguimientos - {{ trabajo }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-3">
+    <div class="mb-4">
+        <h1 class="page-title">Debug Seguimientos</h1>
+        <p class="page-description text-muted">
+            Información de debugging para el trabajo: {{ trabajo }}
+        </p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Información del Trabajo
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">ID del Trabajo</dt>
+                        <dd class="col-sm-8">{{ debug_info.trabajo_id }}</dd>
+                        
+                        <dt class="col-sm-4">Estado Actual</dt>
+                        <dd class="col-sm-8">{{ debug_info.trabajo_estado }} ({{ debug_info.trabajo_estado_display }})</dd>
+                        
+                        <dt class="col-sm-4">Seguimientos</dt>
+                        <dd class="col-sm-8">{{ debug_info.seguimientos_count }}</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-test-tube me-2"></i>Prueba de Formulario
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="estado" class="form-label">Estado</label>
+                            <select name="estado" id="estado" class="form-select" required>
+                                <option value="">Seleccionar estado...</option>
+                                <option value="PENDIENTE">Pendiente de envío</option>
+                                <option value="ENVIADO">Enviado al laboratorio</option>
+                                <option value="EN_PROCESO">En proceso</option>
+                                <option value="LISTO">Listo para recoger</option>
+                                <option value="RECIBIDO">Recibido en clínica</option>
+                                <option value="ENTREGADO">Entregado al paciente</option>
+                                <option value="CANCELADO">Cancelado</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="notas" class="form-label">Notas</label>
+                            <textarea name="notas" id="notas" class="form-control" rows="3" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Probar Formulario</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if debug_info.form_errors %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Errores del Formulario
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <pre>{{ debug_info.form_errors|pprint }}</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if debug_info.post_data %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-database me-2"></i>Datos POST
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <pre>{{ debug_info.post_data|pprint }}</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-list me-2"></i>Lista de Seguimientos
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if debug_info.seguimientos_list %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Estado</th>
+                                        <th>Notas</th>
+                                        <th>Fecha</th>
+                                        <th>Usuario</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for seguimiento in debug_info.seguimientos_list %}
+                                    <tr>
+                                        <td>{{ seguimiento.id }}</td>
+                                        <td>{{ seguimiento.estado }}</td>
+                                        <td>{{ seguimiento.notas|truncatechars:50 }}</td>
+                                        <td>{{ seguimiento.fecha_creacion|date:"d/m/Y H:i" }}</td>
+                                        <td>{{ seguimiento.creado_por__username }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No hay seguimientos registrados.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a href="{% url 'lab_dental:detalle_trabajo' trabajo.pk %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-1"></i>Volver al Detalle
+        </a>
+    </div>
+</div>
+
+<style>
+    .page-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+
+    .page-description {
+        font-size: 1.1rem;
+        color: #6c757d;
+    }
+
+    pre {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 0.375rem;
+        padding: 1rem;
+        font-size: 0.875rem;
+    }
+</style>
+{% endblock %} 
