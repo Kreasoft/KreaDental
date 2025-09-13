@@ -104,3 +104,4 @@ def anular_pago_atencion(request, pago_id):
     return render(request, 'pagos_tratamientos/anular_pago_atencion.html', context)
 
 
+

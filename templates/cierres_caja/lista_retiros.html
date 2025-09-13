@@ -1,0 +1,303 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load cierre_filters %}
+
+{% block title %}Retiros de Caja - KreaDental{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card {
+        border: 1px solid #AED6F1;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    }
+
+    .card-header {
+        background-color: #E8F4FC;
+        border-bottom: 1px solid #AED6F1;
+        border-radius: 15px 15px 0 0 !important;
+        padding: 1.5rem;
+    }
+
+    .card-header h3 {
+        color: #1A5276;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #2980b9 0%, #1f618d 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        border: none;
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-danger:hover {
+        background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+    }
+
+    .table {
+        border: 1px solid #AED6F1;
+        border-radius: 8px;
+    }
+
+    .table th {
+        background-color: #E8F4FC;
+        color: #1A5276;
+        font-weight: 600;
+        border-bottom: 1px solid #AED6F1;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 0.75rem;
+        padding: 0.75rem;
+    }
+
+    .table td {
+        color: #1A5276;
+        border-bottom: 1px solid #E8F4FC;
+        padding: 0.75rem;
+        font-size: 0.85rem;
+        vertical-align: middle;
+    }
+
+    .table tbody tr:hover {
+        background-color: #F8FCFE;
+    }
+
+    .badge {
+        padding: 0.5rem 0.8rem;
+        border-radius: 20px;
+        font-weight: 500;
+        font-size: 0.75rem;
+    }
+
+    .badge-warning {
+        background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+        color: white;
+    }
+
+    .badge-success {
+        background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        color: white;
+    }
+
+    .info-card {
+        background: linear-gradient(135deg, #E8F4FC 0%, #D1E7F5 100%);
+        border: 1px solid #AED6F1;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .info-card h5 {
+        color: #1A5276;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #D1E7F5;
+    }
+
+    .info-item:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        color: #5D6D7E;
+        font-weight: 500;
+    }
+
+    .info-value {
+        color: #1A5276;
+        font-weight: 600;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #5D6D7E;
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        color: #AED6F1;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3>
+                            <i class="fas fa-money-bill-wave me-2"></i>
+                            Retiros de Caja #{{ cierre.id }}
+                        </h3>
+                        <div class="d-flex gap-2">
+                            {% if cierre.estado == 'ABIERTO' %}
+                                <a href="{% url 'cierres_caja:registrar_retiro' cierre.id %}" class="btn btn-primary">
+                                    <i class="fas fa-plus me-1"></i>
+                                    Nuevo Retiro
+                                </a>
+                            {% endif %}
+                            <a href="{% url 'cierres_caja:detalle_cierre' cierre.id %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>
+                                Volver
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Información de la caja -->
+                <div class="col-md-4">
+                    <div class="info-card">
+                        <h5>
+                            <i class="fas fa-info-circle me-2"></i>
+                            Información de la Caja
+                        </h5>
+                        <div class="info-item">
+                            <span class="info-label">ID de Caja:</span>
+                            <span class="info-value">#{{ cierre.id }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Fecha:</span>
+                            <span class="info-value">{{ cierre.fecha|date:"d/m/Y" }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Monto Inicial:</span>
+                            <span class="info-value">${{ cierre.monto_inicial|formatear_monto_sin_decimales }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Total Retiros:</span>
+                            <span class="info-value">${{ cierre.total_retiros|formatear_monto_sin_decimales }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Estado:</span>
+                            <span class="info-value">
+                                {% if cierre.estado == 'ABIERTO' %}
+                                    <span class="badge badge-warning">Abierto</span>
+                                {% else %}
+                                    <span class="badge badge-success">Cerrado</span>
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lista de retiros -->
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-list me-2"></i>
+                                Lista de Retiros
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            {% if retiros %}
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Concepto</th>
+                                                <th>Monto</th>
+                                                <th>Comprobante</th>
+                                                <th>Fecha</th>
+                                                <th>Usuario</th>
+                                                {% if cierre.estado == 'ABIERTO' %}
+                                                    <th>Acciones</th>
+                                                {% endif %}
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for retiro in retiros %}
+                                            <tr>
+                                                <td>#{{ retiro.id }}</td>
+                                                <td>{{ retiro.concepto }}</td>
+                                                <td>${{ retiro.monto|formatear_monto_sin_decimales }}</td>
+                                                <td>
+                                                    {% if retiro.comprobante %}
+                                                        {{ retiro.comprobante }}
+                                                    {% else %}
+                                                        <span class="text-muted">-</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>{{ retiro.fecha_retiro|date:"d/m/Y H:i" }}</td>
+                                                <td>{{ retiro.usuario_retiro.get_full_name|default:retiro.usuario_retiro.username }}</td>
+                                                {% if cierre.estado == 'ABIERTO' %}
+                                                    <td>
+                                                        <a href="{% url 'cierres_caja:eliminar_retiro' retiro.id %}" 
+                                                           class="btn btn-danger btn-sm"
+                                                           onclick="return confirm('¿Estás seguro de que quieres eliminar este retiro?')">
+                                                            <i class="fas fa-trash"></i>
+                                                        </a>
+                                                    </td>
+                                                {% endif %}
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                        <tfoot>
+                                            <tr style="background-color: #E8F4FC; font-weight: 600;">
+                                                <td colspan="2">Total Retiros:</td>
+                                                <td>${{ cierre.total_retiros|formatear_monto_sin_decimales }}</td>
+                                                <td colspan="{% if cierre.estado == 'ABIERTO' %}4{% else %}3{% endif %}"></td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="empty-state">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    <h5>No hay retiros registrados</h5>
+                                    <p>No se han registrado retiros para esta caja.</p>
+                                    {% if cierre.estado == 'ABIERTO' %}
+                                        <a href="{% url 'cierres_caja:registrar_retiro' cierre.id %}" class="btn btn-primary">
+                                            <i class="fas fa-plus me-1"></i>
+                                            Registrar Primer Retiro
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

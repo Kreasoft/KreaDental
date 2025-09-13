@@ -720,3 +720,4 @@ def estado_cuenta_paciente(request, paciente_id):
     
     return render(request, 'pagos_tratamientos/estado_cuenta_paciente.html', context)
 
+

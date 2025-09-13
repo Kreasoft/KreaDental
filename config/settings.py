@@ -308,3 +308,13 @@ JAZZMIN_UI_TWEAKS = {
         "success": "btn-success"
     }
 }
+
+# Configuración de localización para separadores de miles
+USE_L10N = True
+USE_THOUSAND_SEPARATOR = True
+THOUSAND_SEPARATOR = '.'
+NUMBER_GROUPING = 3
+
+# Configuración de impresora
+PRINTER_TYPE = 'THERMAL'  # 'THERMAL' o 'LASER'
+THERMAL_PRINTER_WIDTH = 80  # Ancho en caracteres para impresora térmica

@@ -284,6 +284,43 @@ Análisis detallado de ingresos, pagos y rendimiento financiero del período sel
             <i class="fas fa-clock dental-stats-icon"></i>
         </div>
     </div>
+</div>
+
+<!-- Desglose de Pagos -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="dental-card">
+            <div class="dental-header">
+                <h4 class="dental-title">
+                    <i class="fas fa-chart-pie me-2"></i>
+                    Desglose de Pagos
+                </h4>
+            </div>
+            <div class="row">
+                <div class="col-xl-4 col-md-6 mb-3">
+                    <div class="dental-stats-card" style="background: linear-gradient(135deg, #a8e6cf, #7fcdcd); color: #2c3e50; font-family: 'Poppins', sans-serif;">
+                        <div class="dental-stats-number" style="font-size: 1.8rem; font-weight: 600;">${{ total_pagado_tratamientos|default:0|floatformat:0|intcomma }}</div>
+                        <div class="dental-stats-label" style="font-size: 0.85rem; font-weight: 500; opacity: 0.8;">Pagos Tratamientos</div>
+                        <i class="fas fa-tooth dental-stats-icon" style="opacity: 0.3;"></i>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-md-6 mb-3">
+                    <div class="dental-stats-card" style="background: linear-gradient(135deg, #ffb3ba, #ffdfba); color: #2c3e50; font-family: 'Poppins', sans-serif;">
+                        <div class="dental-stats-number" style="font-size: 1.8rem; font-weight: 600;">${{ total_pagado_atenciones|default:0|floatformat:0|intcomma }}</div>
+                        <div class="dental-stats-label" style="font-size: 0.85rem; font-weight: 500; opacity: 0.8;">Pagos Atenciones</div>
+                        <i class="fas fa-user-md dental-stats-icon" style="opacity: 0.3;"></i>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-md-6 mb-3">
+                    <div class="dental-stats-card" style="background: linear-gradient(135deg, #bae1ff, #c7ceea); color: #2c3e50; font-family: 'Poppins', sans-serif;">
+                        <div class="dental-stats-number" style="font-size: 1.8rem; font-weight: 600;">${{ total_pagado_rapidos|default:0|floatformat:0|intcomma }}</div>
+                        <div class="dental-stats-label" style="font-size: 0.85rem; font-weight: 500; opacity: 0.8;">Pagos Rápidos</div>
+                        <i class="fas fa-bolt dental-stats-icon" style="opacity: 0.3;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="col-xl-3 col-md-6 mb-3">
         <div class="dental-stats-card dental-card-tratamientos">
             <div class="dental-stats-number">{{ num_tratamientos|default:0 }}</div>
@@ -332,7 +369,14 @@ Análisis detallado de ingresos, pagos y rendimiento financiero del período sel
                     <td><strong>{{ prof.profesional__nombres }} {{ prof.profesional__apellido_paterno }}</strong></td>
                     <td><span class="badge bg-primary">{{ prof.num_tratamientos }}</span></td>
                     <td><strong>${{ prof.total|floatformat:0|intcomma }}</strong></td>
-                    <td>${{ prof.promedio|floatformat:0|intcomma }}</td>
+                    <td>
+                        {% if prof.num_tratamientos > 0 %}
+                            {% widthratio prof.total prof.num_tratamientos 1 as promedio %}
+                            ${{ promedio|floatformat:0|intcomma }}
+                        {% else %}
+                            $0
+                        {% endif %}
+                    </td>
                 </tr>
                 {% empty %}
                 <tr>

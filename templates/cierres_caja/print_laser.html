@@ -1,0 +1,323 @@
+{% load cierre_filters %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>CIERRE DE CAJA - {{ cierre.fecha|date:"d/m/Y" }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 1cm;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            line-height: 1.4;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #1A5276;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1A5276;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .date-info {
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .section {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .section-title {
+            font-weight: bold;
+            font-size: 14px;
+            color: #1A5276;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #1A5276;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            padding: 3px 0;
+        }
+        
+        .info-row.total {
+            border-top: 2px solid #1A5276;
+            padding-top: 8px;
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .info-row.grand-total {
+            border-top: 3px solid #1A5276;
+            padding-top: 10px;
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 16px;
+            background: #e8f4fc;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        .label {
+            font-weight: 500;
+        }
+        
+        .value {
+            font-weight: bold;
+            color: #1A5276;
+        }
+        
+        .payments-section {
+            margin-top: 20px;
+        }
+        
+        .payments-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        
+        .payments-table th,
+        .payments-table td {
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .payments-table th {
+            background: #1A5276;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .payments-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 10px;
+            color: #666;
+            border-top: 1px solid #dee2e6;
+            padding-top: 15px;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .summary-card {
+            background: #e8f4fc;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #1A5276;
+        }
+        
+        .summary-card h4 {
+            margin: 0 0 5px 0;
+            color: #1A5276;
+            font-size: 18px;
+        }
+        
+        .summary-card p {
+            margin: 0;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="title">KREA DENTAL</div>
+        <div class="subtitle">REPORTE DE CIERRE DE CAJA</div>
+        <div class="date-info">{{ cierre.fecha|date:"d/m/Y" }} - {{ cierre.hora_cierre|time:"H:i" }}</div>
+    </div>
+    
+    <div class="content">
+        <div class="section">
+            <div class="section-title">INFORMACIÓN GENERAL</div>
+            <div class="info-row">
+                <span class="label">Número de Caja:</span>
+                <span class="value">#{{ cierre.id }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Hora de Apertura:</span>
+                <span class="value">{{ cierre.hora_apertura|time:"H:i" }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Hora de Cierre:</span>
+                <span class="value">{{ cierre.hora_cierre|time:"H:i" }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Usuario:</span>
+                <span class="value">{{ cierre.usuario_apertura.get_full_name|default:cierre.usuario_apertura.username }}</span>
+            </div>
+        </div>
+        
+        {% if cierre.retiros.all %}
+        <div class="section">
+            <div class="section-title">RETIROS DE CAJA</div>
+            {% for retiro in cierre.retiros.all %}
+            <div class="info-row">
+                <span class="label">{{ retiro.concepto }}:</span>
+                <span class="value">${{ retiro.monto|formatear_monto_sin_decimales }}</span>
+            </div>
+            {% if retiro.comprobante %}
+            <div class="info-row small">
+                <span class="label">Comprobante:</span>
+                <span class="value">{{ retiro.comprobante }}</span>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <div class="section">
+            <div class="section-title">RESUMEN FINANCIERO</div>
+            <div class="info-row">
+                <span class="label">Monto Inicial:</span>
+                <span class="value">${{ cierre.monto_inicial|formatear_monto_sin_decimales }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Total Sistema:</span>
+                <span class="value">${{ total_sistema|formatear_monto_sin_decimales }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Total Retiros:</span>
+                <span class="value">${{ cierre.total_retiros|formatear_monto_sin_decimales }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Monto Final:</span>
+                <span class="value">${{ cierre.monto_final|formatear_monto_sin_decimales }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Diferencia:</span>
+                <span class="value">${{ cierre.diferencia|formatear_monto_sin_decimales }}</span>
+            </div>
+            <div class="info-row highlight">
+                <span class="label">Saldo Final:</span>
+                <span class="value">${{ cierre.saldo_final|formatear_monto_sin_decimales }}</span>
+            </div>
+            <div class="info-row total">
+                <span class="label">SALDO FINAL:</span>
+                <span class="value">${{ cierre.saldo_final|formatear_monto_sin_decimales }}</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="summary-grid">
+        <div class="summary-card">
+            <h4>${{ total_efectivo|formatear_monto_sin_decimales }}</h4>
+            <p>EFECTIVO</p>
+        </div>
+        <div class="summary-card">
+            <h4>${{ total_tarjeta|formatear_monto_sin_decimales }}</h4>
+            <p>TARJETA</p>
+        </div>
+        <div class="summary-card">
+            <h4>${{ total_transferencia|formatear_monto_sin_decimales }}</h4>
+            <p>TRANSFERENCIA</p>
+        </div>
+    </div>
+    
+    {% if pagos_tratamientos or pagos_atenciones or pagos_rapidos %}
+    <div class="payments-section">
+        <div class="section-title">DETALLE DE PAGOS</div>
+        <table class="payments-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Paciente</th>
+                    <th>Tipo</th>
+                    <th>Forma de Pago</th>
+                    <th>Monto</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pago in pagos_tratamientos %}
+                <tr>
+                    <td>T-{{ pago.id }}</td>
+                    <td>{{ pago.tratamiento.paciente.nombre_completo }}</td>
+                    <td>Tratamiento</td>
+                    <td>{{ pago.metodo_pago }}</td>
+                    <td>${{ pago.monto|formatear_monto_sin_decimales }}</td>
+                </tr>
+                {% endfor %}
+                
+                {% for pago in pagos_atenciones %}
+                <tr>
+                    <td>A-{{ pago.id }}</td>
+                    <td>{{ pago.cita.paciente.nombre_completo }}</td>
+                    <td>Atención</td>
+                    <td>{{ pago.metodo_pago }}</td>
+                    <td>${{ pago.monto|formatear_monto_sin_decimales }}</td>
+                </tr>
+                {% endfor %}
+                
+                {% for pago in pagos_rapidos %}
+                <tr>
+                    <td>R-{{ pago.id }}</td>
+                    <td>{{ pago.tratamiento.paciente.nombre_completo }}</td>
+                    <td>Rápido</td>
+                    <td>{{ pago.metodo_pago }}</td>
+                    <td>${{ pago.monto|formatear_monto_sin_decimales }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+    
+    <div class="footer">
+        <div>Reporte generado el {% now "d/m/Y H:i" %}</div>
+        <div>KreaDental Cloud v1.0 - Sistema de Gestión Dental</div>
+    </div>
+    
+    <script>
+        // Auto-imprimir al cargar
+        window.onload = function() {
+            window.print();
+        }
+    </script>
+</body>
+</html>

@@ -1,33 +1,208 @@
 {% extends 'base.html' %}
+{% load static %}
 {% load humanize %}
+{% load cierre_filters %}
 
-{% block title %}{{ accion }} Caja{% endblock %}
+{% block title %}{{ accion }} Caja - KreaDental{% endblock %}
 
 {% block extra_css %}
+<style>
+    .card {
+        border: 1px solid #AED6F1;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    }
+
+    .card-header {
+        background-color: #E8F4FC;
+        border-bottom: 1px solid #AED6F1;
+        border-radius: 15px 15px 0 0 !important;
+        padding: 1.5rem;
+    }
+
+    .card-header h3 {
+        color: #1A5276;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #2980b9 0%, #1f618d 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+    }
+
+    .btn-secondary {
+        background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+        background: linear-gradient(135deg, #7f8c8d 0%, #6c7b7d 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(149, 165, 166, 0.3);
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-success:hover {
+        background: linear-gradient(135deg, #229954 0%, #1e8449 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+    }
+
+    .form-control {
+        border: 1px solid #AED6F1;
+        border-radius: 8px;
+        padding: 0.75rem;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        background-color: #fff;
+    }
+
+    .form-control:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        background-color: #fff;
+    }
+
+    .form-select {
+        border: 1px solid #AED6F1;
+        border-radius: 8px;
+        padding: 0.75rem;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        background-color: #fff;
+    }
+
+    .form-select:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    }
+
+    .form-label {
+        color: #1A5276;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .input-group-text {
+        background-color: #E8F4FC;
+        border: 1px solid #AED6F1;
+        color: #1A5276;
+        font-weight: 600;
+    }
+
+    .section-title {
+        color: #1A5276;
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #E8F4FC;
+    }
+
+    .alert {
+        border-radius: 8px;
+        border: none;
+        padding: 1rem;
+    }
+
+    .alert-danger {
+        background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+        color: #721c24;
+    }
+
+    .invalid-feedback {
+        color: #e74c3c;
+        font-size: 0.8rem;
+        margin-top: 0.25rem;
+    }
+
+    .table {
+        border: 1px solid #AED6F1;
+        border-radius: 8px;
+    }
+
+    .table th {
+        background-color: #E8F4FC;
+        color: #1A5276;
+        font-weight: 600;
+        border-bottom: 1px solid #AED6F1;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 0.75rem;
+        padding: 0.75rem;
+    }
+
+    .table td {
+        color: #1A5276;
+        border-bottom: 1px solid #E8F4FC;
+        padding: 0.75rem;
+        font-size: 0.85rem;
+        vertical-align: middle;
+    }
+
+    .table tbody tr:hover {
+        background-color: #F8FCFE;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
 <div class="container-fluid">
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <!-- Header de la página -->
+            <!-- Header -->
             <div class="card mb-4">
-                <div class="card-header bg-primary text-white">
+                <div class="card-header">
                     <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h4 class="mb-0">
-                                <i class="fas fa-cash-register me-2"></i>
-                                {{ accion }} Caja
-                            </h4>
-                            <small class="opacity-75">
-                                {% if accion == 'Crear' %}
-                                    Crear nuevo cierre de caja
-                                {% else %}
-                                    Editar cierre de caja existente
-                                {% endif %}
-                            </small>
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <i class="fas fa-cash-register" style="font-size: 3rem; color: #1A5276;"></i>
+                            </div>
+                            <div>
+                                <h3 class="mb-1">
+                        {{ accion }} Caja
+                        </h3>
+                                <p class="mb-0 text-muted" style="font-size: 0.95rem;">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    {% if accion == 'Abrir' %}
+                                        Inicia el control de caja diario registrando el monto inicial con el que comienzas a trabajar.
+                                    {% else %}
+                                        Finaliza el control de caja registrando el monto real que tienes y calculando las diferencias del día.
+                                    {% endif %}
+                                </p>
+                            </div>
                         </div>
-                        <a href="{% url 'cierres_caja:lista' %}" class="btn btn-light">
+                        <a href="{% url 'cierres_caja:lista_cierres' %}" class="btn btn-secondary">
                             <i class="fas fa-arrow-left me-1"></i>
                             Volver
                         </a>
@@ -38,100 +213,283 @@
             <!-- Formulario -->
             <div class="card">
                 <div class="card-body">
-                    <form method="post">
+                    <form method="post" id="cierre-form">
                         {% csrf_token %}
-                        
+
                         <!-- Información básica -->
-                        <div class="row mb-4">
-                            <div class="col-12">
-                                <h5 class="text-primary mb-3">
+                        <div class="mb-4">
+                            <h5 class="section-title">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Información del Cierre
+                            </h5>
+                        </div>
+
+                        <!-- Campo monto inicial solo para apertura -->
+                        {% if accion == 'Abrir' %}
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="{{ form.monto_inicial.id_for_label }}" class="form-label">Monto Inicial *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    {{ form.monto_inicial }}
+                                </div>
+                                {% if form.monto_inicial.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.monto_inicial.errors|join:", " }}</div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Ingresa el monto inicial con el que abres la caja (ej: 50.000)
+                                </small>
+                            </div>
+                                </div>
+                        {% endif %}
+
+                        <!-- Información de la caja abierta (solo para cerrar caja) -->
+                        {% if accion == 'Cerrar' %}
+                        <div class="mb-4">
+                            <h5 class="section-title">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Información de la Caja Abierta
+                            </h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="alert alert-info">
+                                        <strong>Monto Inicial:</strong> $<span id="monto-inicial-display">{{ cierre.monto_inicial|floatformat:0 }}</span>
+                                        <br><small class="text-muted">Caja abierta el {{ cierre.fecha|date:"d/m/Y" }} a las {{ cierre.hora_apertura|time:"H:i" }}</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="alert alert-success">
+                                        <strong>Total Sistema:</strong> $<span id="total-sistema-display">{{ total_sistema|floatformat:0 }}</span>
+                                        <br><small class="text-muted">Ingresos registrados en el sistema</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Resumen de pagos del día (solo para cerrar caja) -->
+                        <div class="mb-4">
+                            <h5 class="section-title">
+                                <i class="fas fa-receipt me-2"></i>
+                                Resumen de Pagos del Día - {{ cierre.fecha|date:"d/m/Y" }}
+                            </h5>
+                            
+                            {% if pagos_dia %}
+                                <div class="alert alert-info mb-3">
                                     <i class="fas fa-info-circle me-2"></i>
-                                    Información del Cierre
-                                </h5>
+                                    Se encontraron <strong>{{ pagos_tratamientos.count|add:pagos_atenciones.count|add:pagos_rapidos.count }}</strong> pagos completados para esta fecha:
+                                    <ul class="mb-0 mt-2">
+                                        <li><strong>{{ pagos_tratamientos.count }}</strong> pagos de tratamientos</li>
+                                        <li><strong>{{ pagos_atenciones.count }}</strong> pagos de atenciones</li>
+                                        <li><strong>{{ pagos_rapidos.count }}</strong> pagos rápidos</li>
+                                    </ul>
                             </div>
+
+                                <div class="table-responsive">
+                                    <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Forma de Pago</th>
+                                                <th>Cantidad</th>
+                                                <th>Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                            {% for resumen in resumen_pagos %}
+                                            <tr>
+                                                <td>
+                                                    <i class="fas fa-credit-card me-1"></i>
+                                                    {{ resumen.forma_pago__nombre }}
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-primary">{{ resumen.cantidad }}</span>
+                                                </td>
+                                                <td>
+                                                    <strong>${{ resumen.total|formatear_monto_sin_decimales }}</strong>
+                                                </td>
+                                        </tr>
+                                        {% empty %}
+                                        <tr>
+                                                <td colspan="3" class="text-center text-muted">
+                                                    <i class="fas fa-inbox me-2"></i>
+                                                    No hay pagos registrados para esta fecha
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                        <tfoot>
+                                            <tr style="background-color: #E8F4FC; font-weight: 600;">
+                                                <td colspan="2">
+                                                    <i class="fas fa-calculator me-1"></i>
+                                                    Total Sistema:
+                                                </td>
+                                                <td>
+                                                    <strong>${{ total_sistema|formatear_monto_sin_decimales }}</strong>
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+                                </table>
+                            </div>
+                            {% else %}
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    No se encontraron pagos completados para la fecha <strong>{{ cierre.fecha|date:"d/m/Y" }}</strong>.
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Lista detallada de pagos (opcional, colapsable) -->
+                            {% if pagos_dia %}
+                            <div class="mt-3">
+                                <button class="btn btn-outline-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#detallePagos" aria-expanded="false">
+                                    <i class="fas fa-list me-1"></i>
+                                    Ver Detalle de Pagos ({{ pagos_tratamientos.count|add:pagos_atenciones.count|add:pagos_rapidos.count }})
+                                </button>
+                                
+                                <div class="collapse mt-3" id="detallePagos">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h6 class="card-title">
+                                                <i class="fas fa-list-alt me-2"></i>
+                                                Detalle de Pagos Individuales
+                                            </h6>
+                                            <div class="table-responsive">
+                                                <table class="table table-sm">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>ID</th>
+                                                            <th>Paciente</th>
+                                                            <th>Tratamiento</th>
+                                                            <th>Forma Pago</th>
+                                                            <th>Monto</th>
+                                                            <th>Hora</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for pago in pagos_tratamientos %}
+                                                        <tr>
+                                                            <td>#{{ pago.id }}</td>
+                                                            <td>{{ pago.tratamiento.paciente.nombre }} {{ pago.tratamiento.paciente.apellido }}</td>
+                                                            <td>{{ pago.tratamiento.nombre|truncatechars:30 }}</td>
+                                                            <td>
+                                                                <span class="badge bg-primary">{{ pago.forma_pago.nombre }}</span>
+                                                                <small class="text-muted d-block">Tratamiento</small>
+                                                            </td>
+                                                            <td>${{ pago.monto|formatear_monto_sin_decimales }}</td>
+                                                            <td>{{ pago.fecha_pago|time:"H:i" }}</td>
+                                                        </tr>
+                                                        {% endfor %}
+                                                        
+                                                        {% for pago in pagos_atenciones %}
+                                                        <tr>
+                                                            <td>#{{ pago.id }}</td>
+                                                            <td>{{ pago.cita.paciente.nombre }} {{ pago.cita.paciente.apellido }}</td>
+                                                            <td>{{ pago.cita.procedimiento.nombre|truncatechars:30 }}</td>
+                                                            <td>
+                                                                <span class="badge bg-success">{{ pago.forma_pago.nombre }}</span>
+                                                                <small class="text-muted d-block">Atención</small>
+                                                            </td>
+                                                            <td>${{ pago.monto|formatear_monto_sin_decimales }}</td>
+                                                            <td>{{ pago.fecha_pago|time:"H:i" }}</td>
+                                                        </tr>
+                                                        {% endfor %}
+                                                        
+                                                        {% for pago in pagos_rapidos %}
+                                                        <tr>
+                                                            <td>#{{ pago.id }}</td>
+                                                            <td>{{ pago.tratamiento.paciente.nombre }} {{ pago.tratamiento.paciente.apellido }}</td>
+                                                            <td>{{ pago.tratamiento.nombre|truncatechars:30 }}</td>
+                                                            <td>
+                                                                <span class="badge bg-warning">{{ pago.metodo_pago }}</span>
+                                                                <small class="text-muted d-block">Rápido</small>
+                                                            </td>
+                                                            <td>${{ pago.monto|formatear_monto_sin_decimales }}</td>
+                                                            <td>{{ pago.fecha|time:"H:i" }}</td>
+                                                        </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
                         </div>
+                        {% endif %}
+
+                        <!-- Montos de cierre -->
+                        {% if accion == 'Cerrar' %}
+                        <div class="mb-4">
+                            <h5 class="section-title">
+                                <i class="fas fa-dollar-sign me-2"></i>
+                                Montos de Cierre
+                            </h5>
+                            </div>
 
                         <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.fecha.id_for_label }}" class="form-label">Fecha *</label>
-                                {{ form.fecha }}
-                                {% if form.fecha.errors %}
-                                    <div class="invalid-feedback d-block">{{ form.fecha.errors|join:", " }}</div>
-                                {% endif %}
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.estado.id_for_label }}" class="form-label">Estado *</label>
-                                {{ form.estado }}
-                                {% if form.estado.errors %}
-                                    <div class="invalid-feedback d-block">{{ form.estado.errors|join:", " }}</div>
-                                {% endif %}
-                            </div>
-                        </div>
-
-                        <!-- Montos -->
-                        <div class="row mb-4">
-                            <div class="col-12">
-                                <h5 class="text-primary mb-3">
-                                    <i class="fas fa-dollar-sign me-2"></i>
-                                    Montos
-                                </h5>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label for="{{ form.total_ingresos.id_for_label }}" class="form-label">Total Ingresos *</label>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Monto Inicial</label>
                                 <div class="input-group">
                                     <span class="input-group-text">$</span>
-                                    {{ form.total_ingresos }}
+                                    <input type="text" class="form-control" value="{{ cierre.monto_inicial|floatformat:0 }}" readonly id="monto-inicial-field">
                                 </div>
-                                {% if form.total_ingresos.errors %}
-                                    <div class="invalid-feedback d-block">{{ form.total_ingresos.errors|join:", " }}</div>
-                                {% endif %}
+                                <small class="form-text text-muted">
+                                    Monto con el que se abrió la caja
+                                </small>
                             </div>
 
-                            <div class="col-md-4 mb-3">
-                                <label for="{{ form.total_egresos.id_for_label }}" class="form-label">Total Egresos *</label>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Total Sistema</label>
                                 <div class="input-group">
                                     <span class="input-group-text">$</span>
-                                    {{ form.total_egresos }}
+                                    <input type="text" class="form-control" value="{{ total_sistema|floatformat:0 }}" readonly id="total-sistema-field">
                                 </div>
-                                {% if form.total_egresos.errors %}
-                                    <div class="invalid-feedback d-block">{{ form.total_egresos.errors|join:", " }}</div>
-                                {% endif %}
+                                <small class="form-text text-muted">
+                                    Total de ingresos del día
+                                </small>
                             </div>
 
-                            <div class="col-md-4 mb-3">
-                                <label for="{{ form.saldo_final.id_for_label }}" class="form-label">Saldo Final *</label>
+                            <div class="col-md-3 mb-3">
+                                <label for="{{ form.monto_final.id_for_label }}" class="form-label">Monto Final *</label>
                                 <div class="input-group">
                                     <span class="input-group-text">$</span>
-                                    {{ form.saldo_final }}
+                                    {{ form.monto_final }}
                                 </div>
-                                {% if form.saldo_final.errors %}
-                                    <div class="invalid-feedback d-block">{{ form.saldo_final.errors|join:", " }}</div>
+                                {% if form.monto_final.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.monto_final.errors|join:", " }}</div>
                                 {% endif %}
+                                <small class="form-text text-muted">
+                                    Monto real que tienes en caja
+                                </small>
                             </div>
-                        </div>
+
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Diferencia</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="text" class="form-control" value="{{ cierre.diferencia|floatformat:2 }}" readonly>
+                                </div>
+                                <small class="form-text text-muted">
+                                    Diferencia = Monto Final - (Monto Inicial + Total Sistema)
+                                </small>
+                            </div>
+                            </div>
+                        {% endif %}
 
                         <!-- Observaciones -->
-                        <div class="row mb-4">
-                            <div class="col-12">
-                                <h5 class="text-primary mb-3">
-                                    <i class="fas fa-comment-alt me-2"></i>
-                                    Observaciones
-                                </h5>
-                            </div>
+                        <div class="mb-4">
+                            <h5 class="section-title">
+                                <i class="fas fa-comment-alt me-2"></i>
+                                Observaciones
+                            </h5>
                         </div>
 
-                        <div class="row">
-                            <div class="col-12 mb-3">
-                                <label for="{{ form.observaciones.id_for_label }}" class="form-label">Observaciones</label>
-                                {{ form.observaciones }}
-                                {% if form.observaciones.errors %}
-                                    <div class="invalid-feedback d-block">{{ form.observaciones.errors|join:", " }}</div>
-                                {% endif %}
-                            </div>
+                        <div class="mb-3">
+                            <label for="{{ form.observaciones.id_for_label }}" class="form-label">Observaciones</label>
+                            {{ form.observaciones }}
+                            {% if form.observaciones.errors %}
+                                <div class="invalid-feedback d-block">{{ form.observaciones.errors|join:", " }}</div>
+                            {% endif %}
                         </div>
 
                         <!-- Errores generales del formulario -->
@@ -143,23 +501,19 @@
                         {% endif %}
 
                         <!-- Botones de acción -->
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="d-flex justify-content-end gap-2">
-                                    <a href="{% url 'cierres_caja:lista' %}" class="btn btn-secondary">
-                                        <i class="fas fa-times me-1"></i>
-                                        Cancelar
-                                    </a>
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-save me-1"></i>
-                                        {% if accion == 'Crear' %}
-                                            Crear Cierre
-                                        {% else %}
-                                            Actualizar Cierre
-                                        {% endif %}
-                                    </button>
-                                </div>
-                            </div>
+                        <div class="d-flex justify-content-end gap-3">
+                            <a href="{% url 'cierres_caja:lista_cierres' %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-1"></i>
+                                Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-{% if accion == 'Abrir' %}primary{% else %}success{% endif %}" id="btn-submit">
+                                <i class="fas fa-save me-1"></i>
+                                {% if accion == 'Abrir' %}
+                                    Abrir Caja
+                                {% else %}
+                                    Cerrar Caja
+                                {% endif %}
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -171,47 +525,144 @@
 
 {% block extra_js %}
 <script>
+// JavaScript para formateo de números y manejo de formularios
+
+// Función para formatear con separadores de miles (puntos)
+function formatearConSeparadores(input) {
+    let valor = input.value.replace(/[^\d]/g, '');
+    if (valor && valor !== '0') {
+        // Formatear con puntos como separadores de miles
+        let numero = parseInt(valor);
+        if (!isNaN(numero)) {
+            input.value = numero.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+    } else if (valor === '0') {
+        input.value = '0';
+    } else {
+        input.value = '';
+    }
+}
+
+// Función para limpiar los montos (solo números)
+function limpiarMontos() {
+    const campoInicial = document.getElementById('id_monto_inicial');
+    const campoFinal = document.getElementById('id_monto_final');
+    
+    if (campoInicial) {
+        let valor = campoInicial.value.replace(/[^\d]/g, '');
+        campoInicial.value = valor;
+    }
+    
+    if (campoFinal) {
+        let valor = campoFinal.value.replace(/[^\d]/g, '');
+        campoFinal.value = valor;
+    }
+}
+
+// Función para enviar el formulario
+function enviarFormulario() {
+    limpiarMontos();
+    
+    const form = document.getElementById('cierre-form');
+    if (form) {
+        form.submit();
+    }
+}
+
+// Función para formatear números con puntos
+function formatearNumeroConPuntos(numero) {
+    if (!numero || numero === '' || numero === '0') {
+        return '0';
+    }
+    // Limpiar el número primero
+    let numeroLimpio = numero.toString().replace(/[^\d]/g, '');
+    if (!numeroLimpio) {
+        return '0';
+    }
+    return numeroLimpio.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
+// Cuando la página esté lista
 document.addEventListener('DOMContentLoaded', function() {
-    // Auto-calcular saldo final cuando cambien los ingresos o egresos
-    const totalIngresos = document.getElementById('id_total_ingresos');
-    const totalEgresos = document.getElementById('id_total_egresos');
-    const saldoFinal = document.getElementById('id_saldo_final');
-
-    function calcularSaldo() {
-        const ingresos = parseFloat(totalIngresos.value) || 0;
-        const egresos = parseFloat(totalEgresos.value) || 0;
-        const saldo = ingresos - egresos;
-        saldoFinal.value = saldo.toFixed(2);
+    // Formatear números de solo lectura específicos
+    const montoInicialDisplay = document.getElementById('monto-inicial-display');
+    const totalSistemaDisplay = document.getElementById('total-sistema-display');
+    const montoInicialField = document.getElementById('monto-inicial-field');
+    const totalSistemaField = document.getElementById('total-sistema-field');
+    
+    if (montoInicialDisplay) {
+        montoInicialDisplay.textContent = formatearNumeroConPuntos(montoInicialDisplay.textContent);
     }
-
-    if (totalIngresos && totalEgresos && saldoFinal) {
-        totalIngresos.addEventListener('input', calcularSaldo);
-        totalEgresos.addEventListener('input', calcularSaldo);
+    if (totalSistemaDisplay) {
+        totalSistemaDisplay.textContent = formatearNumeroConPuntos(totalSistemaDisplay.textContent);
     }
-
-    // Formatear números con separadores de miles
-    function formatearNumero(input) {
-        let valor = input.value.replace(/[^\d.]/g, '');
-        if (valor) {
-            let numero = parseFloat(valor);
-            if (!isNaN(numero)) {
-                input.value = numero.toLocaleString('es-CL');
+    if (montoInicialField) {
+        montoInicialField.value = formatearNumeroConPuntos(montoInicialField.value);
+    }
+    if (totalSistemaField) {
+        totalSistemaField.value = formatearNumeroConPuntos(totalSistemaField.value);
+    }
+    
+    // Configurar formateo automático para campos de monto
+    const campoInicial = document.getElementById('id_monto_inicial');
+    const campoFinal = document.getElementById('id_monto_final');
+    
+    if (campoInicial) {
+        // Formatear valor inicial si existe
+        if (campoInicial.value) {
+            formatearConSeparadores(campoInicial);
+        }
+        
+        campoInicial.addEventListener('blur', function() {
+            formatearConSeparadores(this);
+        });
+        campoInicial.addEventListener('focus', function() {
+            this.value = this.value.replace(/[^\d]/g, '');
+        });
+        campoInicial.addEventListener('input', function() {
+            // Formatear mientras se escribe (opcional)
+            if (this.value.length > 3) {
+                formatearConSeparadores(this);
             }
-        }
+        });
     }
-
-    // Aplicar formateo a los campos numéricos
-    const camposNumericos = [totalIngresos, totalEgresos, saldoFinal];
-    camposNumericos.forEach(campo => {
-        if (campo) {
-            campo.addEventListener('blur', function() {
-                formatearNumero(this);
-            });
-            campo.addEventListener('focus', function() {
-                this.value = this.value.replace(/[^\d.]/g, '');
-            });
+    
+    if (campoFinal) {
+        // Formatear valor inicial si existe
+        if (campoFinal.value) {
+            formatearConSeparadores(campoFinal);
         }
-    });
+        
+        campoFinal.addEventListener('blur', function() {
+            formatearConSeparadores(this);
+        });
+        campoFinal.addEventListener('focus', function() {
+            this.value = this.value.replace(/[^\d]/g, '');
+        });
+        campoFinal.addEventListener('input', function() {
+            // Formatear mientras se escribe (opcional)
+            if (this.value.length > 3) {
+                formatearConSeparadores(this);
+            }
+        });
+    }
+    
+    // Buscar el botón de envío
+    const boton = document.querySelector('button[type="submit"]');
+    if (boton) {
+        boton.addEventListener('click', function(e) {
+            e.preventDefault();
+            enviarFormulario();
+        });
+    }
+    
+    // También agregar listener al formulario
+    const form = document.getElementById('cierre-form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            limpiarMontos();
+        });
+    }
 });
 </script>
 {% endblock %}
