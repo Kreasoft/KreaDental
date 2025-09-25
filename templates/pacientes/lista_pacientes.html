@@ -169,28 +169,28 @@
 {% block content %}
 <div class="container-fluid">
     <div class="row justify-content-center">
-        <div class="col-lg-10">
+        <div class="col-lg-12">
             <!-- Estadísticas -->
             <div class="row mb-4">
-                <div class="col-md-3">
+                <div class="col-lg-3 col-md-6 mb-3">
                     <div class="stats-card">
                         <h4><i class="fas fa-users me-2"></i>Total</h4>
                         <div class="stat-number">{{ total_pacientes }}</div>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-lg-3 col-md-6 mb-3">
                     <div class="stats-card">
                         <h4><i class="fas fa-check-circle me-2"></i>Activos</h4>
                         <div class="stat-number">{{ pacientes_activos }}</div>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-lg-3 col-md-6 mb-3">
                     <div class="stats-card">
                         <h4><i class="fas fa-home me-2"></i>Propios</h4>
                         <div class="stat-number">{{ pacientes_propios }}</div>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-lg-3 col-md-6 mb-3">
                     <div class="stats-card">
                         <h4><i class="fas fa-share-alt me-2"></i>Compartidos</h4>
                         <div class="stat-number">{{ pacientes_compartidos }}</div>
@@ -227,15 +227,15 @@
                         <table class="table table-sm">
                             <thead>
                                 <tr>
-                                    <th>RUT</th>
-                                    <th>Nombre</th>
-                                    <th>Email</th>
-                                    <th>Teléfono</th>
-                                    <th>Comuna</th>
-                                    <th>Ciudad</th>
-                                    <th>Estado</th>
-                                    <th>Origen</th>
-                                    <th class="text-center">Acciones</th>
+                                    <th style="width: 10%;">RUT</th>
+                                    <th style="width: 20%;">Nombre</th>
+                                    <th style="width: 15%;">Email</th>
+                                    <th style="width: 10%;">Teléfono</th>
+                                    <th style="width: 10%;">Comuna</th>
+                                    <th style="width: 10%;">Ciudad</th>
+                                    <th style="width: 8%;">Estado</th>
+                                    <th style="width: 10%;">Origen</th>
+                                    <th style="width: 7%;" class="text-center">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
