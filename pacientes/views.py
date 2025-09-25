@@ -418,9 +418,13 @@ def detalle_paciente(request, pk):
     # Usar el related_name correcto
     historiales = paciente.historiales_clinicos.all().order_by('-fecha')
     
+    # Obtener tratamientos del paciente
+    tratamientos = paciente.tratamientos.all().order_by('-fecha_creacion')
+    
     context = {
         'paciente': paciente,
         'historiales': historiales,
+        'tratamientos': tratamientos,
         'empresa_actual': empresa_actual,
     }
     
@@ -464,24 +468,3 @@ def obtener_pacientes(request):
             'error': str(e),
             'traceback': traceback.format_exc()
         }, status=500)
-
-@login_required
-def detalle_paciente(request, pk):
-    # Obtener la empresa actual del usuario
-    empresa_actual = get_empresa_actual(request)
-    
-    if not empresa_actual:
-        messages.error(request, 'No tienes una empresa asignada.')
-        return redirect('home')
-
-    paciente = get_object_or_404(Paciente, pk=pk, empresa=empresa_actual)
-    # Usar el related_name correcto
-    historiales = paciente.historiales_clinicos.all().order_by('-fecha')
-    
-    context = {
-        'paciente': paciente,
-        'historiales': historiales,
-        'empresa_actual': empresa_actual,
-    }
-    
-    return render(request, 'pacientes/detalle_paciente.html', context)

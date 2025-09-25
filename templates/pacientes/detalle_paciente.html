@@ -321,6 +321,147 @@
                     {% endif %}
                 </div>
             </div>
+
+            <!-- Sección de Tratamientos -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-0">
+                                <i class="fas fa-stethoscope me-2"></i>Tratamientos Aplicados
+                            </h4>
+                            <p class="text-muted mb-0">Historial de tratamientos y procedimientos realizados</p>
+                        </div>
+                        <a href="{% url 'tratamientos:crear' %}?paciente={{ paciente.id }}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Nuevo Tratamiento
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if tratamientos %}
+                        {% for tratamiento in tratamientos %}
+                        <div class="card historial-card">
+                            <div class="card-header">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-stethoscope me-2"></i>Tratamiento #{{ tratamiento.id }}
+                                        </h5>
+                                        <small class="historial-fecha">
+                                            <i class="fas fa-calendar me-1"></i>{{ tratamiento.fecha_inicio|date:"d/m/Y" }}
+                                            {% if tratamiento.fecha_fin %}
+                                                - {{ tratamiento.fecha_fin|date:"d/m/Y" }}
+                                            {% endif %}
+                                        </small>
+                                    </div>
+                                    <div>
+                                        <span class="badge 
+                                            {% if tratamiento.estado == 'COMPLETADO' %}bg-success
+                                            {% elif tratamiento.estado == 'EN_PROGRESO' %}bg-warning
+                                            {% elif tratamiento.estado == 'CANCELADO' %}bg-danger
+                                            {% else %}bg-info{% endif %}">
+                                            {{ tratamiento.get_estado_display }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-2">
+                                            <strong>Profesional:</strong>
+                                            <span>{{ tratamiento.profesional.nombre_completo|default:"No asignado" }}</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <strong>Costo Total:</strong>
+                                            <span class="text-success">${{ tratamiento.costo_total|floatformat:0 }}</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <strong>Estado de Pago:</strong>
+                                            <span class="badge {% if tratamiento.pagado %}bg-success{% else %}bg-warning{% endif %}">
+                                                {% if tratamiento.pagado %}
+                                                    <i class="fas fa-check me-1"></i>Pagado
+                                                {% else %}
+                                                    <i class="fas fa-clock me-1"></i>Pendiente
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-2">
+                                            <strong>Monto Pagado:</strong>
+                                            <span class="text-success">${{ tratamiento.monto_pagado|floatformat:0 }}</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <strong>Saldo Pendiente:</strong>
+                                            <span class="text-danger">${{ tratamiento.monto_pendiente|floatformat:0 }}</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <strong>Fecha Creación:</strong>
+                                            <span>{{ tratamiento.fecha_creacion|date:"d/m/Y H:i" }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                {% if tratamiento.observaciones %}
+                                <div class="mt-3">
+                                    <strong>Observaciones:</strong>
+                                    <p class="mb-2">{{ tratamiento.observaciones }}</p>
+                                </div>
+                                {% endif %}
+                                
+                                <!-- Detalles del tratamiento -->
+                                {% if tratamiento.detalles.exists %}
+                                <div class="mt-3">
+                                    <strong>Procedimientos:</strong>
+                                    <div class="table-responsive">
+                                        <table class="table table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Procedimiento</th>
+                                                    <th>Cantidad</th>
+                                                    <th>Valor Unit.</th>
+                                                    <th>Descuento</th>
+                                                    <th>Total</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for detalle in tratamiento.detalles.all %}
+                                                <tr>
+                                                    <td>{{ detalle.procedimiento.nombre }}</td>
+                                                    <td>{{ detalle.cantidad }}</td>
+                                                    <td>${{ detalle.procedimiento.valor|floatformat:0 }}</td>
+                                                    <td>{{ detalle.descuento }}%</td>
+                                                    <td>${{ detalle.total|floatformat:0 }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                
+                                <div class="mt-3">
+                                    <div class="alert alert-info">
+                                        <strong>Tratamiento #{{ tratamiento.id }}</strong><br>
+                                        <small>Para ver o editar este tratamiento, ve a la sección "Tratamientos" en el menú principal.</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-stethoscope fa-3x"></i>
+                            <h5>No hay tratamientos registrados</h5>
+                            <p>Agregue el primer tratamiento del paciente</p>
+                            <a href="{% url 'tratamientos:crear' %}?paciente={{ paciente.id }}" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Nuevo Tratamiento
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
 </div>

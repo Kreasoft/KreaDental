@@ -554,34 +554,3 @@
     }
 </style>
 {% endblock %} 
-                if (value && !isNaN(value)) {
-                    e.target.value = parseFloat(value).toFixed(2);
-                }
-            });
-        }
-        
-        if (tiempoInput) {
-            tiempoInput.addEventListener('input', function(e) {
-                let value = e.target.value.replace(/[^\d]/g, '');
-                if (value && !isNaN(value)) {
-                    e.target.value = parseInt(value);
-                }
-            });
-        }
-    });
-</script>
-
-<style>
-    /* Estilos personalizados para SweetAlert2 con tema dental */
-    .swal2-toast-dental {
-        background: #E8F4FC !important;
-        border: 1px solid #AED6F1 !important;
-        color: #1A5276 !important;
-    }
-
-    .swal2-popup-dental {
-        border-radius: 15px !important;
-        border: 1px solid #AED6F1 !important;
-    }
-</style>
-{% endblock %} 
