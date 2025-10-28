@@ -1,0 +1,267 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Detalle del Tratamiento{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
+<style>
+    :root {
+        --primary-color: #1A5276;
+        --primary-light: #AED6F1;
+        --primary-bg: #E8F4FC;
+        --success-color: #2ecc71;
+        --danger-color: #e74c3c;
+        --secondary-color: #95a5a6;
+    }
+
+    .card {
+        border-radius: 15px;
+        border: 1px solid var(--primary-light);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 1.5rem;
+    }
+
+    .card-header {
+        background-color: var(--primary-bg);
+        border-bottom: 1px solid var(--primary-light);
+        border-radius: 15px 15px 0 0 !important;
+        padding: 1rem;
+    }
+
+    .card-title {
+        color: var(--primary-color);
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    .btn {
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .btn-primary:hover {
+        background-color: #154360;
+        border-color: #154360;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .btn-success {
+        background-color: var(--success-color);
+        border-color: var(--success-color);
+    }
+
+    .btn-success:hover {
+        background-color: #27ae60;
+        border-color: #27ae60;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .btn-info {
+        background-color: var(--primary-light);
+        border-color: var(--primary-light);
+        color: var(--primary-color);
+    }
+
+    .btn-info:hover {
+        background-color: #85C1E9;
+        border-color: #85C1E9;
+        color: var(--primary-color);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .badge {
+        padding: 0.5em 1em;
+        font-weight: 500;
+        border-radius: 6px;
+    }
+
+    .badge.bg-success {
+        background-color: var(--success-color) !important;
+    }
+
+    .badge.bg-danger {
+        background-color: var(--danger-color) !important;
+    }
+
+    .form-select {
+        border-color: var(--primary-light);
+        border-radius: 8px;
+        padding: 0.5rem;
+    }
+
+    .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(26, 82, 118, 0.25);
+    }
+
+    .info-label {
+        color: var(--primary-color);
+        font-weight: 600;
+    }
+
+    .info-value {
+        color: #2c3e50;
+    }
+
+    hr {
+        border-color: var(--primary-light);
+        margin: 1.5rem 0;
+    }
+
+    .page-title {
+        color: var(--primary-color);
+        font-weight: 600;
+        margin-bottom: 0;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="page-title">
+            <i class="fas fa-tooth me-2"></i>Detalle del Tratamiento
+        </h1>
+        <a href="{% url 'tratamientos:lista' %}" class="btn btn-info">
+            <i class="fas fa-arrow-left me-2"></i>Volver
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <i class="fas fa-info-circle me-2"></i>Información del Tratamiento
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><span class="info-label">Paciente:</span> <span class="info-value">{{ tratamiento.paciente }}</span></p>
+                            <p><span class="info-label">Procedimiento:</span> <span class="info-value">{{ tratamiento.procedimiento }}</span></p>
+                            <p><span class="info-label">Profesional:</span> <span class="info-value">{{ tratamiento.profesional.get_full_name }}</span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><span class="info-label">Fecha de Inicio:</span> <span class="info-value">{{ tratamiento.fecha_inicio }}</span></p>
+                            <p><span class="info-label">Estado:</span> 
+                                <span class="badge bg-{{ tratamiento.estado|lower }}">
+                                    {{ tratamiento.get_estado_display }}
+                                </span>
+                            </p>
+                            <p><span class="info-label">Pagado:</span> 
+                                {% if tratamiento.pagado %}
+                                    <span class="badge bg-success">Sí</span>
+                                {% else %}
+                                    <span class="badge bg-danger">No</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <p class="info-label">Observaciones:</p>
+                            <p class="info-value">{{ tratamiento.observaciones|default:"No hay observaciones" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <i class="fas fa-cogs me-2"></i>Acciones
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'tratamientos:actualizar_estado' tratamiento.id %}" class="mb-3">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="estado" class="form-label info-label">Cambiar Estado</label>
+                            <select class="form-select" id="estado" name="estado">
+                                <option value="PENDIENTE" {% if tratamiento.estado == 'PENDIENTE' %}selected{% endif %}>Pendiente</option>
+                                <option value="EN_PROGRESO" {% if tratamiento.estado == 'EN_PROGRESO' %}selected{% endif %}>En Progreso</option>
+                                <option value="COMPLETADO" {% if tratamiento.estado == 'COMPLETADO' %}selected{% endif %}>Completado</option>
+                                <option value="CANCELADO" {% if tratamiento.estado == 'CANCELADO' %}selected{% endif %}>Cancelado</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-sync me-2"></i>Actualizar Estado
+                        </button>
+                    </form>
+
+                    {% if not tratamiento.pagado %}
+                    <div class="action-buttons">
+                        <a href="{% url 'pagos_tratamientos:crear_pago' tratamiento.id %}" class="btn btn-primary flex-grow-1">
+                            <i class="fas fa-money-bill-wave me-2"></i>Registrar Pago
+                        </a>
+                        <form method="post" action="{% url 'tratamientos:marcar_pagado' tratamiento.id %}" class="flex-grow-1">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success w-100">
+                                <i class="fas fa-check me-2"></i>Marcar como Pagado
+                            </button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <i class="fas fa-money-bill me-2"></i>Información de Pago
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p><span class="info-label">Costo Total:</span> <span class="info-value">${{ tratamiento.costo_total }}</span></p>
+                    <p><span class="info-label">Fecha de Creación:</span> <span class="info-value">{{ tratamiento.fecha_creacion }}</span></p>
+                    <p><span class="info-label">Última Actualización:</span> <span class="info-value">{{ tratamiento.fecha_actualizacion }}</span></p>
+                    <hr>
+                    <a href="{% url 'pagos_tratamientos:lista_pagos' %}?tratamiento={{ tratamiento.id }}" class="btn btn-info w-100">
+                        <i class="fas fa-history me-2"></i>Ver Historial de Pagos
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Mostrar mensaje de éxito al actualizar el estado
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('success')) {
+            Swal.fire({
+                title: '¡Éxito!',
+                text: 'El estado del tratamiento ha sido actualizado',
+                icon: 'success',
+                confirmButtonColor: '#1A5276'
+            });
+        }
+    });
+</script>
+{% endblock %} 

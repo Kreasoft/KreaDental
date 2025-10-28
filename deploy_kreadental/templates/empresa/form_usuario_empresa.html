@@ -1,0 +1,427 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ titulo }} - {{ empresa.nombre_fantasia }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card {
+        border: 1px solid #AED6F1;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    }
+
+    .card-header {
+        background-color: #E8F4FC;
+        border-bottom: 1px solid #AED6F1;
+        border-radius: 15px 15px 0 0 !important;
+        padding: 1.5rem;
+    }
+
+    .card-header h4 {
+        color: #1A5276;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    .form-label {
+        color: #1A5276;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control, .form-select {
+        border: 1px solid #AED6F1;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #3498DB;
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    }
+
+    .form-check-input {
+        border: 1px solid #AED6F1;
+    }
+
+    .form-check-input:checked {
+        background-color: #3498DB;
+        border-color: #3498DB;
+    }
+
+    .btn {
+        border-radius: 8px;
+        font-weight: 500;
+        padding: 0.75rem 1.5rem;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+        background-color: #3498DB;
+        border-color: #3498DB;
+    }
+
+    .btn-primary:hover {
+        background-color: #2980B9;
+        border-color: #2980B9;
+        transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+        background-color: #95A5A6;
+        border-color: #95A5A6;
+    }
+
+    .btn-secondary:hover {
+        background-color: #7F8C8D;
+        border-color: #7F8C8D;
+        transform: translateY(-1px);
+    }
+
+    .btn-light {
+        background-color: #FFFFFF;
+        border-color: #AED6F1;
+        color: #1A5276;
+    }
+
+    .btn-light:hover {
+        background-color: #F8F9FA;
+        border-color: #3498DB;
+        color: #1A5276;
+        transform: translateY(-1px);
+    }
+
+    .alert {
+        border-radius: 8px;
+        border: none;
+        padding: 1rem 1.25rem;
+    }
+
+    .alert-danger {
+        background-color: #FADBD8;
+        color: #A93226;
+    }
+
+    .alert-success {
+        background-color: #D5F4E6;
+        color: #27AE60;
+    }
+
+    .form-text {
+        color: #7F8C8D;
+        font-size: 0.875rem;
+    }
+
+    .required {
+        color: #E74C3C;
+    }
+
+    .form-floating > label {
+        color: #7F8C8D;
+    }
+
+    .loading {
+        opacity: 0.6;
+        pointer-events: none;
+    }
+
+    .spinner-border-sm {
+        width: 1rem;
+        height: 1rem;
+    }
+
+    .help-text {
+        background-color: #F8F9FA;
+        border: 1px solid #E9ECEF;
+        border-radius: 6px;
+        padding: 0.75rem;
+        margin-top: 0.5rem;
+        font-size: 0.875rem;
+        color: #6C757D;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header de la página -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4>
+                                <i class="fas fa-user-edit me-2"></i>
+                                {{ titulo }}
+                            </h4>
+                            <small class="text-muted">{{ empresa.nombre_fantasia }}</small>
+                        </div>
+                        <a href="{% url 'empresa:listar_usuarios_empresa' empresa.id %}" class="btn btn-light">
+                            <i class="fas fa-arrow-left me-1"></i>
+                            Volver
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulario -->
+            <div class="card">
+                <div class="card-body">
+                    {% if messages %}
+                        <div class="mb-3">
+                            {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <form id="usuarioForm" method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <!-- Email del Usuario -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.email.id_for_label }}" class="form-label">
+                                    {{ form.email.label }}
+                                    <span class="required">*</span>
+                                </label>
+                                {{ form.email }}
+                                {% if form.email.help_text %}
+                                    <div class="form-text">{{ form.email.help_text }}</div>
+                                {% endif %}
+                                {% if form.email.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.email.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Contraseña -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.password.id_for_label }}" class="form-label">
+                                    {{ form.password.label }}
+                                </label>
+                                {{ form.password }}
+                                {% if form.password.help_text %}
+                                    <div class="form-text">{{ form.password.help_text }}</div>
+                                {% endif %}
+                                {% if form.password.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.password.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Sucursal -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.sucursal.id_for_label }}" class="form-label">
+                                    {{ form.sucursal.label }}
+                                    <span class="required">*</span>
+                                </label>
+                                {{ form.sucursal }}
+                                {% if form.sucursal.help_text %}
+                                    <div class="form-text">{{ form.sucursal.help_text }}</div>
+                                {% endif %}
+                                {% if form.sucursal.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.sucursal.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Tipo de Usuario -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.tipo_usuario.id_for_label }}" class="form-label">
+                                    {{ form.tipo_usuario.label }}
+                                    <span class="required">*</span>
+                                </label>
+                                {{ form.tipo_usuario }}
+                                {% if form.tipo_usuario.help_text %}
+                                    <div class="form-text">{{ form.tipo_usuario.help_text }}</div>
+                                {% endif %}
+                                {% if form.tipo_usuario.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.tipo_usuario.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Fecha de Inicio -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.fecha_inicio.id_for_label }}" class="form-label">
+                                    {{ form.fecha_inicio.label }}
+                                    <span class="required">*</span>
+                                </label>
+                                {{ form.fecha_inicio }}
+                                {% if form.fecha_inicio.help_text %}
+                                    <div class="form-text">{{ form.fecha_inicio.help_text }}</div>
+                                {% endif %}
+                                {% if form.fecha_inicio.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.fecha_inicio.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Fecha de Fin -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.fecha_fin.id_for_label }}" class="form-label">
+                                    {{ form.fecha_fin.label }}
+                                </label>
+                                {{ form.fecha_fin }}
+                                {% if form.fecha_fin.help_text %}
+                                    <div class="form-text">{{ form.fecha_fin.help_text }}</div>
+                                {% endif %}
+                                {% if form.fecha_fin.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.fecha_fin.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Estado Activo -->
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <div class="form-check">
+                                    {{ form.activo }}
+                                    <label class="form-check-label" for="{{ form.activo.id_for_label }}">
+                                        {{ form.activo.label }}
+                                    </label>
+                                </div>
+                                {% if form.activo.help_text %}
+                                    <div class="form-text">{{ form.activo.help_text }}</div>
+                                {% endif %}
+                                {% if form.activo.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.activo.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Información sobre tipos de usuario -->
+                        <div class="help-text">
+                            <h6 class="mb-2"><i class="fas fa-info-circle me-1"></i> Tipos de Usuario:</h6>
+                            <ul class="mb-0">
+                                <li><strong>Super Administrador:</strong> Acceso completo al sistema</li>
+                                <li><strong>Administrador Empresa:</strong> Gestiona la empresa y usuarios</li>
+                                <li><strong>Administrador Sucursal:</strong> Gestiona una sucursal específica</li>
+                                <li><strong>Profesional:</strong> Acceso a pacientes y tratamientos</li>
+                                <li><strong>Recepción:</strong> Acceso a citas y pagos</li>
+                                <li><strong>Auxiliar:</strong> Acceso limitado según permisos</li>
+                            </ul>
+                        </div>
+
+                        <!-- Botones -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a href="{% url 'empresa:listar_usuarios_empresa' empresa.id %}" class="btn btn-secondary">
+                                        <i class="fas fa-times me-1"></i>
+                                        Cancelar
+                                    </a>
+                                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                                        <i class="fas fa-save me-1"></i>
+                                        Guardar Usuario
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('usuarioForm');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    // Limpiar mensajes automáticamente después de 5 segundos
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(function(alert) {
+        setTimeout(function() {
+            if (alert && alert.parentNode) {
+                alert.remove();
+            }
+        }, 5000);
+    });
+    
+    // Manejar envío del formulario
+    form.addEventListener('submit', function(e) {
+        // Mostrar loading en el botón
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Guardando...';
+        submitBtn.disabled = true;
+        form.classList.add('loading');
+        
+        // El formulario se enviará normalmente
+    });
+    
+    // Validación de fechas
+    const fechaInicio = document.getElementById('{{ form.fecha_inicio.id_for_label }}');
+    const fechaFin = document.getElementById('{{ form.fecha_fin.id_for_label }}');
+    
+    function validateDates() {
+        if (fechaInicio.value && fechaFin.value) {
+            const inicio = new Date(fechaInicio.value);
+            const fin = new Date(fechaFin.value);
+            
+            if (fin <= inicio) {
+                fechaFin.setCustomValidity('La fecha de fin debe ser posterior a la fecha de inicio');
+                fechaFin.reportValidity();
+            } else {
+                fechaFin.setCustomValidity('');
+            }
+        }
+    }
+    
+    if (fechaInicio && fechaFin) {
+        fechaInicio.addEventListener('change', validateDates);
+        fechaFin.addEventListener('change', validateDates);
+    }
+    
+    // Auto-focus en el primer campo
+    const firstField = form.querySelector('input:not([type="hidden"]), select, textarea');
+    if (firstField) {
+        firstField.focus();
+    }
+});
+</script>
+{% endblock %}

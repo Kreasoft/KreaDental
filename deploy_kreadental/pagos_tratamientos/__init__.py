@@ -1,0 +1,1 @@
+default_app_config = 'pagos_tratamientos.apps.PagosTratamientosConfig'

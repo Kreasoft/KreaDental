@@ -1,0 +1,252 @@
+{% load cierre_filters %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>CIERRE DE CAJA - {{ cierre.fecha|date:"d/m/Y" }}</title>
+    <style>
+        @page {
+            size: 80mm auto;
+            margin: 0;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.2;
+            margin: 0;
+            padding: 5mm;
+            width: {{ printer_width }}ch;
+            max-width: {{ printer_width }}ch;
+        }
+        
+        .header {
+            text-align: center;
+            border-bottom: 1px solid #000;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .title {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            font-size: 10px;
+            color: #666;
+        }
+        
+        .section {
+            margin: 8px 0;
+        }
+        
+        .section-title {
+            font-weight: bold;
+            text-decoration: underline;
+            margin-bottom: 3px;
+        }
+        
+        .line {
+            display: flex;
+            justify-content: space-between;
+            margin: 2px 0;
+        }
+        
+        .line.total {
+            border-top: 1px solid #000;
+            padding-top: 3px;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+        
+        .line.grand-total {
+            border-top: 2px solid #000;
+            padding-top: 5px;
+            margin-top: 8px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .left {
+            text-align: left;
+        }
+        
+        .right {
+            text-align: right;
+        }
+        
+        .center {
+            text-align: center;
+        }
+        
+        .separator {
+            border-top: 1px dashed #000;
+            margin: 5px 0;
+        }
+        
+        .footer {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 10px;
+            border-top: 1px solid #000;
+            padding-top: 5px;
+        }
+        
+        .pago-item {
+            margin: 1px 0;
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="title">KREA DENTAL</div>
+        <div class="subtitle">CIERRE DE CAJA</div>
+        <div class="subtitle">{{ cierre.fecha|date:"d/m/Y" }} - {{ cierre.hora_cierre|time:"H:i" }}</div>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">INFORMACIÓN GENERAL</div>
+        <div class="line">
+            <span class="left">Caja #:</span>
+            <span class="right">{{ cierre.id }}</span>
+        </div>
+        <div class="line">
+            <span class="left">Apertura:</span>
+            <span class="right">{{ cierre.hora_apertura|time:"H:i" }}</span>
+        </div>
+        <div class="line">
+            <span class="left">Cierre:</span>
+            <span class="right">{{ cierre.hora_cierre|time:"H:i" }}</span>
+        </div>
+        <div class="line">
+            <span class="left">Usuario:</span>
+            <span class="right">{{ cierre.usuario_apertura.get_full_name|default:cierre.usuario_apertura.username }}</span>
+        </div>
+    </div>
+    
+    {% if cierre.retiros.all %}
+    <div class="separator"></div>
+    
+    <div class="section">
+        <div class="section-title">RETIROS DE CAJA</div>
+        {% for retiro in cierre.retiros.all %}
+        <div class="line">
+            <span class="left">{{ retiro.concepto|truncatechars:20 }}:</span>
+            <span class="right">${{ retiro.monto|formatear_monto_sin_decimales }}</span>
+        </div>
+        {% if retiro.comprobante %}
+        <div class="line small">
+            <span class="left">Comprobante:</span>
+            <span class="right">{{ retiro.comprobante }}</span>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <div class="separator"></div>
+    
+    <div class="section">
+        <div class="section-title">MONTOS</div>
+        <div class="line">
+            <span class="left">Monto Inicial:</span>
+            <span class="right">${{ cierre.monto_inicial|formatear_monto_sin_decimales }}</span>
+        </div>
+        <div class="line">
+            <span class="left">Total Sistema:</span>
+            <span class="right">${{ total_sistema|formatear_monto_sin_decimales }}</span>
+        </div>
+        <div class="line">
+            <span class="left">Total Retiros:</span>
+            <span class="right">${{ cierre.total_retiros|formatear_monto_sin_decimales }}</span>
+        </div>
+        <div class="line">
+            <span class="left">Monto Final:</span>
+            <span class="right">${{ cierre.monto_final|formatear_monto_sin_decimales }}</span>
+        </div>
+        <div class="line">
+            <span class="left">Diferencia:</span>
+            <span class="right">${{ cierre.diferencia|formatear_monto_sin_decimales }}</span>
+        </div>
+        <div class="line">
+            <span class="left">Saldo Final:</span>
+            <span class="right">${{ cierre.saldo_final|formatear_monto_sin_decimales }}</span>
+        </div>
+        <div class="line total">
+            <span class="left">SALDO FINAL:</span>
+            <span class="right">${{ cierre.saldo_final|formatear_monto_sin_decimales }}</span>
+        </div>
+    </div>
+    
+    <div class="separator"></div>
+    
+    <div class="section">
+        <div class="section-title">RESUMEN POR FORMA DE PAGO</div>
+        <div class="line">
+            <span class="left">Efectivo:</span>
+            <span class="right">${{ total_efectivo|formatear_monto_sin_decimales }}</span>
+        </div>
+        <div class="line">
+            <span class="left">Tarjeta:</span>
+            <span class="right">${{ total_tarjeta|formatear_monto_sin_decimales }}</span>
+        </div>
+        <div class="line">
+            <span class="left">Transferencia:</span>
+            <span class="right">${{ total_transferencia|formatear_monto_sin_decimales }}</span>
+        </div>
+    </div>
+    
+    {% if pagos_tratamientos or pagos_atenciones or pagos_rapidos %}
+    <div class="separator"></div>
+    
+    <div class="section">
+        <div class="section-title">DETALLE DE PAGOS</div>
+        
+        {% for pago in pagos_tratamientos %}
+        <div class="pago-item">
+            <div class="line">
+                <span class="left">T-{{ pago.id }} {{ pago.tratamiento.paciente.nombre_completo|truncatechars:20 }}</span>
+                <span class="right">${{ pago.monto|formatear_monto_sin_decimales }}</span>
+            </div>
+        </div>
+        {% endfor %}
+        
+        {% for pago in pagos_atenciones %}
+        <div class="pago-item">
+            <div class="line">
+                <span class="left">A-{{ pago.id }} {{ pago.cita.paciente.nombre_completo|truncatechars:20 }}</span>
+                <span class="right">${{ pago.monto|formatear_monto_sin_decimales }}</span>
+            </div>
+        </div>
+        {% endfor %}
+        
+        {% for pago in pagos_rapidos %}
+        <div class="pago-item">
+            <div class="line">
+                <span class="left">R-{{ pago.id }} {{ pago.tratamiento.paciente.nombre_completo|truncatechars:20 }}</span>
+                <span class="right">${{ pago.monto|formatear_monto_sin_decimales }}</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <div class="separator"></div>
+    
+    <div class="footer">
+        <div>--- FIN DEL REPORTE ---</div>
+        <div>Impreso: {% now "d/m/Y H:i" %}</div>
+        <div>KreaDental Cloud v1.0</div>
+    </div>
+    
+    <script>
+        // Auto-imprimir al cargar
+        window.onload = function() {
+            window.print();
+        }
+    </script>
+</body>
+</html>

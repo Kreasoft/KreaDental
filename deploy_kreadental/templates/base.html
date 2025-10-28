@@ -1,0 +1,953 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sistema Dental{% endblock %}</title>
+    
+    <!-- Google Fonts - Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet">
+    <!-- SweetAlert2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+    <link href="{% static 'css/custom.css' %}" rel="stylesheet">
+    <link href="{% static 'css/sidebar.css' %}" rel="stylesheet">
+    
+    <style>
+        :root {
+            --font-family-base: 'Poppins', sans-serif;
+            --sidebar-width: 320px;
+        }
+        
+        body {
+            font-family: var(--font-family-base);
+            background-color: #f8f9fc;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        
+        h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+            font-family: var(--font-family-base);
+            font-weight: 600;
+        }
+        
+        .display-1, .display-2, .display-3, .display-4, .display-5, .display-6 {
+            font-family: var(--font-family-base);
+            font-weight: 700;
+        }
+        
+        .modal-subtitle {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            font-weight: 400;
+            margin-top: 0.5rem;
+        }
+        
+        .btn {
+            font-family: var(--font-family-base);
+            font-weight: 500;
+        }
+        
+        .card {
+            font-family: var(--font-family-base);
+        }
+        
+        .table {
+            font-family: var(--font-family-base);
+        }
+        
+        .form-control, .form-select {
+            font-family: var(--font-family-base);
+        }
+        
+        .nav-link {
+            font-family: var(--font-family-base);
+            font-weight: 500;
+        }
+        
+        .text-xs {
+            font-family: var(--font-family-base);
+            font-weight: 500;
+        }
+        
+        .text-sm {
+            font-family: var(--font-family-base);
+        }
+        
+        .text-lg {
+            font-family: var(--font-family-base);
+        }
+        
+        .text-xl {
+            font-family: var(--font-family-base);
+        }
+        
+        .text-2xl {
+            font-family: var(--font-family-base);
+        }
+        
+        .text-3xl {
+            font-family: var(--font-family-base);
+        }
+        
+        .text-4xl {
+            font-family: var(--font-family-base);
+        }
+        
+        .text-5xl {
+            font-family: var(--font-family-base);
+        }
+        
+        .text-6xl {
+            font-family: var(--font-family-base);
+        }
+        
+        .text-7xl {
+            font-family: var(--font-family-base);
+        }
+        
+        .text-8xl {
+            font-family: var(--font-family-base);
+        }
+        
+        .text-9xl {
+            font-family: var(--font-family-base);
+        }
+
+        .footer {
+            background: #2c3e50;
+            color: rgba(255, 255, 255, 0.8);
+            padding: 0.25rem 1rem;
+            position: relative;
+            margin-top: auto;
+            font-size: 0.875rem;
+            height: 28px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(to right, rgba(255,255,255,0.1), rgba(255,255,255,0.3), rgba(255,255,255,0.1));
+        }
+
+        .footer a {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer a:hover {
+            color: #fff;
+        }
+
+        .footer .social-links a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 0 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .footer .social-links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        #wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        #sidebar {
+            width: var(--sidebar-width);
+            background: #2c3e50;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        
+        .sidebar-heading {
+            padding: 0.5rem 1rem;
+            background: #2c3e50;
+            text-align: center;
+            position: relative;
+            margin-bottom: 0;
+        }
+        
+        .sidebar-heading img {
+            height: 50px;
+            width: auto;
+            margin-bottom: 0.5rem;
+        }
+        
+        .sidebar-heading small {
+            display: block;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.875rem;
+            margin-top: -2rem;
+            padding-left: 1rem;
+            text-align: right;
+        }
+        
+        /* Espacio antes de la línea divisoria */
+        .sidebar-menu::before {
+            content: '';
+            display: block;
+            height: 35px;
+            width: 100%;
+        }
+        
+        .sidebar-menu {
+            padding: 0.25rem 0;
+            list-style: none;
+            overflow-y: auto;
+            flex-grow: 1;
+            margin: 0;
+        }
+
+        /* Estilo para la barra de desplazamiento */
+        .sidebar-menu::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar-menu::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .sidebar-menu::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
+        }
+
+        .sidebar-menu::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .sidebar-menu li a {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-menu li a:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        
+        .sidebar-menu li a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .sidebar-menu li a.active {
+            background: #3498db;
+            color: white;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 1.5rem;
+            width: 100%;
+            max-width: 100%;
+            margin: 0;
+        }
+
+        .topbar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: var(--sidebar-width);
+            z-index: 1000;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        @media (max-width: 768px) {
+            #content {
+                margin-left: 0;
+                width: 100%;
+            }
+            .topbar {
+                left: 0;
+            }
+        }
+
+        .sidebar-divider {
+            margin: 5rem 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .sidebar-divider.my-0 {
+            margin-top: 5rem !important;
+            margin-bottom: 0 !important;
+        }
+        
+        /* Comportamiento del menú - colapsados por defecto */
+        .collapse {
+            display: none !important;
+        }
+        
+        .collapse.show {
+            display: block !important;
+        }
+        
+        /* Submenús simples también colapsados por defecto */
+        .has-submenu .submenu {
+            display: none !important;
+        }
+        
+        .has-submenu.expanded .submenu {
+            display: block !important;
+        }
+        
+        /* Iconos de submenú rotados solo cuando están expandidos */
+        .submenu-icon, .fa-chevron-down, .fa-angle-down, .submenu-arrow {
+            transform: rotate(0deg);
+            transition: transform 0.3s ease;
+        }
+        
+        .collapse.show ~ [data-bs-target] .submenu-icon,
+        .collapse.show ~ [data-bs-target] .fa-chevron-down,
+        .collapse.show ~ [data-bs-target] .fa-angle-down,
+        [data-bs-target]:has(+ .collapse.show) .submenu-icon,
+        [data-bs-target]:has(+ .collapse.show) .fa-chevron-down,
+        [data-bs-target]:has(+ .collapse.show) .fa-angle-down,
+        .has-submenu.expanded .submenu-arrow {
+            transform: rotate(180deg);
+        }
+        
+        /* Estilo para elementos activos */
+        .sidebar-menu a.active {
+            background: #3498db !important;
+            color: white !important;
+            font-weight: 600;
+        }
+        
+        /* Estilo para submenús */
+        .submenu {
+            display: block !important;
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .submenu li {
+            margin: 0;
+        }
+        
+        .submenu a {
+            padding: 0.4rem 1rem 0.4rem 3rem !important;
+            color: rgba(255,255,255,0.7) !important;
+            font-size: 0.85rem;
+            line-height: 1.2;
+        }
+        
+        .submenu a:hover {
+            background: rgba(255,255,255,0.1) !important;
+            color: white !important;
+        }
+        
+        .submenu a.active {
+            background: #2980b9 !important;
+            color: white !important;
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div id="wrapper">
+        <!-- Sidebar -->
+        <nav id="sidebar">
+            <!-- Logo -->
+            <div class="sidebar-heading">
+                <img src="{% static 'img/dentali-logo.png' %}" alt="Dentali" style="height: 50px; width: auto;">
+                <div class="mt-2">
+                    <small class="text-white-50">Gestión Odontológica</small>
+                </div>
+            </div>
+            
+            <!-- Menú de Navegación -->
+            <ul class="sidebar-menu" id="accordionSidebar">
+                <!-- Dashboard -->
+                <li>
+                    <a href="{% url 'core:home' %}" class="py-0 {% if request.path == '/' %}active{% endif %}">
+                        <i class="fas fa-home"></i>Inicio
+                    </a>
+                </li>
+
+                <!-- Gestión de Pacientes -->
+                <li class="menu-category py-0 mt-2">Gestión de Pacientes</li>
+                <li class="has-submenu">
+                    <a href="#" class="py-0 {% if 'pacientes' in request.path %}active{% endif %} py-1">
+                        <i class="fas fa-users"></i>Pacientes
+                        <i class="fas fa-chevron-down submenu-arrow"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li>
+                            <a href="{% url 'pacientes:lista_pacientes' %}" class="py-0">
+                                <i class="fas fa-list"></i>Lista de Pacientes
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="py-0" onclick="mostrarEstadoCuenta()">
+                                <i class="fas fa-file-invoice-dollar"></i>Estado de Cuenta
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="{% url 'profesionales:lista_profesionales' %}" class="py-0 {% if 'profesionales' in request.path and 'especialidades' not in request.path %}active{% endif %} py-1">
+                        <i class="fas fa-user-md"></i>Profesionales
+                    </a>
+                </li>
+
+                <!-- Control -->
+                <li class="menu-category py-0 mt-2">Control</li>
+                <li>
+                    <a href="#" class="py-0 d-flex align-items-center justify-content-between {% if 'lab_dental' in request.path %}active{% endif %}" data-bs-toggle="collapse" data-bs-target="#collapseLaboratorios">
+                        <div>
+                            <i class="fas fa-flask"></i>Laboratorios
+                        </div>
+                        <i class="fas fa-angle-down submenu-icon"></i>
+                    </a>
+                    <div id="collapseLaboratorios" class="collapse {% if 'lab_dental' in request.path %}show{% endif %}" data-bs-parent="#accordionSidebar">
+                        <ul class="nav flex-column ps-4 py-0">
+                            <li class="py-0 mb-0">
+                                <a href="{% url 'lab_dental:lista_laboratorios' %}" class="text-white-50 d-block py-0">
+                                    <i class="fas fa-building me-1"></i>Laboratorios
+                                </a>
+                            </li>
+                            <li class="py-0 mb-0">
+                                <a href="{% url 'lab_dental:lista_trabajos' %}" class="text-white-50 d-block py-0">
+                                    <i class="fas fa-teeth me-1"></i>Trabajos
+                                </a>
+                            </li>
+                            <li class="py-0 mb-0">
+                                <a href="{% url 'lab_dental:crear_trabajo' %}" class="text-white-50 d-block py-0">
+                                    <i class="fas fa-plus me-1"></i>Nuevo Trabajo
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
+                <!-- Reservas -->
+                <li class="menu-category py-0 mt-2">Reservas</li>
+                <li>
+                    <a href="{% url 'citas:calendario_citas' %}" class="py-0 {% if 'citas' in request.path %}active{% endif %} py-1">
+                        <i class="fas fa-calendar-alt"></i>Citas
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'tratamientos:lista' %}" class="py-0 {% if 'tratamientos' in request.path %}active{% endif %}">
+                        <i class="fas fa-tooth"></i>Tratamientos
+                    </a>
+                </li>
+                <li class="has-submenu">
+                    <a href="#" class="py-0 {% if 'pagos' in request.path %}active{% endif %}">
+                        <i class="fas fa-money-bill-wave"></i>Gestión de Pagos
+                        <i class="fas fa-chevron-down submenu-arrow"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li>
+                            <a href="{% url 'pagos_tratamientos:lista_pagos' %}" class="py-0">
+                                <i class="fas fa-credit-card"></i>Pagos de Tratamientos
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'pagos_tratamientos:lista_pagos_atenciones' %}" class="py-0">
+                                <i class="fas fa-stethoscope"></i>Pagos de Atenciones
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'pagos_tratamientos:agregar_pago_simple' %}" class="py-0">
+                                <i class="fas fa-plus-circle"></i>Pago Rápido Tratamientos
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'pagos_tratamientos:agregar_pago_atencion_rapido' %}" class="py-0">
+                                <i class="fas fa-bolt"></i>Pago Rápido Atenciones
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                
+                <li>
+                    <a href="{% url 'cierres_caja:lista_cierres' %}" class="py-0 {% if 'cierres_caja' in request.path %}active{% endif %}">
+                        <i class="fas fa-cash-register"></i>Cierre de Caja
+                    </a>
+                </li>
+
+                <!-- Tablas del Sistema -->
+                <li class="menu-category py-0 mt-2">Tablas del Sistema</li>
+                <li>
+                    <a href="#" class="py-0 d-flex align-items-center justify-content-between {% if 'especialidades' in request.path or 'procedimientos' in request.path or 'previsiones' in request.path or 'formas-pago' in request.path %}active{% endif %}" 
+                       data-bs-toggle="collapse" data-bs-target="#collapseTablasSystem">
+                        <div>
+                            <i class="fas fa-table"></i>Tablas del Sistema
+                        </div>
+                        <i class="fas fa-chevron-down submenu-icon"></i>
+                    </a>
+                    <div id="collapseTablasSystem" class="collapse {% if 'especialidades' in request.path or 'procedimientos' in request.path or 'previsiones' in request.path or 'formas-pago' in request.path %}show{% endif %}" 
+                         data-bs-parent="#accordionSidebar">
+                        <ul class="nav flex-column ps-4 py-0">
+                            <li class="py-0 mb-0">
+                                <a href="{% url 'profesionales:lista_especialidades' %}" class="text-white-50 d-block py-0">
+                                    <i class="fas fa-stethoscope me-1"></i>Especialidades
+                                </a>
+                            </li>
+                            <li class="py-0 mb-0">
+                                <a href="{% url 'procedimientos:lista_procedimientos' %}" class="text-white-50 d-block py-0">
+                                    <i class="fas fa-list-check me-1"></i>Procedimientos
+                                </a>
+                            </li>
+                            <li class="py-0 mb-0">
+                                <a href="{% url 'prevision:lista_previsiones' %}" class="text-white-50 d-block py-0">
+                                    <i class="fas fa-heartbeat me-1"></i>Previsiones
+                                </a>
+                            </li>
+                            <li class="py-0 mb-0">
+                                <a href="{% url 'formas_pago:lista_formas_pago' %}" class="text-white-50 d-block py-0">
+                                    <i class="fas fa-credit-card me-1"></i>Formas de Pago
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
+                <!-- Reportes -->
+                <li class="menu-category py-0 mt-2">Reportes</li>
+                <li>
+                    <a href="#" class="py-0 d-flex align-items-center justify-content-between {% if 'informes' in request.path %}active{% endif %}" data-bs-toggle="collapse" data-bs-target="#collapseInformes">
+                        <div>
+                            <i class="fas fa-chart-bar"></i>Informes
+                        </div>
+                        <i class="fas fa-chevron-down submenu-icon"></i>
+                    </a>
+                    <div class="collapse {% if 'informes' in request.path %}show{% endif %}" id="collapseInformes" data-bs-parent="#accordionSidebar">
+                        <ul class="nav flex-column ps-4 py-0">
+                            <li class="py-0 mb-0">
+                                <a href="{% url 'informes:financiero' %}" class="text-white-50 d-block py-0">
+                                    <i class="fas fa-chart-line"></i>Financiero
+                                </a>
+                            </li>
+                            <li class="py-0 mb-0">
+                                <a href="{% url 'informes:tratamientos' %}" class="text-white-50 d-block py-0">
+                                    <i class="fas fa-calendar-check"></i>Tratamientos
+                                </a>
+                            </li>
+                            <li class="py-0 mb-0">
+                                <a href="{% url 'informes:pacientes' %}" class="text-white-50 d-block py-0">
+                                    <i class="fas fa-users"></i>Pacientes
+                                </a>
+                            </li>
+                            <li class="py-0 mb-0">
+                                <a href="{% url 'informes:profesionales' %}" class="text-white-50 d-block py-0">
+                                    <i class="fas fa-user-md"></i>Profesionales
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
+                <!-- Configuración -->
+                <li class="menu-category py-0 mt-auto">Configuración</li>
+                <li>
+                    <a href="#" class="py-0 d-flex align-items-center justify-content-between {% if 'configuracion' in request.path or 'previsiones' in request.path or 'formas-pago' in request.path or 'usuarios' in request.path %}active{% endif %}" 
+                       data-bs-toggle="collapse" data-bs-target="#collapseConfiguracion">
+                        <div>
+                            <i class="fas fa-cog"></i>Configuración
+                        </div>
+                        <i class="fas fa-chevron-down submenu-icon"></i>
+                    </a>
+                    <div class="collapse {% if 'configuracion' in request.path or 'previsiones' in request.path or 'formas-pago' in request.path or 'usuarios' in request.path %}show{% endif %}" 
+                         id="collapseConfiguracion" data-bs-parent="#accordionSidebar">
+                        <ul class="nav flex-column ps-4 py-0">
+                            <li class="py-0 mb-0">
+                                <a href="{% url 'configuracion:empresa' %}" class="text-white-50 d-block py-0">
+                                    <i class="fas fa-building me-1"></i>Empresa
+                                </a>
+                            </li>
+                            {% if empresa_actual %}
+                            <li class="py-0 mb-0">
+                                <a href="{% url 'empresa:listar_sucursales' empresa_actual.id %}" class="text-white-50 d-block py-0">
+                                    <i class="fas fa-map-marker-alt me-1"></i>Sucursales
+                                </a>
+                            </li>
+                            {% endif %}
+                            <!-- Comentado temporalmente - Demo Fuentes
+                            <li class="py-0 mb-0">
+                                <a href="{% url 'core:demo_fonts' %}" class="text-white-50 d-block py-0">
+                                    <i class="fas fa-font me-1"></i>Demo Fuentes
+                                </a>
+                            </li>
+                            -->
+                            <!-- Comentado temporalmente - Colores Calipso
+                            <li class="py-0 mb-0">
+                                <a href="{% url 'core:colores_calipso' %}" class="text-white-50 d-block py-0">
+                                    <i class="fas fa-palette me-1"></i>Colores Calipso
+                                </a>
+                            </li>
+                            -->
+                        </ul>
+                    </div>
+                </li>
+
+                <!-- Selector de Sucursal (solo si hay múltiples sucursales) -->
+                {% if sucursales_disponibles|length > 1 %}
+                <li class="nav-item">
+                    <a href="#" class="nav-link d-flex align-items-center justify-content-between" data-bs-toggle="collapse" data-bs-target="#collapseSucursales">
+                        <div>
+                            <i class="fas fa-map-marker-alt"></i>Cambiar Sucursal
+                        </div>
+                        <i class="fas fa-chevron-down submenu-icon"></i>
+                    </a>
+                    <div id="collapseSucursales" class="collapse" data-bs-parent="#accordionSidebar">
+                        <ul class="nav flex-column ps-4 py-0">
+                            {% for sucursal in sucursales_disponibles %}
+                            <li class="py-0 mb-0">
+                                <a href="{% url 'empresa:cambiar_sucursal' sucursal.id %}" 
+                                   class="text-white-50 d-block py-0 {% if sucursal_actual and sucursal_actual.id == sucursal.id %}active{% endif %}">
+                                    <i class="fas fa-{% if sucursal_actual and sucursal_actual.id == sucursal.id %}check-circle{% else %}building{% endif %} me-1"></i>
+                                    {{ sucursal.nombre }}
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </li>
+                {% endif %}
+
+                <!-- Usuario -->
+                <li class="menu-category py-0">Usuario</li>
+                <li>
+                    <a href="#" class="py-0 d-flex align-items-center justify-content-between {% if 'usuario' in request.path or 'empresa' in request.path and 'usuarios' in request.path %}active{% endif %}" data-bs-toggle="collapse" data-bs-target="#collapseUsuario">
+                        <div>
+                            <i class="fas fa-user"></i>{{ user.get_full_name|default:user.username|default:"Mi Cuenta" }}
+                        </div>
+                        <i class="fas fa-chevron-down submenu-icon"></i>
+                    </a>
+                    <div id="collapseUsuario" class="collapse {% if 'usuario' in request.path or 'empresa' in request.path and 'usuarios' in request.path %}show{% endif %}" 
+                         data-bs-parent="#accordionSidebar">
+                        <ul class="nav flex-column ps-4 py-0">
+                            <li class="py-0 mb-0">
+                                <a href="{% url 'usuarios:perfil' %}" class="text-white-50 d-block py-0">
+                                    <i class="fas fa-user-circle me-1"></i>Mi Perfil
+                                </a>
+                            </li>
+                            <li class="py-0 mb-0">
+                                <a href="/empresas/1/usuarios/" class="text-white-50 d-block py-0">
+                                    <i class="fas fa-users me-1"></i>Gestionar Usuarios
+                                </a>
+                            </li>
+                            {% if user.is_staff %}
+                            <li class="py-0 mb-0">
+                                <a href="{% url 'admin:index' %}" class="text-white-50 d-block py-0" target="_blank">
+                                    <i class="fas fa-tools me-1"></i>Administración
+                                </a>
+                            </li>
+                            {% endif %}
+                            <li class="py-0 mb-0">
+                                <a href="{% url 'logout' %}" class="text-white-50 d-block py-0">
+                                    <i class="fas fa-sign-out-alt me-1"></i>Cerrar Sesión
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Page Content -->
+        <div id="content">
+            <!-- Navbar -->
+            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow-sm">
+                <!-- Sidebar Toggle (Topbar) -->
+                <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                    <i class="fa fa-bars"></i>
+                </button>
+
+                <!-- Topbar Navbar -->
+                <ul class="navbar-nav ms-auto">
+                    <!-- Nav Item - Empresa Dropdown -->
+                    <li class="nav-item dropdown no-arrow mx-1">
+                        <a class="nav-link dropdown-toggle" href="#" id="empresaDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="d-none d-lg-inline text-gray-600 small">
+                                {% if empresa_actual %}
+                                    <i class="fas fa-hospital me-1"></i>{{ empresa_actual.nombre|truncatechars:20 }}
+                                    {% if sucursal_actual %}
+                                        <br><small class="text-muted">{{ sucursal_actual.nombre|truncatechars:15 }}</small>
+                                    {% endif %}
+                                {% else %}
+                                    <i class="fas fa-exclamation-triangle text-warning me-1"></i>Sin clínica
+                                {% endif %}
+                            </span>
+                        </a>
+                        <!-- Dropdown - Información de Clínica -->
+                        <div class="dropdown-menu dropdown-menu-end shadow animated--grow-in" aria-labelledby="empresaDropdown">
+                            <h6 class="dropdown-header">
+                                <i class="fas fa-hospital me-2"></i>Información de Clínica
+                            </h6>
+                            {% if empresa_actual %}
+                            <div class="dropdown-item">
+                                <strong>{{ empresa_actual.nombre }}</strong>
+                                {% if empresa_actual.direccion %}
+                                <br><small class="text-muted">{{ empresa_actual.direccion }}</small>
+                                {% endif %}
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            {% if sucursal_actual %}
+                            <div class="dropdown-item">
+                                <i class="fas fa-map-marker-alt me-2"></i>
+                                <strong>Sucursal:</strong> {{ sucursal_actual.nombre }}
+                                {% if sucursal_actual.direccion %}
+                                <br><small class="text-muted">{{ sucursal_actual.direccion }}</small>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                            {% if sucursales_disponibles|length > 1 %}
+                            <div class="dropdown-divider"></div>
+                            <h6 class="dropdown-header">Cambiar sucursal</h6>
+                            {% for sucursal in sucursales_disponibles %}
+                            <a class="dropdown-item d-flex align-items-center {% if sucursal_actual and sucursal_actual.id == sucursal.id %}active{% endif %}" 
+                               href="{% url 'empresa:cambiar_sucursal' sucursal.id %}">
+                                <i class="fas fa-{% if sucursal_actual and sucursal_actual.id == sucursal.id %}check-circle{% else %}building{% endif %} me-2"></i>
+                                {{ sucursal.nombre }}
+                            </a>
+                            {% endfor %}
+                            {% endif %}
+                            {% else %}
+                            <div class="dropdown-item text-muted">
+                                <i class="fas fa-info-circle me-2"></i>No tienes clínica asignada
+                            </div>
+                            {% endif %}
+                        </div>
+                    </li>
+
+                    <!-- Divider -->
+                    <div class="topbar-divider d-none d-sm-block"></div>
+
+                    <!-- Nav Item - User Information -->
+                    <li class="nav-item dropdown no-arrow">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            {% if user.is_authenticated %}
+                                {% if user.avatar %}
+                                    <img src="{{ user.avatar.url }}" alt="Avatar de {{ user.get_full_name|default:user.username }}" class="img-profile rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">
+                                {% else %}
+                                    <i class="fas fa-user-circle fa-fw me-2"></i>
+                                {% endif %}
+                                <span class="d-none d-lg-inline text-gray-600">
+                                    {{ user.get_full_name|default:user.username }}
+                                </span>
+                            {% else %}
+                                <i class="fas fa-user me-2"></i>
+                                <span class="d-none d-lg-inline text-gray-600">Iniciar Sesión</span>
+                            {% endif %}
+                        </a>
+                        <!-- Dropdown - User Information -->
+                        <div class="dropdown-menu dropdown-menu-end shadow animated--grow-in"
+                            aria-labelledby="userDropdown" style="min-width: 250px;">
+                            {% if user.is_authenticated %}
+                            <div class="px-4 py-3">
+                                <div class="text-truncate fw-bold">{{ user.get_full_name|default:user.username }}</div>
+                                {% if user.email %}
+                                <div class="small text-muted">{{ user.email }}</div>
+                                {% endif %}
+                                {% if empresa_actual %}
+                                <div class="small mt-1">
+                                    <i class="fas fa-hospital me-1"></i> {{ empresa_actual.nombre }}
+                                    {% if sucursal_actual %}
+                                    <br><i class="fas fa-map-marker-alt me-1"></i> {{ sucursal_actual.nombre }}
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                            <div class="dropdown-divider"></div>
+                            {% if request.user.empresas.count > 1 %}
+                            <h6 class="dropdown-header">Cambiar clínica</h6>
+                            {% for empresa in request.user.empresas.all %}
+                            <a class="dropdown-item d-flex align-items-center {% if empresa.id == empresa_actual.id %}active{% endif %}" 
+                               href="{% url 'empresa:cambiar_empresa' empresa.id %}">
+                                {% if empresa.logo %}
+                                <img src="{{ empresa.logo.url }}" alt="Logo de {{ empresa.nombre }}" class="rounded me-2" style="width: 20px; height: 20px; object-fit: cover;">
+                                {% else %}
+                                <i class="fas fa-hospital text-muted me-2"></i>
+                                {% endif %}
+                                <span>{{ empresa.nombre }}</span>
+                            </a>
+                            {% endfor %}
+                            <div class="dropdown-divider"></div>
+                            {% endif %}
+                            <a class="dropdown-item" href="{% url 'usuarios:perfil' %}">
+                                <i class="fas fa-user fa-sm fa-fw me-2 text-gray-400"></i>
+                                Perfil
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal">
+                                <i class="fas fa-sign-out-alt fa-sm fa-fw me-2 text-gray-400"></i>
+                                Cerrar sesión
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+            <!-- End of Topbar -->
+
+            <!-- Main Content -->
+            <div class="container-fluid p-4 main-content">
+                <h4 class="mb-4">{% block page_title %}{% endblock %}</h4>
+                {% block content %}{% endblock %}
+            </div>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="container-fluid">
+                    <div class="d-flex justify-content-between align-items-center w-100">
+                        <div class="text-start">
+                            <span>&copy; {% now 'Y' %} KreaDental Cloud</span>
+                        </div>
+                        <div class="text-end">
+                            <span>Desarrollado por <a href="https://www.kreasoft.cl" target="_blank" class="ms-1">Kreasoft</a></span>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <!-- DataTables -->
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.4.1/js/dataTables.responsive.min.js"></script>
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- SweetAlert Functions -->
+    <script src="{% static 'js/sweetalert-functions.js' %}"></script>
+    
+    <!-- Custom JS -->
+    <script src="{% static 'js/scripts.js' %}"></script>
+    <script src="{% static 'js/sidebar.js' %}"></script>
+    <script src="{% static 'js/menu-behavior.js' %}"></script>
+    
+    {% block extra_js %}{% endblock %}
+    
+    <!-- Modal para selección de paciente para estado de cuenta -->
+    <div class="modal fade" id="modalEstadoCuenta" tabindex="-1" aria-labelledby="modalEstadoCuentaLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header text-white" style="background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%);">
+                    <h5 class="modal-title" id="modalEstadoCuentaLabel">
+                        <i class="fas fa-file-invoice-dollar me-2"></i>Estado de Cuenta del Paciente
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="pacienteSelect" class="form-label">Seleccionar Paciente</label>
+                        <select id="pacienteSelect" class="form-select" required>
+                            <option value="">Seleccione un paciente...</option>
+                        </select>
+                    </div>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Seleccione un paciente para ver su estado de cuenta completo, incluyendo pagos de tratamientos y atenciones.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn" style="background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%); border: none; color: white;" onclick="verEstadoCuenta()">
+                        <i class="fas fa-eye me-2"></i>Ver Estado de Cuenta
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Función para mostrar el modal de estado de cuenta
+        function mostrarEstadoCuenta() {
+            // Cargar lista de pacientes
+            cargarPacientes();
+            // Mostrar modal
+            var modal = new bootstrap.Modal(document.getElementById('modalEstadoCuenta'));
+            modal.show();
+        }
+
+        // Función para cargar pacientes en el select
+        function cargarPacientes() {
+            $.ajax({
+                url: '{% url "pacientes:obtener_pacientes" %}',
+                method: 'GET',
+                success: function(data) {
+                    var select = $('#pacienteSelect');
+                    select.empty();
+                    select.append('<option value="">Seleccione un paciente...</option>');
+                    
+                    data.pacientes.forEach(function(paciente) {
+                        select.append('<option value="' + paciente.id + '">' + 
+                                    paciente.nombre + ' ' + paciente.apellidos + 
+                                    ' (' + paciente.rut + ')</option>');
+                    });
+                },
+                error: function() {
+                    Swal.fire('Error', 'No se pudieron cargar los pacientes', 'error');
+                }
+            });
+        }
+
+        // Función para ver el estado de cuenta
+        function verEstadoCuenta() {
+            var pacienteId = $('#pacienteSelect').val();
+            if (!pacienteId) {
+                Swal.fire('Error', 'Por favor seleccione un paciente', 'warning');
+                return;
+            }
+            
+            // Redirigir a la página de estado de cuenta
+            window.location.href = '{% url "pagos_tratamientos:estado_cuenta_paciente" 0 %}'.replace('0', pacienteId);
+        }
+    </script>
+</body>
+</html>

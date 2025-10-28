@@ -1,0 +1,541 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Pagos de Tratamientos{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css"/>
+<style>
+    .card {
+        border: 1px solid #AED6F1;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    }
+
+    .card-header {
+        background-color: #E8F4FC;
+        border-bottom: 1px solid #AED6F1;
+        border-radius: 15px 15px 0 0 !important;
+        padding: 1.5rem;
+    }
+
+    .card-header h3 {
+        color: #1A5276;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    .table {
+        border: 1px solid #AED6F1;
+        border-radius: 8px;
+    }
+
+    .table th {
+        background-color: #E8F4FC;
+        color: #1A5276;
+        font-weight: 600;
+        border-bottom: 1px solid #AED6F1;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 0.85rem;
+        padding: 0.5rem;
+    }
+
+    .table td {
+        border-bottom: 1px solid #E8F4FC;
+        vertical-align: middle;
+        font-size: 0.9rem;
+        padding: 0.5rem;
+    }
+
+    .btn-primary {
+        background-color: #1A5276;
+        border-color: #1A5276;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        border-radius: 8px;
+        font-size: 0.9rem;
+    }
+
+    .btn-primary:hover {
+        background-color: #2874A6;
+        border-color: #2874A6;
+    }
+
+    .btn-warning {
+        background-color: #f39c12;
+        border-color: #f39c12;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+    }
+
+    .btn-warning:hover {
+        background-color: #d35400;
+        border-color: #d35400;
+    }
+
+    .btn-danger {
+        background-color: #e74c3c;
+        border-color: #e74c3c;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+    }
+
+    .btn-danger:hover {
+        background-color: #c0392b;
+        border-color: #c0392b;
+    }
+
+    .estado-badge {
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+    
+    .pagination .page-item .page-link {
+        color: #1A5276;
+        border: 1px solid #AED6F1;
+        margin: 0 2px;
+    }
+    
+    .pagination .page-item.active .page-link {
+        background-color: #1A5276;
+        border-color: #1A5276;
+    }
+
+    .content-card .card-title i {
+        color: #4a5568;
+        opacity: 0.7;
+    }
+
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 1rem;
+        }
+        
+        .table-responsive {
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .action-buttons .btn {
+            margin-bottom: 0.25rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-0"><i class="fas fa-money-bill-wave me-2"></i>Pagos de Tratamientos</h3>
+                            <p class="mb-0 text-muted">Gestión de pagos de tratamientos dentales</p>
+                        </div>
+                        <div>
+                            <a href="{% url 'pagos_tratamientos:crear_pago' %}" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#seleccionarTratamientoModal">
+                                <i class="fas fa-plus-circle me-2"></i>Agregar Pago
+                            </a>
+                            <a href="{% url 'pagos_tratamientos:exportar_pagos' %}" class="btn btn-success">
+                                <i class="fas fa-file-excel me-2"></i>Exportar a Excel
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Tarjetas de estadísticas -->
+                    <div class="row mb-4">
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-primary shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                Total Pagado</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">S/ {{ total_pagado|default:0|intcomma }}</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-success shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                                Pagos Completados</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ pagos_completados|default:0 }}</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-warning shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                                Pagos Pendientes</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ pagos_pendientes|default:0 }}</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-clock fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-danger shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                                Pagos Anulados</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ pagos_anulados|default:0 }}</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-ban fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tabla de pagos -->
+                    <div class="card mt-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="fas fa-money-bill-wave me-2"></i>
+                                {% if tratamiento %}
+                                    Pagos del Tratamiento #{{ tratamiento.id }} - {{ tratamiento.paciente.get_full_name|default:tratamiento.paciente.username }}
+                                {% else %}
+                                    Todos los Pagos
+                                {% endif %}
+                            </h5>
+                            {% if tratamiento %}
+                            <a href="{% url 'pagos_tratamientos:lista_pagos' %}" class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-1"></i> Volver a todos los pagos
+                            </a>
+                            {% endif %}
+                        </div>
+                        <div class="card-body p-0">
+                            {% if pagos %}
+                            <div class="table-responsive">
+                                <table class="table table-sm table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Fecha</th>
+                                            <th>Paciente</th>
+                                            <th>Tratamiento</th>
+                                            <th>Método de Pago</th>
+                                            <th>Monto</th>
+                                            <th>Estado</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for pago in pagos %}
+                                        <tr>
+                                            <td>#{{ pago.id }}</td>
+                                            <td>{{ pago.fecha_pago|date:"d/m/Y H:i" }}</td>
+                                            <td>{{ pago.tratamiento.paciente.get_full_name|default:pago.tratamiento.paciente.username }}</td>
+                                            <td>{{ pago.tratamiento.get_estado_display }}</td>
+                                            <td>{{ pago.forma_pago.nombre }}</td>
+                                            <td>S/ {{ pago.monto|intcomma }}</td>
+                                            <td>
+                                                {% if pago.estado == 'COMPLETADO' %}
+                                                    <span class="badge bg-success">Completado</span>
+                                                {% elif pago.estado == 'PENDIENTE' %}
+                                                    <span class="badge bg-warning text-dark">Pendiente</span>
+                                                {% elif pago.estado == 'ANULADO' %}
+                                                    <span class="badge bg-danger">Anulado</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="text-nowrap">
+                                                <a href="{% url 'pagos_tratamientos:detalle_pago' pago.id %}" class="btn btn-sm btn-info" title="Ver detalles">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                {% if pago.estado != 'ANULADO' %}
+                                                    <a href="{% url 'pagos_tratamientos:editar_pago' pago.id %}" class="btn btn-sm btn-warning" title="Editar">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <button onclick="confirmarAnulacion({{ pago.id }})" class="btn btn-sm btn-danger" title="Anular">
+                                                        <i class="fas fa-ban"></i>
+                                                    </button>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <div class="alert alert-info m-3 mb-0">
+                                <i class="fas fa-info-circle me-2"></i> No se encontraron pagos registrados.
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if pagos.has_other_pages %}
+<nav aria-label="Navegación de páginas" class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if pagos.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ pagos.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" aria-label="Anterior">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link" aria-hidden="true">&laquo;</span>
+        </li>
+        {% endif %}
+
+        {% for num in pagos.paginator.page_range %}
+            {% if pagos.number == num %}
+            <li class="page-item active" aria-current="page">
+                <span class="page-link">{{ num }}</span>
+            </li>
+            {% elif num > pagos.number|add:'-3' and num < pagos.number|add:'3' %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ num }}</a>
+            </li>
+            {% endif %}
+        {% endfor %}
+
+        {% if pagos.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ pagos.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" aria-label="Siguiente">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link" aria-hidden="true">&raquo;</span>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+
+<!-- Modal para seleccionar tratamiento -->
+<div class="modal fade" id="seleccionarTratamientoModal" tabindex="-1" aria-labelledby="seleccionarTratamientoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="seleccionarTratamientoModalLabel">
+                    <i class="fas fa-tooth me-2"></i>Seleccionar Tratamiento
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover" id="tablaTratamientos">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Paciente</th>
+                                <th>Tratamiento</th>
+                                <th>Monto Total</th>
+                                <th>Saldo Pendiente</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for tratamiento in tratamientos_disponibles %}
+                            <tr>
+                                <td>{{ tratamiento.id }}</td>
+                                <td>{{ tratamiento.paciente.get_full_name|default:tratamiento.paciente.username }}</td>
+                                <td>{{ tratamiento.get_estado_display }}</td>
+                                <td>S/ {{ tratamiento.costo_total|floatformat:2 }}</td>
+                                <td>S/ {{ tratamiento.saldo_pendiente|floatformat:2 }}</td>
+                                <td>
+                                    <a href="{% url 'pagos_tratamientos:crear_pago' tratamiento.id %}" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-plus me-1"></i> Seleccionar
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center">No hay tratamientos disponibles para pagar</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i> Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Anulación -->
+<div class="modal fade" id="modalAnulacion" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Anular Pago</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro que desea anular este pago?</p>
+                <div class="mb-3">
+                    <label for="motivo_anulacion" class="form-label">Motivo de la anulación</label>
+                    <textarea class="form-control" id="motivo_anulacion" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" onclick="anularPago()">Anular</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+<script>
+    // Esperar a que el documento esté completamente cargado
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Documento listo, inicializando...');
+        
+        // Inicializar DataTable para la tabla de tratamientos en el modal
+        const tablaTratamientos = document.getElementById('tablaTratamientos');
+        
+        if (tablaTratamientos) {
+            console.log('Inicializando DataTable para tablaTratamientos');
+            $(tablaTratamientos).DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.11.5/i18n/es-ES.json'
+                },
+                order: [[0, 'desc']],
+                pageLength: 5,
+                lengthMenu: [5, 10, 25, 50],
+                responsive: true,
+                initComplete: function() {
+                    console.log('DataTable inicializado correctamente');
+                }
+            });
+        } else {
+            console.warn('No se encontró la tabla con ID tablaTratamientos');
+        }
+
+        // Inicializar tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+
+    // Variable global para almacenar el ID del pago a anular
+    let pagoAAnular = null;
+
+    // Función para confirmar anulación
+    function confirmarAnulacion(pagoId) {
+        pagoAAnular = pagoId;
+        const modalAnulacion = new bootstrap.Modal(document.getElementById('modalAnulacion'));
+        document.getElementById('motivo_anulacion').value = '';
+        modalAnulacion.show();
+    }
+
+    // Función para anular pago
+    function anularPago() {
+        if (!pagoAAnular) return;
+        
+        const motivo = document.getElementById('motivo_anulacion').value.trim();
+        if (!motivo) {
+            Swal.fire({
+                title: 'Error',
+                text: 'Por favor ingrese el motivo de la anulación',
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+            });
+            return;
+        }
+
+        // Mostrar loading
+        Swal.fire({
+            title: 'Procesando...',
+            text: 'Anulando el pago, por favor espere.',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        // Enviar la solicitud de anulación
+        fetch(`/pagos/anular/${pagoAAnular}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+                motivo: motivo
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    title: '¡Éxito!',
+                    text: data.message || 'El pago ha sido anulado correctamente.',
+                    icon: 'success',
+                    confirmButtonText: 'Aceptar'
+                }).then(() => {
+                    // Recargar la página para ver los cambios
+                    window.location.reload();
+                });
+            } else {
+                throw new Error(data.message || 'Error al anular el pago');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                title: 'Error',
+                text: error.message || 'Ocurrió un error al intentar anular el pago. Por favor, intente nuevamente.',
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+            });
+        });
+    }
+</script>
+{% endblock %}

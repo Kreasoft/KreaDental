@@ -1,0 +1,284 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ accion }} Registro Clínico{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
+<style>
+    .card {
+        border: 1px solid #AED6F1;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    }
+
+    .card-header {
+        background-color: #E8F4FC;
+        border-bottom: 1px solid #AED6F1;
+        border-radius: 15px 15px 0 0 !important;
+        padding: 1.5rem;
+    }
+
+    .card-header h3 {
+        color: #1A5276;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    .form-label {
+        color: #1A5276;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control, .form-select {
+        border: 1px solid #AED6F1;
+        border-radius: 8px;
+        padding: 0.75rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #2874A6;
+        box-shadow: 0 0 0 0.2rem rgba(26, 82, 118, 0.1);
+    }
+
+    .btn-primary {
+        background-color: #1A5276;
+        border-color: #1A5276;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        border-radius: 8px;
+    }
+
+    .btn-primary:hover {
+        background-color: #2874A6;
+        border-color: #2874A6;
+    }
+
+    .btn-secondary {
+        background-color: #95a5a6;
+        border-color: #95a5a6;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        border-radius: 8px;
+    }
+
+    .btn-secondary:hover {
+        background-color: #7f8c8d;
+        border-color: #7f8c8d;
+    }
+
+    .alert {
+        border-radius: 8px;
+        border: none;
+    }
+
+    .paciente-info {
+        background-color: #E8F4FC;
+        border: 1px solid #AED6F1;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .paciente-info h4 {
+        color: #1A5276;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .paciente-info p {
+        color: #2874A6;
+        margin-bottom: 0.25rem;
+    }
+
+    .section-title {
+        color: #1A5276;
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin: 1.5rem 0 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #AED6F1;
+    }
+
+    .form-check {
+        margin-bottom: 0.5rem;
+    }
+
+    .form-check-input:checked {
+        background-color: #1A5276;
+        border-color: #1A5276;
+    }
+
+    .form-check-label {
+        color: #2874A6;
+    }
+
+    .form-text {
+        color: #7f8c8d;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-notes-medical me-2"></i>{{ accion }} Registro Clínico</h3>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                    <div class="messages mb-4">
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <!-- Información del Paciente -->
+                    <div class="paciente-info">
+                        <h4><i class="fas fa-user me-2"></i>Información del Paciente</h4>
+                        <p><strong>Nombre:</strong> {{ paciente.nombre }} {{ paciente.apellidos }}</p>
+                        <p><strong>RUT:</strong> {{ paciente.documento }}</p>
+                        <p><strong>Edad:</strong> {{ paciente.edad }} años</p>
+                    </div>
+
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Datos Básicos -->
+                        <div class="section-title">
+                            <i class="fas fa-info-circle me-2"></i>Datos Básicos
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="fecha" class="form-label">Fecha</label>
+                                <input type="date" class="form-control" id="fecha" name="fecha" value="{{ registro.fecha|date:'Y-m-d'|default:'' }}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="profesional" class="form-label">Profesional</label>
+                                <input type="text" class="form-control" id="profesional" name="profesional" value="{{ registro.profesional|default:'' }}" required>
+                            </div>
+                        </div>
+
+                        <!-- Motivo de Consulta -->
+                        <div class="section-title">
+                            <i class="fas fa-clipboard-list me-2"></i>Motivo de Consulta
+                        </div>
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="motivo_consulta" class="form-label">Descripción</label>
+                                <textarea class="form-control" id="motivo_consulta" name="motivo_consulta" rows="3" required>{{ registro.motivo_consulta|default:'' }}</textarea>
+                            </div>
+                        </div>
+
+                        <!-- Antecedentes -->
+                        <div class="section-title">
+                            <i class="fas fa-history me-2"></i>Antecedentes
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="antecedentes_personales" class="form-label">Antecedentes Personales</label>
+                                <textarea class="form-control" id="antecedentes_personales" name="antecedentes_personales" rows="3">{{ registro.antecedentes_personales|default:'' }}</textarea>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="antecedentes_familiares" class="form-label">Antecedentes Familiares</label>
+                                <textarea class="form-control" id="antecedentes_familiares" name="antecedentes_familiares" rows="3">{{ registro.antecedentes_familiares|default:'' }}</textarea>
+                            </div>
+                        </div>
+
+                        <!-- Examen Clínico -->
+                        <div class="section-title">
+                            <i class="fas fa-stethoscope me-2"></i>Examen Clínico
+                        </div>
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="examen_clinico" class="form-label">Observaciones</label>
+                                <textarea class="form-control" id="examen_clinico" name="examen_clinico" rows="3" required>{{ registro.examen_clinico|default:'' }}</textarea>
+                            </div>
+                        </div>
+
+                        <!-- Diagnóstico -->
+                        <div class="section-title">
+                            <i class="fas fa-file-medical-alt me-2"></i>Diagnóstico
+                        </div>
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="diagnostico" class="form-label">Diagnóstico</label>
+                                <textarea class="form-control" id="diagnostico" name="diagnostico" rows="3" required>{{ registro.diagnostico|default:'' }}</textarea>
+                            </div>
+                        </div>
+
+                        <!-- Tratamiento -->
+                        <div class="section-title">
+                            <i class="fas fa-prescription-bottle-alt me-2"></i>Tratamiento
+                        </div>
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="tratamiento" class="form-label">Plan de Tratamiento</label>
+                                <textarea class="form-control" id="tratamiento" name="tratamiento" rows="3" required>{{ registro.tratamiento|default:'' }}</textarea>
+                            </div>
+                        </div>
+
+                        <!-- Observaciones -->
+                        <div class="section-title">
+                            <i class="fas fa-comment-medical me-2"></i>Observaciones
+                        </div>
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="observaciones" class="form-label">Observaciones Adicionales</label>
+                                <textarea class="form-control" id="observaciones" name="observaciones" rows="3">{{ registro.observaciones|default:'' }}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a href="{% url 'pacientes:editar_paciente' paciente.id %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Guardar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+<script>
+    // Configuración base de Toast
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true
+    });
+
+    // Mostrar mensajes de Django
+    {% if messages %}
+        {% for message in messages %}
+            Toast.fire({
+                icon: '{{ message.tags }}',
+                title: '{{ message }}'
+            });
+        {% endfor %}
+    {% endif %}
+</script>
+{% endblock %} 

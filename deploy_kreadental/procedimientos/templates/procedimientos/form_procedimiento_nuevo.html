@@ -1,0 +1,556 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ accion }} Procedimiento{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
+<style>
+    /* Variables del tema dental */
+    :root {
+        --dental-primary: #1A5276;
+        --dental-secondary: #3498DB;
+        --dental-accent: #AED6F1;
+        --dental-light: #E8F4FC;
+        --dental-dark: #0E3A5F;
+        --dental-success: #27AE60;
+        --dental-warning: #F39C12;
+        --dental-danger: #E74C3C;
+        --dental-text: #2C3E50;
+        --dental-text-light: #7F8C8D;
+    }
+
+    /* Estilos del tema dental */
+    .card {
+        border: 1px solid var(--dental-accent);
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        background: white;
+        overflow: hidden;
+    }
+    
+    .card-header {
+        background-color: var(--dental-light);
+        border-bottom: 1px solid var(--dental-accent);
+        border-radius: 15px 15px 0 0 !important;
+        padding: 1.5rem;
+    }
+
+    .card-header h3 {
+        color: var(--dental-primary);
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+    }
+    
+    .form-label {
+        color: var(--dental-text);
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        font-family: 'Poppins', sans-serif;
+    }
+    
+    .form-control, .form-select, textarea.form-control {
+        border-radius: 10px;
+        border: 1px solid #B8D4F0;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background-color: white;
+    }
+    
+    .form-control:focus, .form-select:focus, textarea.form-control:focus {
+        border-color: var(--dental-primary);
+        box-shadow: 0 0 0 0.2rem rgba(26, 82, 118, 0.25);
+        transform: translateY(-1px);
+        outline: none;
+    }
+    
+    .input-group-text {
+        border: 1px solid #B8D4F0;
+        border-right: none;
+        font-weight: 500;
+        background-color: #F0F8FF;
+        color: var(--dental-primary);
+    }
+    
+    .input-group-text:first-child {
+        border-radius: 10px 0 0 10px;
+    }
+    
+    .input-group-text:last-child {
+        border-radius: 0 10px 10px 0 !important;
+        border-right: 1px solid #B8D4F0 !important;
+        border-left: none !important;
+    }
+    
+    .input-group {
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    
+    .input-group .form-control:not(:last-child) {
+        border-right: none !important;
+    }
+    
+    .input-group .form-control, .input-group textarea.form-control {
+        border-radius: 0 !important;
+        border-left: none !important;
+        border-right: 1px solid #B8D4F0 !important;
+        border-top: 1px solid #B8D4F0 !important;
+        border-bottom: 1px solid #B8D4F0 !important;
+    }
+    
+    .input-group .form-control:focus, .input-group textarea.form-control:focus {
+        border-left: 1px solid var(--dental-primary) !important;
+        border-right: 1px solid var(--dental-primary) !important;
+        border-top: 1px solid var(--dental-primary) !important;
+        border-bottom: 1px solid var(--dental-primary) !important;
+    }
+    
+    .input-group .form-control:last-child {
+        border-radius: 0 10px 10px 0 !important;
+    }
+    
+    .input-group .form-control:not(:last-child) {
+        border-right: none !important;
+    }
+    
+    .form-check-input {
+        width: 3rem;
+        height: 1.5rem;
+        border-radius: 1rem;
+        border: 2px solid var(--dental-accent);
+        background-color: var(--dental-light);
+        transition: all 0.3s ease;
+    }
+    
+    .form-check-input:checked {
+        background-color: var(--dental-primary);
+        border-color: var(--dental-primary);
+    }
+    
+    .form-check-input:focus {
+        box-shadow: 0 0 0 0.2rem rgba(26, 82, 118, 0.25);
+    }
+    
+    .form-check-label {
+        color: var(--dental-text);
+        font-weight: 500;
+    }
+    
+    /* Botones con tema dental */
+    .btn {
+        border-radius: 10px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        font-family: 'Poppins', sans-serif;
+    }
+    
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .btn-primary {
+        background-color: var(--dental-primary);
+        border-color: var(--dental-primary);
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background-color: var(--dental-dark);
+        border-color: var(--dental-dark);
+        color: white;
+    }
+    
+    .btn-outline-secondary {
+        border-color: var(--dental-text-light);
+        color: var(--dental-text-light);
+    }
+    
+    .btn-outline-secondary:hover {
+        background-color: var(--dental-text-light);
+        border-color: var(--dental-text-light);
+        color: white;
+    }
+    
+    .btn-lg {
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+    }
+    
+    .invalid-feedback {
+        font-size: 0.875rem;
+        color: var(--dental-danger);
+        margin-top: 0.25rem;
+    }
+    
+    .form-text {
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+        color: var(--dental-text-light);
+    }
+    
+    /* Iconos con colores del tema */
+    .text-primary {
+        color: var(--dental-primary) !important;
+    }
+    
+    .text-success {
+        color: var(--dental-success) !important;
+    }
+    
+    .text-info {
+        color: var(--dental-secondary) !important;
+    }
+    
+    .text-warning {
+        color: var(--dental-warning) !important;
+    }
+    
+    /* Animaciones */
+    .card {
+        animation: slideInUp 0.6s ease forwards;
+    }
+    
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .btn-lg {
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+        }
+        
+        .form-control, .form-select {
+            padding: 0.5rem 0.75rem;
+        }
+        
+        .card-header {
+            padding: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-6">
+            <!-- Formulario -->
+            <div class="card">
+                <div class="card-header" style="background-color: #E8F4FC; border-bottom: 1px solid #AED6F1; border-radius: 15px 15px 0 0 !important; padding: 1.5rem;">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="d-flex flex-column">
+                            <h3 style="color: #1A5276; font-size: 1.5rem; font-weight: 600; margin: 0; font-family: 'Poppins', sans-serif;">
+                                <i class="fas fa-procedures me-2"></i>Editar Procedimiento
+                            </h3>
+                            <p style="color: #7f8c8d; font-size: 0.9rem; font-weight: 400; margin-top: 0.5rem; margin-bottom: 0;">
+                                Modifica la información del procedimiento seleccionado
+                            </p>
+                        </div>
+                        <a href="{% url 'procedimientos:lista_procedimientos' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Volver
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <!-- Nombre del procedimiento -->
+                            <div class="col-12 mb-4">
+                                <label for="{{ form.nombre.id_for_label }}" class="form-label">
+                                    {{ form.nombre.label }}
+                                </label>
+                                <div class="input-group" style="border-radius: 10px; overflow: hidden;">
+                                    <span class="input-group-text" style="border-radius: 10px 0 0 10px; border: 1px solid #B8D4F0; border-right: none; background-color: #F0F8FF; color: #1A5276;">
+                                        <i class="fas fa-tooth"></i>
+                                    </span>
+                                    {{ form.nombre }}
+                                </div>
+                                {% if form.nombre.help_text %}
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    {{ form.nombre.help_text }}
+                                </div>
+                                {% endif %}
+                                {% if form.nombre.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.nombre.errors %}
+                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Descripción -->
+                            <div class="col-12 mb-4">
+                                <label for="{{ form.descripcion.id_for_label }}" class="form-label">
+                                    {{ form.descripcion.label }}
+                                </label>
+                                <div class="input-group" style="border-radius: 10px; overflow: hidden;">
+                                    <span class="input-group-text" style="border-radius: 10px 0 0 10px; border: 1px solid #B8D4F0; border-right: none; background-color: #F0F8FF; color: #1A5276;">
+                                        <i class="fas fa-info-circle"></i>
+                                    </span>
+                                    {{ form.descripcion }}
+                                </div>
+                                {% if form.descripcion.help_text %}
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    {{ form.descripcion.help_text }}
+                                </div>
+                                {% endif %}
+                                {% if form.descripcion.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.descripcion.errors %}
+                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Valor y Tiempo estimado -->
+                            <div class="col-md-6 mb-4">
+                                <label for="{{ form.valor.id_for_label }}" class="form-label">
+                                    {{ form.valor.label }}
+                                </label>
+                                <div class="input-group" style="border-radius: 10px; overflow: hidden;">
+                                    <span class="input-group-text" style="border-radius: 10px 0 0 10px; border: 1px solid #B8D4F0; border-right: none; background-color: #F0F8FF; color: #1A5276;">
+                                        <i class="fas fa-dollar-sign"></i>
+                                    </span>
+                                    {{ form.valor }}
+                                </div>
+                                {% if form.valor.help_text %}
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    {{ form.valor.help_text }}
+                                </div>
+                                {% endif %}
+                                {% if form.valor.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.valor.errors %}
+                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <label for="{{ form.tiempo_estimado.id_for_label }}" class="form-label">
+                                    {{ form.tiempo_estimado.label }}
+                                </label>
+                                <div class="input-group" style="border-radius: 10px; overflow: hidden;">
+                                    <span class="input-group-text" style="border-radius: 10px 0 0 10px; border: 1px solid #B8D4F0; border-right: none; background-color: #F0F8FF; color: #1A5276;">
+                                        <i class="fas fa-clock"></i>
+                                    </span>
+                                    {{ form.tiempo_estimado }}
+                                    <span class="input-group-text" style="border-radius: 0 10px 10px 0; border: 1px solid #B8D4F0; border-left: none; background-color: #F0F8FF; color: #1A5276;">minutos</span>
+                                </div>
+                                {% if form.tiempo_estimado.help_text %}
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    {{ form.tiempo_estimado.help_text }}
+                                </div>
+                                {% endif %}
+                                {% if form.tiempo_estimado.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.tiempo_estimado.errors %}
+                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Especialidad y Estado -->
+                            <div class="col-md-6 mb-4">
+                                <label for="{{ form.especialidad.id_for_label }}" class="form-label">
+                                    {{ form.especialidad.label }}
+                                </label>
+                                <div class="input-group" style="border-radius: 10px; overflow: hidden;">
+                                    <span class="input-group-text" style="border-radius: 10px 0 0 10px; border: 1px solid #B8D4F0; border-right: none; background-color: #F0F8FF; color: #1A5276;">
+                                        <i class="fas fa-user-md"></i>
+                                    </span>
+                                    {{ form.especialidad }}
+                                </div>
+                                {% if form.especialidad.help_text %}
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    {{ form.especialidad.help_text }}
+                                </div>
+                                {% endif %}
+                                {% if form.especialidad.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.especialidad.errors %}
+                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <label for="{{ form.estado.id_for_label }}" class="form-label">
+                                    {{ form.estado.label }}
+                                </label>
+                                <div class="form-check form-switch d-flex align-items-center">
+                                    <i class="fas fa-toggle-on me-2 text-primary"></i>
+                                    {{ form.estado }}
+                                    <label class="form-check-label ms-2" for="{{ form.estado.id_for_label }}">
+                                        Procedimiento activo
+                                    </label>
+                                </div>
+                                {% if form.estado.help_text %}
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    {{ form.estado.help_text }}
+                                </div>
+                                {% endif %}
+                                {% if form.estado.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.estado.errors %}
+                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="d-flex justify-content-between align-items-center pt-4 border-top">
+                            <a href="{% url 'procedimientos:lista_procedimientos' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save me-2"></i>
+                                {% if accion == 'Crear' %}
+                                    Crear Procedimiento
+                                {% else %}
+                                    Actualizar Procedimiento
+                                {% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+<script>
+    // Configuración base de Toast con tema dental
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        customClass: {
+            popup: 'swal2-toast-dental'
+        }
+    });
+
+    // Validación del formulario
+    (function() {
+        'use strict';
+        window.addEventListener('load', function() {
+            var forms = document.getElementsByClassName('needs-validation');
+            var validation = Array.prototype.filter.call(forms, function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        
+                        // Mostrar error con SweetAlert2
+                        Swal.fire({
+                            title: 'Error de Validación',
+                            text: 'Por favor, corrija los errores en el formulario',
+                            icon: 'error',
+                            confirmButtonColor: '#E74C3C',
+                            customClass: {
+                                popup: 'swal2-popup-dental'
+                            }
+                        });
+                    } else {
+                        // Mostrar loading
+                        Swal.fire({
+                            title: 'Guardando...',
+                            text: 'Por favor espere',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+    
+    // Mostrar mensajes de Django con SweetAlert2
+    {% if messages %}
+        {% for message in messages %}
+            Toast.fire({
+                icon: '{{ message.tags }}',
+                title: '{{ message }}',
+                background: '#E8F4FC',
+                color: '#1A5276'
+            });
+        {% endfor %}
+    {% endif %}
+    
+    // Formatear campos numéricos
+    document.addEventListener('DOMContentLoaded', function() {
+        const valorInput = document.getElementById('{{ form.valor.id_for_label }}');
+        const tiempoInput = document.getElementById('{{ form.tiempo_estimado.id_for_label }}');
+        
+        if (valorInput) {
+            valorInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/[^\d.]/g, '');
+                if (value && !isNaN(value)) {
+                    e.target.value = parseFloat(value).toFixed(2);
+                }
+            });
+        }
+        
+        if (tiempoInput) {
+            tiempoInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/[^\d]/g, '');
+                if (value && !isNaN(value)) {
+                    e.target.value = parseInt(value);
+                }
+            });
+        }
+    });
+</script>
+
+<style>
+    /* Estilos personalizados para SweetAlert2 con tema dental */
+    .swal2-toast-dental {
+        background: #E8F4FC !important;
+        border: 1px solid #AED6F1 !important;
+        color: #1A5276 !important;
+    }
+
+    .swal2-popup-dental {
+        border-radius: 15px !important;
+        border: 1px solid #AED6F1 !important;
+    }
+</style>
+{% endblock %} 

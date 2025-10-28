@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Informes de Citas{% endblock %}
+{% block page_title %}Informes de Citas{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.css" rel="stylesheet">
+<style>
+    .filtros-container, .stats-container {
+        background: white;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        margin-bottom: 20px;
+    }
+    .chart-container {
+        position: relative;
+        height: 300px;
+        margin-bottom: 20px;
+    }
+    .stats-card {
+        background: white;
+        padding: 1rem;
+        border-radius: 5px;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        margin-bottom: 1rem;
+    }
+    .stats-number {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #4e73df;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <div class="d-flex align-items-center">
+        <div>
+            <a href="?{{ request.GET.urlencode }}&export=excel" class="btn btn-success">
+                <i class="fas fa-file-excel"></i> Exportar a Excel
+            </a>
+        </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filtros-container">
+        <form method="get" class="row">
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>Fecha Inicio:</label>
+                    <input type="date" name="fecha_inicio" class="form-control" value="{{ fecha_inicio }}">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>Fecha Fin:</label>
+                    <input type="date" name="fecha_fin" class="form-control" value="{{ fecha_fin }}">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>Profesional:</label>
+                    <select name="profesional" class="form-control">
+                        <option value="">Todos los profesionales</option>
+                        {% for prof in profesionales %}
+                        <option value="{{ prof.id }}" {% if prof.id|stringformat:"s" == profesional_id %}selected{% endif %}>
+                            {{ prof.nombre }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <button type="submit" class="btn btn-primary d-block w-100">
+                        <i class="fas fa-search"></i> Filtrar
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Resumen de estadísticas -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="stats-card">
+                <div class="stats-number">{{ total_citas }}</div>
+                <div>Total de Citas</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficos -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="stats-container">
+                <h4>Citas por Estado</h4>
+                <div class="chart-container">
+                    <canvas id="estadosChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="stats-container">
+                <h4>Citas por Profesional</h4>
+                <div class="chart-container">
+                    <canvas id="profesionalesChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de citas -->
+    <div class="stats-container">
+        <h4>Listado de Citas</h4>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Hora</th>
+                        <th>Paciente</th>
+                        <th>Profesional</th>
+                        <th>Estado</th>
+                        <th>Motivo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cita in citas %}
+                    <tr>
+                        <td>{{ cita.fecha }}</td>
+                        <td>{{ cita.hora }}</td>
+                        <td>{{ cita.paciente }}</td>
+                        <td>{{ cita.profesional }}</td>
+                        <td>{{ cita.get_estado_display }}</td>
+                        <td>{{ cita.motivo|truncatechars:50 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Gráfico de estados
+    var ctxEstados = document.getElementById('estadosChart').getContext('2d');
+    new Chart(ctxEstados, {
+        type: 'pie',
+        data: {
+            labels: [{% for estado in citas_por_estado %}'{{ estado.get_estado_display }}',{% endfor %}],
+            datasets: [{
+                data: [{% for estado in citas_por_estado %}{{ estado.total }},{% endfor %}],
+                backgroundColor: [
+                    '#ffc107', // Pendiente
+                    '#28a745', // Confirmada
+                    '#007bff', // Completada
+                    '#dc3545'  // Cancelada
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+
+    // Gráfico de profesionales
+    var ctxProfesionales = document.getElementById('profesionalesChart').getContext('2d');
+    new Chart(ctxProfesionales, {
+        type: 'bar',
+        data: {
+            labels: [{% for prof in citas_por_profesional %}'{{ prof.profesional__nombre }}',{% endfor %}],
+            datasets: [{
+                label: 'Número de citas',
+                data: [{% for prof in citas_por_profesional %}{{ prof.total }},{% endfor %}],
+                backgroundColor: '#4e73df'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %} 

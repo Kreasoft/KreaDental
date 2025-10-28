@@ -1,0 +1,86 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    {% if error %}
+    <div class="alert alert-danger">
+        {{ error }}
+    </div>
+    {% else %}
+    <div class="row">
+        <!-- Tarjeta de Profesionales -->
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Profesionales Activos</h5>
+                    <p class="card-text display-4">{{ total_profesionales }}</p>
+                    <a href="{% url 'profesionales:lista_profesionales' %}" class="btn btn-primary">Ver Profesionales</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tarjeta de Pacientes -->
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Pacientes Registrados</h5>
+                    <p class="card-text display-4">{{ total_pacientes }}</p>
+                    <a href="{% url 'pacientes:lista_pacientes' %}" class="btn btn-primary">Ver Pacientes</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Citas Próximas -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Próximas Citas</h5>
+                </div>
+                <div class="card-body">
+                    {% if citas_proximas %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Hora</th>
+                                    <th>Paciente</th>
+                                    <th>Profesional</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cita in citas_proximas %}
+                                <tr>
+                                    <td>{{ cita.fecha }}</td>
+                                    <td>{{ cita.hora }}</td>
+                                    <td>{{ cita.paciente }}</td>
+                                    <td>{{ cita.profesional }}</td>
+                                    <td>
+                                        <span class="badge {% if cita.estado == 'PENDIENTE' %}bg-warning
+                                                     {% elif cita.estado == 'CONFIRMADA' %}bg-success
+                                                     {% elif cita.estado == 'CANCELADA' %}bg-danger
+                                                     {% else %}bg-secondary{% endif %}">
+                                            {{ cita.estado }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-center">No hay citas próximas programadas.</p>
+                    {% endif %}
+                    <div class="text-end mt-3">
+                        <a href="{% url 'citas:calendario' %}" class="btn btn-primary">Ver Calendario</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

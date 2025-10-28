@@ -1,0 +1,202 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% load humanize %}
+{% load humanize %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <!-- Detalles del Pago -->
+            <div class="card mb-4">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Detalle del Pago #{{ pago.id }}</h5>
+                    <span class="badge {% if pago.estado == 'COMPLETADO' %}bg-success
+                                    {% elif pago.estado == 'PENDIENTE' %}bg-warning
+                                    {% else %}bg-danger{% endif %}">
+                        {{ pago.estado }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <p><strong>Paciente:</strong> {{ pago.tratamiento.paciente.nombre }} {{ pago.tratamiento.paciente.apellidos }}</p>
+                            <p><strong>Tratamiento:</strong> {{ pago.tratamiento }}</p>
+                            <p><strong>Forma de Pago:</strong> {{ pago.forma_pago.nombre }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Monto:</strong> ${{ pago.monto|floatformat:0|intcomma }}</p>
+                            <p><strong>Fecha:</strong> {{ pago.fecha_pago|date:"d/m/Y H:i" }}</p>
+                            <p><strong>Comprobante:</strong> {{ pago.comprobante|default:"No especificado" }}</p>
+                        </div>
+                    </div>
+
+                    {% if pago.notas %}
+                    <div class="mb-3">
+                        <h6>Notas:</h6>
+                        <p class="mb-0">{{ pago.notas }}</p>
+                    </div>
+                    {% endif %}
+
+                    <div class="text-muted small">
+                        <p class="mb-0">Creado por: {{ pago.creado_por.get_full_name|default:pago.creado_por.username }}</p>
+                        <p class="mb-0">Fecha de creación: {{ pago.fecha_creacion|date:"d/m/Y H:i" }}</p>
+                        <p class="mb-0">Última actualización: {{ pago.fecha_actualizacion|date:"d/m/Y H:i" }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Historial del Pago -->
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Historial</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Acción</th>
+                                    <th>Estado</th>
+                                    <th>Monto</th>
+                                    <th>Usuario</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for registro in historial %}
+                                <tr>
+                                    <td>{{ registro.fecha_accion|date:"d/m/Y H:i" }}</td>
+                                    <td>{{ registro.tipo_accion }}</td>
+                                    <td>
+                                        {% if registro.estado_anterior %}
+                                        {{ registro.estado_anterior }} → {{ registro.estado_nuevo }}
+                                        {% else %}
+                                        {{ registro.estado_nuevo }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if registro.monto_anterior %}
+                                        ${{ registro.monto_anterior|floatformat:0|intcomma }} → ${{ registro.monto_nuevo|floatformat:0|intcomma }}
+                                        {% else %}
+                                        ${{ registro.monto_nuevo|floatformat:0|intcomma }}
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ registro.realizado_por.get_full_name|default:registro.realizado_por.username }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-4">
+                                        <p class="mb-0">No hay registros en el historial</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="mt-4 d-flex justify-content-between">
+                <a href="{% url 'pagos_tratamientos:lista_pagos' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Volver a la Lista
+                </a>
+                {% if pago.estado != 'ANULADO' %}
+                <div>
+                    <a href="{% url 'pagos_tratamientos:editar_pago' pago.id %}" class="btn btn-primary me-2">
+                        <i class="fas fa-edit me-2"></i>Editar Pago
+                    </a>
+                    <button class="btn btn-danger anular-pago" data-pago-id="{{ pago.id }}">
+                        <i class="fas fa-times me-2"></i>Anular Pago
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Anulación -->
+<div class="modal fade" id="anularPagoModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Anular Pago</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas anular este pago?</p>
+                <div class="form-group">
+                    <label for="motivoAnulacion">Motivo de la anulación:</label>
+                    <textarea id="motivoAnulacion" class="form-control" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmarAnulacion">Anular</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extrajs %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Animaciones
+    document.querySelectorAll('.card').forEach(card => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    });
+
+    setTimeout(() => {
+        document.querySelectorAll('.card').forEach((card, index) => {
+            setTimeout(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    }, 100);
+
+    // Anulación de pago
+    const anularPagoModal = new bootstrap.Modal(document.getElementById('anularPagoModal'));
+    const pagoId = '{{ pago.id }}';
+
+    document.querySelector('.anular-pago')?.addEventListener('click', function() {
+        anularPagoModal.show();
+    });
+
+    document.getElementById('confirmarAnulacion')?.addEventListener('click', function() {
+        const motivo = document.getElementById('motivoAnulacion').value;
+        const url = `/pagos/anular/${pagoId}/`;
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({ motivo_anulacion: motivo })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                location.reload();
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al procesar la solicitud');
+        })
+        .finally(() => {
+            anularPagoModal.hide();
+        });
+    });
+});
+</script>
+{% endblock %}

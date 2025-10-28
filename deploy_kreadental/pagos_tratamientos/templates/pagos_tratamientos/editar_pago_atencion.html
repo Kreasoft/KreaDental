@@ -1,0 +1,270 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Editar Pago de Atención{% endblock %}
+
+{% block extra_css %}
+<style>
+    .pago-info {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .form-section {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-control, .form-select {
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 10px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-secondary {
+        border-radius: 10px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+    }
+    
+    .info-card {
+        background: #f8f9fa;
+        border-left: 4px solid #667eea;
+        padding: 1rem;
+        border-radius: 0 10px 10px 0;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="mb-1">
+                        <i class="fas fa-edit text-warning me-2"></i>
+                        Editar Pago de Atención
+                    </h2>
+                    <p class="text-muted mb-0">Modificar información del pago registrado</p>
+                </div>
+                <div>
+                    <a href="{% url 'pagos_tratamientos:lista_pagos_atenciones' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Volver
+                    </a>
+                </div>
+            </div>
+
+            <!-- Información del Pago -->
+            <div class="pago-info">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h4 class="mb-3">
+                            <i class="fas fa-credit-card me-2"></i>
+                            Información del Pago
+                        </h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="mb-2"><strong>Paciente:</strong> {{ pago.cita.paciente.nombre_completo }}</p>
+                                <p class="mb-2"><strong>RUT:</strong> {{ pago.cita.paciente.rut }}</p>
+                                <p class="mb-2"><strong>Profesional:</strong> {{ pago.cita.profesional.nombre_completo }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-2"><strong>Fecha Atención:</strong> {{ pago.cita.fecha|date:"d/m/Y" }}</p>
+                                <p class="mb-2"><strong>Hora:</strong> {{ pago.cita.hora|time:"H:i" }}</p>
+                                <p class="mb-2"><strong>Motivo:</strong> {{ pago.cita.motivo }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <div class="info-card">
+                            <h6 class="mb-2">Estado del Pago</h6>
+                            <span class="badge bg-success fs-6">{{ pago.get_estado_display }}</span>
+                            <hr class="my-2">
+                            <h6 class="mb-2">Tipo de Atención</h6>
+                            <span class="badge bg-info fs-6">{{ pago.get_tipo_pago_display }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulario de Edición -->
+            <div class="form-section">
+                <h5 class="mb-4">
+                    <i class="fas fa-edit me-2"></i>
+                    Modificar Datos del Pago
+                </h5>
+                
+                <form id="formEditarPago" method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="tipo_pago" class="form-label">Tipo de Atención</label>
+                                <select id="tipo_pago" name="tipo_pago" class="form-select" required>
+                                    <option value="ATENCION_UNICA" {% if pago.tipo_pago == 'ATENCION_UNICA' %}selected{% endif %}>Atención Única</option>
+                                    <option value="CONSULTA" {% if pago.tipo_pago == 'CONSULTA' %}selected{% endif %}>Consulta</option>
+                                    <option value="URGENCIA" {% if pago.tipo_pago == 'URGENCIA' %}selected{% endif %}>Urgencia</option>
+                                    <option value="SESION_TRATAMIENTO" {% if pago.tipo_pago == 'SESION_TRATAMIENTO' %}selected{% endif %}>Sesión de Tratamiento</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="monto" class="form-label">Monto a Pagar</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="text" id="monto" name="monto" class="form-control" 
+                                           value="{{ pago.monto|floatformat:0 }}" required>
+                                </div>
+                                <div class="form-text">Ingrese el monto sin puntos ni comas</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="forma_pago" class="form-label">Forma de Pago</label>
+                                <select id="forma_pago" name="forma_pago" class="form-select" required>
+                                    <option value="">Seleccione una forma de pago</option>
+                                    {% for forma in formas_pago %}
+                                    <option value="{{ forma.id }}" {% if forma.id == pago.forma_pago.id %}selected{% endif %}>{{ forma.nombre }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="comprobante" class="form-label">Número de Comprobante</label>
+                                <input type="text" id="comprobante" name="comprobante" class="form-control" 
+                                       value="{{ pago.comprobante }}" placeholder="Opcional">
+                                <div class="form-text">Número de boleta, factura o referencia</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="notas" class="form-label">Notas Adicionales</label>
+                        <textarea id="notas" name="notas" class="form-control" rows="3" 
+                                  placeholder="Observaciones sobre el pago (opcional)">{{ pago.notas }}</textarea>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{% url 'pagos_tratamientos:lista_pagos_atenciones' %}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Guardar Cambios
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Formatear monto mientras se escribe
+        $('#monto').on('input', function() {
+            let value = $(this).val().replace(/[^\d]/g, '');
+            if (value) {
+                $(this).val(parseInt(value).toLocaleString('es-CL'));
+            }
+        });
+
+        // Enviar formulario
+        $('#formEditarPago').on('submit', function(e) {
+            e.preventDefault();
+            
+            // Limpiar monto para envío
+            let monto = $('#monto').val().replace(/[^\d]/g, '');
+            $('#monto').val(monto);
+            
+            // Mostrar loading
+            Swal.fire({
+                title: 'Procesando...',
+                text: 'Actualizando el pago',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            $.ajax({
+                url: '{% url "pagos_tratamientos:editar_pago_atencion" pago.id %}',
+                method: 'POST',
+                data: $(this).serialize(),
+                success: function(response) {
+                    if (response.status === 'success') {
+                        Swal.fire({
+                            title: '¡Éxito!',
+                            text: response.message,
+                            icon: 'success',
+                            confirmButtonText: 'Continuar'
+                        }).then(() => {
+                            window.location.href = '{% url "pagos_tratamientos:lista_pagos_atenciones" %}';
+                        });
+                    } else {
+                        Swal.fire('Error', response.message, 'error');
+                    }
+                },
+                error: function() {
+                    Swal.fire('Error', 'Ocurrió un error al actualizar el pago', 'error');
+                }
+            });
+        });
+
+        // Validar monto
+        $('#monto').on('blur', function() {
+            let value = $(this).val().replace(/[^\d]/g, '');
+            if (value && parseInt(value) <= 0) {
+                Swal.fire('Error', 'El monto debe ser mayor a 0', 'warning');
+                $(this).focus();
+            }
+        });
+    });
+</script>
+{% endblock %}
+
+
+
+
+

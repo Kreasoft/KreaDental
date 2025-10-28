@@ -1,0 +1,393 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load static %}
+
+{% block title %}Crear Pago{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card {
+        border: 1px solid #AED6F1;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    }
+
+    .card-header {
+        background-color: #E8F4FC;
+        border-bottom: 1px solid #AED6F1;
+        border-radius: 15px 15px 0 0 !important;
+        padding: 1.5rem;
+    }
+
+    .card-header h3, .card-header h5 {
+        color: #1A5276;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    .btn-primary {
+        background-color: #1A5276;
+        border-color: #1A5276;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        border-radius: 8px;
+        font-size: 0.9rem;
+    }
+
+    .btn-primary:hover {
+        background-color: #2874A6;
+        border-color: #2874A6;
+    }
+
+    .btn-secondary {
+        background-color: #95a5a6;
+        border-color: #95a5a6;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        border-radius: 8px;
+        font-size: 0.9rem;
+    }
+
+    .btn-secondary:hover {
+        background-color: #7f8c8d;
+        border-color: #7f8c8d;
+    }
+
+    .form-label {
+        color: #1A5276;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control, .form-select {
+        border: 1px solid #AED6F1;
+        border-radius: 8px;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.9rem;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #1A5276;
+        box-shadow: 0 0 0 0.2rem rgba(26, 82, 118, 0.25);
+    }
+
+    .input-group-text {
+        background-color: #E8F4FC;
+        border: 1px solid #AED6F1;
+        color: #1A5276;
+        font-weight: 600;
+    }
+
+    .info-group {
+        background-color: #E8F4FC;
+        border: 1px solid #AED6F1;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .info-label {
+        color: #1A5276;
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+    }
+
+    .info-value {
+        color: #2c3e50;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+
+    .amount-highlight {
+        color: #1A5276;
+        font-weight: 700;
+        font-size: 1.3rem;
+    }
+
+    .section-divider {
+        height: 2px;
+        background-color: #AED6F1;
+        margin: 2rem 0;
+        border-radius: 1px;
+    }
+
+    .form-section {
+        background-color: #f8f9fa;
+        border: 1px solid #AED6F1;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-section-title {
+        color: #1A5276;
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .info-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .info-list li {
+        padding: 1rem;
+        margin-bottom: 1rem;
+        background-color: #f8f9fa;
+        border: 1px solid #AED6F1;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .info-list li i {
+        font-size: 1.1rem;
+        width: 20px;
+        text-align: center;
+    }
+
+    .text-warning i {
+        color: #f39c12;
+    }
+
+    .text-success i {
+        color: #27ae60;
+    }
+
+    .text-info i {
+        color: #3498db;
+    }
+
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        background-color: #95a5a6;
+        color: white;
+        text-decoration: none;
+        font-weight: 500;
+        border: 1px solid #95a5a6;
+        margin-bottom: 1rem;
+    }
+
+    .btn-back:hover {
+        background-color: #7f8c8d;
+        border-color: #7f8c8d;
+        color: white;
+        text-decoration: none;
+    }
+
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 1rem;
+        }
+
+        .info-group {
+            padding: 1rem;
+        }
+
+        .form-section {
+            padding: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="mb-4">
+        <a href="{% url 'tratamientos:detalle' tratamiento.id %}" class="btn-back">
+            <i class="fas fa-arrow-left"></i>
+            Volver al tratamiento
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="form-card">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <i class="fas fa-money-bill-wave"></i>
+                        Registrar Pago
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Información del tratamiento -->
+                    <div class="info-group">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="info-label">Paciente</div>
+                                <div class="info-value">{{ tratamiento.paciente.nombre_completo }}</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="info-label">Costo Total del Tratamiento</div>
+                                <div class="info-value amount-highlight">${{ tratamiento.costo_total|floatformat:0|intcomma }}</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="info-label">Saldo Pendiente</div>
+                                <div class="info-value amount-highlight">${{ saldo_pendiente|floatformat:0|intcomma }}</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="info-label">Estado del Tratamiento</div>
+                                <div class="info-value">{{ tratamiento.get_estado_display }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-divider"></div>
+
+                    <!-- Formulario de pago -->
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="form-section">
+                            <div class="form-section-title">
+                                <i class="fas fa-dollar-sign"></i>
+                                Detalles del Pago
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="monto" class="form-label">Monto del Pago</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="text" class="form-control" id="monto" name="monto" 
+                                           value="{{ saldo_pendiente }}" required 
+                                           placeholder="Ingrese el monto del pago">
+                                </div>
+                                <div class="form-text">Monto máximo permitido: ${{ saldo_pendiente|floatformat:0|intcomma }}</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="forma_pago" class="form-label">Forma de Pago</label>
+                                <select class="form-select" id="forma_pago" name="forma_pago" required>
+                                    <option value="">Seleccione una forma de pago...</option>
+                                    {% for forma in formas_pago %}
+                                    <option value="{{ forma.id }}">{{ forma.nombre }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <div class="form-section-title">
+                                <i class="fas fa-file-alt"></i>
+                                Información Adicional
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="comprobante" class="form-label">Número de Comprobante</label>
+                                <input type="text" class="form-control" id="comprobante" name="comprobante" 
+                                       placeholder="Ej: Boleta 001-123456, Factura F001-789">
+                                <div class="form-text">Opcional: Número de boleta, factura o comprobante para referencia</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="notas" class="form-label">Notas Adicionales</label>
+                                <textarea class="form-control" id="notas" name="notas" rows="4" 
+                                        placeholder="Observaciones o detalles específicos del pago (opcional)"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>
+                                Registrar Pago
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información adicional -->
+        <div class="col-lg-4">
+            <div class="form-card">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <i class="fas fa-info-circle"></i>
+                        Información Importante
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <ul class="info-list">
+                        <li class="text-warning">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span>El monto del pago no puede exceder el saldo pendiente del tratamiento.</span>
+                        </li>
+                        <li class="text-success">
+                            <i class="fas fa-check-circle"></i>
+                            <span>El pago quedará registrado inmediatamente como completado.</span>
+                        </li>
+                        <li class="text-success">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Puede agregar un número de comprobante para referencia futura.</span>
+                        </li>
+                        <li class="text-info">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Las notas ayudan a documentar detalles específicos del pago.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Formateo de números para el campo monto
+document.addEventListener('DOMContentLoaded', function() {
+    const montoInput = document.getElementById('monto');
+    
+    // Función para formatear número con comas
+    function formatNumber(value) {
+        // Remover todo excepto números
+        let num = value.replace(/[^\d]/g, '');
+        
+        // Formatear con comas
+        if (num.length > 0) {
+            num = parseInt(num).toLocaleString('es-ES');
+        }
+        
+        return num;
+    }
+    
+    // Función para limpiar formato antes de enviar
+    function cleanNumber(value) {
+        return value.replace(/[^\d]/g, '');
+    }
+    
+    // Aplicar formato al escribir
+    montoInput.addEventListener('input', function(e) {
+        let value = e.target.value;
+        e.target.value = formatNumber(value);
+    });
+    
+    // Limpiar formato antes de enviar el formulario
+    document.querySelector('form').addEventListener('submit', function(e) {
+        montoInput.value = cleanNumber(montoInput.value);
+    });
+    
+    // Formatear valor inicial
+    if (montoInput.value) {
+        montoInput.value = formatNumber(montoInput.value);
+    }
+});
+</script>
+{% endblock %}

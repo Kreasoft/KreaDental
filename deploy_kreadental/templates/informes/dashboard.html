@@ -1,0 +1,184 @@
+{% extends 'informes/base_informes.html' %}
+{% load humanize %}
+
+{% block informe_titulo %}Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stats-card {
+        position: relative;
+        padding: 1.75rem;
+        border-radius: 1rem;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        transition: all 0.3s ease;
+    }
+    
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .stats-icon {
+        position: absolute;
+        right: 1.5rem;
+        bottom: 1rem;
+        font-size: 4.5rem;
+        opacity: 0.15;
+        transform: rotate(-5deg);
+        transition: all 0.3s ease;
+    }
+
+    .stats-card:hover .stats-icon {
+        transform: rotate(0deg) scale(1.1);
+        opacity: 0.2;
+    }
+
+    .stats-number {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+        position: relative;
+        z-index: 1;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .stats-label {
+        font-size: 0.9rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        position: relative;
+        z-index: 1;
+        opacity: 0.9;
+    }
+
+    .stats-trend {
+        position: absolute;
+        top: 1.75rem;
+        right: 1.75rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(4px);
+    }
+
+    .card-pacientes {
+        background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);
+        color: white;
+    }
+
+    .card-citas {
+        background: linear-gradient(135deg, var(--dental-primary) 0%, var(--dental-secondary) 100%);
+        color: white;
+    }
+
+    .card-tratamientos {
+        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        color: white;
+    }
+
+    .card-ingresos {
+        background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+        color: white;
+    }
+
+    .stats-container {
+        background: white;
+        border-radius: 1rem;
+        padding: 1.75rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        margin-bottom: 1.5rem;
+    }
+
+    .stats-container h4 {
+        color: var(--dental-text);
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .stats-container h4 i {
+        color: var(--dental-text-light);
+        opacity: 0.7;
+    }
+</style>
+{% endblock %}
+
+{% block contenido_informe %}
+<!-- Tarjetas de estadísticas -->
+<div class="row">
+    <div class="col-xl-3 col-md-6">
+        <div class="stats-card card-pacientes">
+            <div class="stats-trend">
+                <i class="fas fa-chart-line"></i> +5%
+            </div>
+            <div class="stats-number">{{ total_pacientes }}</div>
+            <div class="stats-label">Total Pacientes</div>
+            <i class="fas fa-users stats-icon"></i>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="stats-card card-citas">
+            <div class="stats-trend">
+                <i class="fas fa-chart-line"></i> +12%
+            </div>
+            <div class="stats-number">{{ total_citas }}</div>
+            <div class="stats-label">Citas en el Periodo</div>
+            <i class="fas fa-calendar-check stats-icon"></i>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="stats-card card-tratamientos">
+            <div class="stats-trend">
+                <i class="fas fa-chart-line"></i> +8%
+            </div>
+            <div class="stats-number">{{ total_tratamientos }}</div>
+            <div class="stats-label">Tratamientos en el Periodo</div>
+            <i class="fas fa-clipboard-list stats-icon"></i>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="stats-card card-ingresos">
+            <div class="stats-trend">
+                <i class="fas fa-chart-line"></i> +15%
+            </div>
+            <div class="stats-number">${{ ingresos_totales|floatformat:0|intcomma }}</div>
+            <div class="stats-label">Ingresos en el Periodo</div>
+            <i class="fas fa-dollar-sign stats-icon"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Gráficos -->
+<div class="row">
+    <div class="col-lg-6">
+        <div class="stats-container">
+            <h4>
+                <i class="fas fa-calendar-alt"></i>
+                Citas por Día
+            </h4>
+            <div class="chart-container">
+                {{ grafico_citas|safe }}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="stats-container">
+            <h4>
+                <i class="fas fa-chart-line"></i>
+                Tratamientos por Día
+            </h4>
+            <div class="chart-container">
+                {{ grafico_tratamientos|safe }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

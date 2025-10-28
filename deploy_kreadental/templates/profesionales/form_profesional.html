@@ -1,0 +1,410 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ accion }} Profesional{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
+<style>
+    .card {
+        border: 1px solid #AED6F1;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    }
+
+    .card-header {
+        background-color: #E8F4FC;
+        border-bottom: 1px solid #AED6F1;
+        border-radius: 15px 15px 0 0 !important;
+        padding: 1.5rem;
+    }
+
+    .card-header h3 {
+        color: #1A5276;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .modal-subtitle {
+        color: #7f8c8d;
+        font-size: 0.9rem;
+        font-weight: 400;
+        margin-top: 0.5rem;
+        margin-bottom: 0;
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    .nav-tabs {
+        border-bottom: 1px solid #AED6F1;
+    }
+
+    .nav-tabs .nav-link {
+        color: #2874A6;
+        border: none;
+        padding: 1rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .nav-tabs .nav-link:hover {
+        color: #1A5276;
+        background-color: #E8F4FC;
+        border: none;
+    }
+
+    .nav-tabs .nav-link.active {
+        color: #1A5276;
+        background-color: #E8F4FC;
+        border: none;
+        border-bottom: 2px solid #1A5276;
+    }
+
+    .form-label {
+        color: #1A5276;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control, .form-select {
+        border: 1px solid #AED6F1;
+        border-radius: 8px;
+        padding: 0.75rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #2874A6;
+        box-shadow: 0 0 0 0.2rem rgba(26, 82, 118, 0.1);
+    }
+
+    .btn-primary {
+        background-color: #1A5276;
+        border-color: #1A5276;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        border-radius: 8px;
+    }
+
+    .btn-primary:hover {
+        background-color: #2874A6;
+        border-color: #2874A6;
+    }
+
+    .btn-secondary {
+        background-color: #95a5a6;
+        border-color: #95a5a6;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        border-radius: 8px;
+    }
+
+    .btn-secondary:hover {
+        background-color: #7f8c8d;
+        border-color: #7f8c8d;
+    }
+
+    .invalid-feedback {
+        color: #e74c3c;
+        font-size: 0.85rem;
+    }
+
+    .required-field::after {
+        content: " *";
+        color: #e74c3c;
+    }
+
+    .tab-pane {
+        padding: 1.5rem 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex flex-column">
+                        <h3><i class="fas fa-user-md me-2"></i>{{ accion }} Profesional</h3>
+                        <p class="modal-subtitle">
+                            {% if accion == "Crear" %}
+                                Complete la información del nuevo profesional médico que se unirá al equipo de la clínica. Los datos marcados con * son obligatorios.
+                            {% else %}
+                                Modifique la información del profesional médico. Los datos marcados con * son obligatorios y se actualizarán en el sistema.
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Mensajes manejados por SweetAlert -->
+
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            Por favor, corrija los siguientes errores:
+                            <ul class="mb-0 mt-2">
+                                {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+
+                        <div class="row">
+                            <!-- RUT -->
+                            <div class="col-md-6">
+                                <label for="{{ form.rut.id_for_label }}" class="form-label">RUT *</label>
+                                {{ form.rut }}
+                                {% if form.rut.errors %}
+                                <div class="invalid-feedback d-block">{{ form.rut.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Nombres -->
+                            <div class="col-md-6">
+                                <label for="{{ form.nombres.id_for_label }}" class="form-label">Nombres *</label>
+                                {{ form.nombres }}
+                                {% if form.nombres.errors %}
+                                <div class="invalid-feedback d-block">{{ form.nombres.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Apellido Paterno -->
+                            <div class="col-md-6">
+                                <label for="{{ form.apellido_paterno.id_for_label }}" class="form-label">Apellido Paterno *</label>
+                                {{ form.apellido_paterno }}
+                                {% if form.apellido_paterno.errors %}
+                                <div class="invalid-feedback d-block">{{ form.apellido_paterno.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Apellido Materno -->
+                            <div class="col-md-6">
+                                <label for="{{ form.apellido_materno.id_for_label }}" class="form-label">Apellido Materno *</label>
+                                {{ form.apellido_materno }}
+                                {% if form.apellido_materno.errors %}
+                                <div class="invalid-feedback d-block">{{ form.apellido_materno.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Fecha de Nacimiento -->
+                            <div class="col-md-6">
+                                <label for="{{ form.fecha_nacimiento.id_for_label }}" class="form-label">Fecha de Nacimiento *</label>
+                                {{ form.fecha_nacimiento }}
+                                {% if form.fecha_nacimiento.errors %}
+                                <div class="invalid-feedback d-block">{{ form.fecha_nacimiento.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Género -->
+                            <div class="col-md-6">
+                                <label for="{{ form.genero.id_for_label }}" class="form-label">Género *</label>
+                                {{ form.genero }}
+                                {% if form.genero.errors %}
+                                <div class="invalid-feedback d-block">{{ form.genero.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Teléfono -->
+                            <div class="col-md-6">
+                                <label for="{{ form.telefono.id_for_label }}" class="form-label">Teléfono *</label>
+                                {{ form.telefono }}
+                                {% if form.telefono.errors %}
+                                <div class="invalid-feedback d-block">{{ form.telefono.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Email -->
+                            <div class="col-md-6">
+                                <label for="{{ form.email.id_for_label }}" class="form-label">Email *</label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                <div class="invalid-feedback d-block">{{ form.email.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Dirección -->
+                            <div class="col-12">
+                                <label for="{{ form.direccion.id_for_label }}" class="form-label">Dirección *</label>
+                                {{ form.direccion }}
+                                {% if form.direccion.errors %}
+                                <div class="invalid-feedback d-block">{{ form.direccion.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Especialidad -->
+                            <div class="col-md-6">
+                                <label for="{{ form.especialidad.id_for_label }}" class="form-label">Especialidad *</label>
+                                {{ form.especialidad }}
+                                {% if form.especialidad.errors %}
+                                <div class="invalid-feedback d-block">{{ form.especialidad.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Porcentaje de Utilidad -->
+                            <div class="col-md-6">
+                                <label for="{{ form.porcentaje_utilidad.id_for_label }}" class="form-label">Porcentaje de Utilidad (%)</label>
+                                <div class="input-group">
+                                    {{ form.porcentaje_utilidad }}
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                {% if form.porcentaje_utilidad.errors %}
+                                <div class="invalid-feedback d-block">{{ form.porcentaje_utilidad.errors|join:", " }}</div>
+                                {% endif %}
+                                <div class="form-text">Porcentaje que recibe el profesional por procedimientos realizados (0.00 - 100.00)</div>
+                            </div>
+
+                            <!-- Activo -->
+                            <div class="col-md-6">
+                                <div class="form-check mt-4">
+                                    {{ form.activo }}
+                                    <label class="form-check-label" for="{{ form.activo.id_for_label }}">
+                                        Profesional Activo
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a href="{% url 'profesionales:lista_profesionales' %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>{{ accion }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+:root {
+    --dental-primary: #00A0B0;
+    --dental-secondary: #008C9A;
+    --dental-accent: #00B4C8;
+    --dental-light: #E6F7F9;
+    --dental-dark: #006D78;
+}
+
+.form-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--dental-primary);
+}
+
+.form-control, .form-select {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--dental-primary);
+    box-shadow: 0 0 0 0.25rem rgba(0, 160, 176, 0.25);
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+}
+
+.btn-dental-primary {
+    background-color: var(--dental-primary);
+    border-color: var(--dental-primary);
+    color: white;
+}
+
+.btn-dental-primary:hover {
+    background-color: var(--dental-secondary);
+    border-color: var(--dental-secondary);
+    color: white;
+}
+
+.bg-dental-primary {
+    background-color: var(--dental-primary) !important;
+}
+
+.form-check-input:checked {
+    background-color: var(--dental-primary);
+    border-color: var(--dental-primary);
+}
+
+.alert {
+    font-size: 0.9rem;
+}
+
+.invalid-feedback {
+    font-size: 0.8rem;
+}
+
+.card-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+<script>
+    // Configuración base de Toast
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true
+    });
+
+    // Función para cerrar alerts automáticamente
+    document.addEventListener('DOMContentLoaded', function() {
+        const alerts = document.querySelectorAll('.alert[data-auto-dismiss]');
+        alerts.forEach(function(alert) {
+            const delay = parseInt(alert.getAttribute('data-auto-dismiss'));
+            setTimeout(function() {
+                const closeButton = alert.querySelector('.btn-close');
+                if (closeButton) {
+                    closeButton.click();
+                }
+            }, delay);
+        });
+    });
+
+    // Mostrar mensajes de Django
+    {% if messages %}
+        {% for message in messages %}
+            Toast.fire({
+                icon: '{{ message.tags }}',
+                title: '{{ message }}'
+            });
+        {% endfor %}
+    {% endif %}
+
+    // Validación del formulario
+    (function () {
+        'use strict'
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+    })()
+</script>
+{% endblock %} 

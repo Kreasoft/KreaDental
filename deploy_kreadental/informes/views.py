@@ -1,0 +1,719 @@
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.utils import timezone
+from datetime import datetime, timedelta
+from django.db.models import Count, Sum, FloatField
+from django.db.models.functions import Cast
+import plotly.express as px
+import plotly.graph_objects as go
+import pandas as pd
+
+from pacientes.models import Paciente
+from citas.models import Cita
+from tratamientos.models import Tratamiento
+from profesionales.models import Profesional
+from pagos_tratamientos.models import PagoTratamiento, PagoAtencion
+from tratamientos.models import Pago
+
+@login_required
+def dashboard(request):
+    # Obtener fechas para filtrado
+    fecha_fin = request.GET.get('fecha_fin', timezone.now().date())
+    if isinstance(fecha_fin, str):
+        fecha_fin = datetime.strptime(fecha_fin, '%Y-%m-%d').date()
+    fecha_inicio = request.GET.get('fecha_inicio', (fecha_fin - timedelta(days=30)))
+    if isinstance(fecha_inicio, str):
+        fecha_inicio = datetime.strptime(fecha_inicio, '%Y-%m-%d').date()
+
+    # Estadísticas generales
+    total_pacientes = Paciente.objects.count()
+    total_citas = Cita.objects.filter(fecha__range=[fecha_inicio, fecha_fin]).count()
+    total_tratamientos = Tratamiento.objects.filter(fecha_inicio__range=[fecha_inicio, fecha_fin]).count()
+    ingresos_totales = Tratamiento.objects.filter(
+        fecha_inicio__range=[fecha_inicio, fecha_fin]
+    ).aggregate(total=Sum('costo_total'))['total'] or 0
+
+    # Gráficos para el dashboard
+    citas_por_dia = Cita.objects.filter(
+        fecha__range=[fecha_inicio, fecha_fin]
+    ).values('fecha').annotate(total=Count('id')).order_by('fecha')
+
+    tratamientos_por_dia = Tratamiento.objects.filter(
+        fecha_inicio__range=[fecha_inicio, fecha_fin]
+    ).values('fecha_inicio').annotate(total=Count('id')).order_by('fecha_inicio')
+
+    # Crear gráficos con Plotly
+    fig_citas = go.Figure()
+    fig_citas.add_trace(go.Scatter(
+        x=[x['fecha'] for x in citas_por_dia],
+        y=[x['total'] for x in citas_por_dia],
+        name='Citas',
+        mode='lines+markers',
+        line=dict(color='#1A5276', width=3),
+        marker=dict(color='#2874A6', size=8)
+    ))
+    fig_citas.update_layout(
+        title='Citas por Día',
+        xaxis_title='Fecha',
+        yaxis_title='Número de Citas',
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font=dict(color='#2C3E50')
+    )
+
+    fig_tratamientos = go.Figure()
+    fig_tratamientos.add_trace(go.Scatter(
+        x=[x['fecha_inicio'] for x in tratamientos_por_dia],
+        y=[x['total'] for x in tratamientos_por_dia],
+        name='Tratamientos',
+        mode='lines+markers',
+        line=dict(color='#2ecc71', width=3),
+        marker=dict(color='#27ae60', size=8)
+    ))
+    fig_tratamientos.update_layout(
+        title='Tratamientos por Día',
+        xaxis_title='Fecha',
+        yaxis_title='Número de Tratamientos',
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font=dict(color='#2C3E50')
+    )
+
+    context = {
+        'total_pacientes': total_pacientes,
+        'total_citas': total_citas,
+        'total_tratamientos': total_tratamientos,
+        'ingresos_totales': ingresos_totales,
+        'grafico_citas': fig_citas.to_html(full_html=False),
+        'grafico_tratamientos': fig_tratamientos.to_html(full_html=False),
+        'fecha_inicio': fecha_inicio,
+        'fecha_fin': fecha_fin,
+    }
+    return render(request, 'informes/dashboard.html', context)
+
+@login_required
+def informe_tratamientos(request):
+    fecha_fin = request.GET.get('fecha_fin', timezone.now().date())
+    if isinstance(fecha_fin, str):
+        fecha_fin = datetime.strptime(fecha_fin, '%Y-%m-%d').date()
+    fecha_inicio = request.GET.get('fecha_inicio', (fecha_fin - timedelta(days=30)))
+    if isinstance(fecha_inicio, str):
+        fecha_inicio = datetime.strptime(fecha_inicio, '%Y-%m-%d').date()
+
+    profesional_id = request.GET.get('profesional')
+
+    # Base queryset
+    tratamientos = Tratamiento.objects.filter(fecha_inicio__range=[fecha_inicio, fecha_fin])
+    pagos = PagoTratamiento.objects.filter(fecha_pago__range=[fecha_inicio, fecha_fin], estado='COMPLETADO')
+    if profesional_id:
+        tratamientos = tratamientos.filter(profesional_id=profesional_id)
+        pagos = pagos.filter(tratamiento__profesional_id=profesional_id)
+
+    # Análisis de tratamientos
+    tratamientos_por_estado = tratamientos.values('estado').annotate(
+        total=Count('id'),
+        ingresos=Sum('costo_total')
+    )
+
+    tratamientos_por_profesional = tratamientos.values(
+        'profesional__nombres', 
+        'profesional__apellido_paterno'
+    ).annotate(
+        total=Count('id'),
+        ingresos=Sum('costo_total')
+    )
+
+    # Análisis de ingresos por día (tratamientos)
+    ingresos_por_dia = tratamientos.values('fecha_inicio').annotate(
+        total=Sum('costo_total')
+    ).order_by('fecha_inicio')
+
+    # Análisis de pagos por día
+    pagos_por_dia = pagos.values('fecha_pago').annotate(
+        total=Sum('monto')
+    ).order_by('fecha_pago')
+
+    # Crear gráficos
+    df_estados = pd.DataFrame(list(tratamientos_por_estado))
+    if not df_estados.empty:
+        fig_estados = px.pie(
+            df_estados,
+            values='total',
+            names='estado',
+            title='Tratamientos por Estado',
+            color_discrete_map={
+                'PENDIENTE': '#f39c12',
+                'EN_PROGRESO': '#2874A6',
+                'COMPLETADO': '#2ecc71',
+                'CANCELADO': '#e74c3c'
+            }
+        )
+        fig_estados.update_layout(
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='#2C3E50')
+        )
+    else:
+        fig_estados = go.Figure()
+        fig_estados.add_annotation(
+            text="No hay datos de tratamientos para el período seleccionado",
+            xref="paper", yref="paper",
+            x=0.5, y=0.5, showarrow=False,
+            font=dict(size=16, color="#7f8c8d")
+        )
+        fig_estados.update_layout(
+            title='Tratamientos por Estado',
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='#2C3E50')
+        )
+
+    fig_ingresos = go.Figure()
+    fig_ingresos.add_trace(go.Scatter(
+        x=[x['fecha_inicio'] for x in ingresos_por_dia],
+        y=[x['total'] for x in ingresos_por_dia],
+        name='Ingresos Totales',
+        mode='lines+markers',
+        line=dict(color='#1A5276', width=3),
+        marker=dict(color='#2874A6', size=8)
+    ))
+    fig_ingresos.add_trace(go.Scatter(
+        x=[x['fecha_pago'] for x in pagos_por_dia],
+        y=[x['total'] for x in pagos_por_dia],
+        name='Pagos Recibidos',
+        mode='lines+markers',
+        line=dict(color='#2ecc71', width=3),
+        marker=dict(color='#27ae60', size=8)
+    ))
+    fig_ingresos.update_layout(
+        title='Ingresos y Pagos por Día',
+        xaxis_title='Fecha',
+        yaxis_title='Monto',
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font=dict(color='#2C3E50')
+    )
+
+    df_profesionales = pd.DataFrame(list(tratamientos_por_profesional))
+    if not df_profesionales.empty:
+        fig_ingresos_profesionales = px.bar(
+            df_profesionales,
+            x='profesional__nombres',
+            y='ingresos',
+            title='Ingresos por Profesional',
+            labels={'profesional__nombres': 'Profesional', 'ingresos': 'Ingresos'},
+            color_discrete_sequence=['#1A5276']
+        )
+        fig_ingresos_profesionales.update_layout(
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='#2C3E50')
+        )
+    else:
+        fig_ingresos_profesionales = go.Figure()
+        fig_ingresos_profesionales.add_annotation(
+            text="No hay datos de profesionales para el período seleccionado",
+            xref="paper", yref="paper",
+            x=0.5, y=0.5, showarrow=False,
+            font=dict(size=16, color="#7f8c8d")
+        )
+        fig_ingresos_profesionales.update_layout(
+            title='Ingresos por Profesional',
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='#2C3E50')
+        )
+
+    context = {
+        'tratamientos': tratamientos,
+        'fecha_inicio': fecha_inicio,
+        'fecha_fin': fecha_fin,
+        'profesionales': Profesional.objects.filter(activo=True),
+        'profesional_id': profesional_id,
+        'grafico_estados': fig_estados.to_html(full_html=False),
+        'grafico_ingresos': fig_ingresos.to_html(full_html=False),
+        'grafico_ingresos_profesionales': fig_ingresos_profesionales.to_html(full_html=False),
+        'total_tratamientos': tratamientos.count(),
+        'total_ingresos': tratamientos.aggregate(total=Sum('costo_total'))['total'] or 0,
+    }
+    return render(request, 'informes/tratamientos.html', context)
+
+@login_required
+def informe_financiero(request):
+    # Obtener fechas
+    fecha_fin = request.GET.get('fecha_fin', timezone.now().date())
+    if isinstance(fecha_fin, str):
+        fecha_fin = datetime.strptime(fecha_fin, '%Y-%m-%d').date()
+    fecha_inicio = request.GET.get('fecha_inicio', (fecha_fin - timedelta(days=30)))
+    if isinstance(fecha_inicio, str):
+        fecha_inicio = datetime.strptime(fecha_inicio, '%Y-%m-%d').date()
+        
+    print(f'\nDEBUG - Fechas:')
+    print(f'Fecha inicio: {fecha_inicio}')
+    print(f'Fecha fin: {fecha_fin}')
+
+    # 1. Obtener tratamientos del período
+    tratamientos = Tratamiento.objects.filter(
+        fecha_inicio__range=[fecha_inicio, fecha_fin]
+    )
+    
+    # 2. Obtener todos los tipos de pagos del período
+    pagos_tratamientos = PagoTratamiento.objects.filter(
+        fecha_pago__range=[fecha_inicio, fecha_fin],
+        estado='COMPLETADO'
+    )
+    
+    pagos_atenciones = PagoAtencion.objects.filter(
+        fecha_pago__range=[fecha_inicio, fecha_fin],
+        estado='COMPLETADO'
+    )
+    
+    pagos_rapidos = Pago.objects.filter(
+        fecha__range=[fecha_inicio, fecha_fin],
+        estado='PAGADO'
+    )
+    
+    print('\nDEBUG - Consultas:')
+    print(f'Número de tratamientos: {tratamientos.count()}')
+    print(f'Número de pagos tratamientos: {pagos_tratamientos.count()}')
+    print(f'Número de pagos atenciones: {pagos_atenciones.count()}')
+    print(f'Número de pagos rápidos: {pagos_rapidos.count()}')
+
+    # Análisis de ingresos por día (tratamientos)
+    ingresos_por_dia = tratamientos.values('fecha_inicio').annotate(
+        total=Sum('costo_total')
+    ).order_by('fecha_inicio')
+
+    # Análisis de pagos por día - combinar todos los tipos
+    from django.db.models import Q
+    from django.db.models.functions import Cast
+    from django.db.models import IntegerField
+    
+    # Pagos de tratamientos por día
+    pagos_tratamientos_por_dia = pagos_tratamientos.values('fecha_pago__date').annotate(
+        total=Sum(Cast('monto', IntegerField()))
+    ).order_by('fecha_pago__date')
+    
+    # Pagos de atenciones por día
+    pagos_atenciones_por_dia = pagos_atenciones.values('fecha_pago__date').annotate(
+        total=Sum(Cast('monto', IntegerField()))
+    ).order_by('fecha_pago__date')
+    
+    # Pagos rápidos por día
+    pagos_rapidos_por_dia = pagos_rapidos.values('fecha').annotate(
+        total=Sum(Cast('monto', IntegerField()))
+    ).order_by('fecha')
+
+    # Análisis de ingresos por profesional
+    ingresos_por_profesional = tratamientos.values(
+        'profesional__nombres',
+        'profesional__apellido_paterno'
+    ).annotate(
+        total=Sum('costo_total'),
+        num_tratamientos=Count('id'),
+        promedio=Cast(Sum('costo_total'), FloatField()) / Cast(Count('id'), FloatField())
+    ).order_by('-total')
+
+    # Crear gráficos
+    fig_ingresos = go.Figure()
+    fig_ingresos.add_trace(go.Scatter(
+        x=[x['fecha_inicio'] for x in ingresos_por_dia],
+        y=[x['total'] for x in ingresos_por_dia],
+        name='Ingresos Totales',
+        mode='lines+markers',
+        line=dict(color='#1A5276', width=3),
+        marker=dict(color='#2874A6', size=8)
+    ))
+    
+    # Agregar pagos de tratamientos
+    if pagos_tratamientos_por_dia:
+        fig_ingresos.add_trace(go.Scatter(
+            x=[x['fecha_pago__date'] for x in pagos_tratamientos_por_dia],
+            y=[x['total'] for x in pagos_tratamientos_por_dia],
+            name='Pagos Tratamientos',
+            mode='lines+markers',
+            line=dict(color='#2ecc71', width=2),
+            marker=dict(color='#27ae60', size=6)
+        ))
+    
+    # Agregar pagos de atenciones
+    if pagos_atenciones_por_dia:
+        fig_ingresos.add_trace(go.Scatter(
+            x=[x['fecha_pago__date'] for x in pagos_atenciones_por_dia],
+            y=[x['total'] for x in pagos_atenciones_por_dia],
+            name='Pagos Atenciones',
+            mode='lines+markers',
+            line=dict(color='#e74c3c', width=2),
+            marker=dict(color='#c0392b', size=6)
+        ))
+    
+    # Agregar pagos rápidos
+    if pagos_rapidos_por_dia:
+        fig_ingresos.add_trace(go.Scatter(
+            x=[x['fecha'] for x in pagos_rapidos_por_dia],
+            y=[x['total'] for x in pagos_rapidos_por_dia],
+            name='Pagos Rápidos',
+            mode='lines+markers',
+            line=dict(color='#f39c12', width=2),
+            marker=dict(color='#e67e22', size=6)
+        ))
+    fig_ingresos.update_layout(
+        title='Ingresos y Pagos por Día',
+        xaxis_title='Fecha',
+        yaxis_title='Monto',
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font=dict(color='#2C3E50')
+    )
+
+    # Gráfico de barras para ingresos por profesional
+    df_profesionales = pd.DataFrame(list(ingresos_por_profesional))
+    if not df_profesionales.empty:
+        df_profesionales['nombre_completo'] = df_profesionales['profesional__nombres'] + ' ' + df_profesionales['profesional__apellido_paterno']
+        fig_prof = px.bar(
+            df_profesionales,
+            x='nombre_completo',
+            y='total',
+            title='Ingresos por Profesional',
+            labels={'nombre_completo': 'Profesional', 'total': 'Ingresos'},
+            color_discrete_sequence=['#1A5276']
+        )
+        fig_prof.update_layout(
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='#2C3E50')
+        )
+    else:
+        fig_prof = go.Figure()
+
+    # 3. Calcular totales
+    ingresos_totales = tratamientos.aggregate(
+        total=Sum('costo_total')
+    )['total'] or 0
+    
+    # Total pagado: sumar todos los tipos de pagos
+    total_pagado_tratamientos = pagos_tratamientos.aggregate(
+        total=Sum(Cast('monto', IntegerField()))
+    )['total'] or 0
+    
+    total_pagado_atenciones = pagos_atenciones.aggregate(
+        total=Sum(Cast('monto', IntegerField()))
+    )['total'] or 0
+    
+    total_pagado_rapidos = pagos_rapidos.aggregate(
+        total=Sum(Cast('monto', IntegerField()))
+    )['total'] or 0
+    
+    total_pagado = total_pagado_tratamientos + total_pagado_atenciones + total_pagado_rapidos
+    
+    # Total pendiente: ingresos totales menos lo que ya se ha pagado
+    total_pendiente = ingresos_totales - total_pagado
+    
+    print('\nDEBUG - Totales:')
+    print(f'Ingresos totales: ${ingresos_totales:,.0f}')
+    print(f'Total pagado tratamientos: ${total_pagado_tratamientos:,.0f}')
+    print(f'Total pagado atenciones: ${total_pagado_atenciones:,.0f}')
+    print(f'Total pagado rápidos: ${total_pagado_rapidos:,.0f}')
+    print(f'Total pagado: ${total_pagado:,.0f}')
+    print(f'Total pendiente: ${total_pendiente:,.0f}')
+
+    # 4. Preparar contexto
+    context = {
+        'fecha_inicio': fecha_inicio,
+        'fecha_fin': fecha_fin,
+        'grafico_ingresos': fig_ingresos.to_html(full_html=False),
+        'grafico_profesionales': fig_prof.to_html(full_html=False),
+        'ingresos_totales': ingresos_totales,
+        'total_pagado': total_pagado,
+        'total_pagado_tratamientos': total_pagado_tratamientos,
+        'total_pagado_atenciones': total_pagado_atenciones,
+        'total_pagado_rapidos': total_pagado_rapidos,
+        'total_pendiente': total_pendiente,
+        'num_tratamientos': tratamientos.count(),
+        'ingresos_por_profesional': ingresos_por_profesional,
+    }
+    
+    print('\nDEBUG - Contexto enviado al template:')
+    print(f'ingresos_totales: ${context["ingresos_totales"]:,.0f}')
+    print(f'total_pagado: ${context["total_pagado"]:,.0f}')
+    print(f'total_pendiente: ${context["total_pendiente"]:,.0f}')
+    print(f'ingresos_por_profesional count: {len(ingresos_por_profesional)}')
+    for prof in ingresos_por_profesional:
+        print(f'  - {prof["profesional__nombres"]} {prof["profesional__apellido_paterno"]}: ${prof["total"]:,.0f}')
+    return render(request, 'informes/financiero.html', context)
+
+@login_required
+def informe_pacientes(request):
+    fecha_fin = request.GET.get('fecha_fin', timezone.now().date())
+    if isinstance(fecha_fin, str):
+        fecha_fin = datetime.strptime(fecha_fin, '%Y-%m-%d').date()
+    fecha_inicio = request.GET.get('fecha_inicio', (fecha_fin - timedelta(days=30)))
+    if isinstance(fecha_inicio, str):
+        fecha_inicio = datetime.strptime(fecha_inicio, '%Y-%m-%d').date()
+
+    # Análisis de pacientes
+    pacientes = Paciente.objects.all()
+    pacientes_nuevos = pacientes.filter(fecha_registro__range=[fecha_inicio, fecha_fin])
+    
+    citas_por_paciente = Cita.objects.filter(
+        fecha__range=[fecha_inicio, fecha_fin]
+    ).values(
+        'paciente__nombre',
+        'paciente__apellidos'
+    ).annotate(
+        total_citas=Count('id')
+    ).order_by('-total_citas')
+
+    tratamientos_por_paciente = Tratamiento.objects.filter(
+        fecha_inicio__range=[fecha_inicio, fecha_fin]
+    ).values(
+        'paciente__nombre',
+        'paciente__apellidos'
+    ).annotate(
+        total_tratamientos=Count('id'),
+        total_gastos=Sum('costo_total')
+    ).order_by('-total_gastos')
+
+    # Crear gráficos
+    df_citas = pd.DataFrame(list(citas_por_paciente))
+    if not df_citas.empty:
+        df_citas['nombre_completo'] = df_citas['paciente__nombre'] + ' ' + df_citas['paciente__apellidos']
+        fig_citas = px.bar(
+            df_citas.head(10),  # Top 10 pacientes
+            x='nombre_completo',
+            y='total_citas',
+            title='Top 10 Pacientes por Número de Citas',
+            labels={'nombre_completo': 'Paciente', 'total_citas': 'Número de Citas'},
+            color_discrete_sequence=['#2874A6']
+        )
+        fig_citas.update_layout(
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='#2C3E50')
+        )
+    else:
+        fig_citas = go.Figure()
+
+    df_tratamientos = pd.DataFrame(list(tratamientos_por_paciente))
+    if not df_tratamientos.empty:
+        df_tratamientos['nombre_completo'] = df_tratamientos['paciente__nombre'] + ' ' + df_tratamientos['paciente__apellidos']
+        fig_gastos = px.bar(
+            df_tratamientos.head(10),  # Top 10 pacientes
+            x='nombre_completo',
+            y='total_gastos',
+            title='Top 10 Pacientes por Gastos en Tratamientos',
+            labels={'nombre_completo': 'Paciente', 'total_gastos': 'Total Gastos'},
+            color_discrete_sequence=['#2ecc71']
+        )
+        fig_gastos.update_layout(
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='#2C3E50')
+        )
+    else:
+        fig_gastos = go.Figure()
+
+    context = {
+        'fecha_inicio': fecha_inicio,
+        'fecha_fin': fecha_fin,
+        'total_pacientes': pacientes.count(),
+        'pacientes_nuevos': pacientes_nuevos.count(),
+        'grafico_citas': fig_citas.to_html(full_html=False),
+        'grafico_gastos': fig_gastos.to_html(full_html=False),
+        'citas_por_paciente': citas_por_paciente[:10],  # Top 10
+        'tratamientos_por_paciente': tratamientos_por_paciente[:10],  # Top 10
+    }
+    return render(request, 'informes/pacientes.html', context)
+
+@login_required
+def informe_profesionales(request):
+    # Obtener fechas
+    fecha_fin = request.GET.get('fecha_fin', timezone.now().date())
+    if isinstance(fecha_fin, str):
+        fecha_fin = datetime.strptime(fecha_fin, '%Y-%m-%d').date()
+    fecha_inicio = request.GET.get('fecha_inicio', (fecha_fin - timedelta(days=30)))
+    if isinstance(fecha_inicio, str):
+        fecha_inicio = datetime.strptime(fecha_inicio, '%Y-%m-%d').date()
+
+    # Obtener todos los profesionales activos
+    profesionales = Profesional.objects.filter(activo=True)
+    
+    # Datos por profesional
+    datos_profesionales = []
+    
+    for profesional in profesionales:
+        # Citas del profesional en el rango de fechas
+        citas = Cita.objects.filter(
+            profesional=profesional,
+            fecha__range=[fecha_inicio, fecha_fin]
+        )
+        
+        # Tratamientos del profesional en el rango de fechas
+        tratamientos = Tratamiento.objects.filter(
+            profesional=profesional,
+            fecha_inicio__range=[fecha_inicio, fecha_fin]
+        )
+        
+        # Pagos de tratamientos del profesional
+        pagos_tratamientos = PagoTratamiento.objects.filter(
+            tratamiento__profesional=profesional,
+            fecha_pago__range=[fecha_inicio, fecha_fin],
+            estado='COMPLETADO'
+        )
+        
+        # Pagos de atenciones del profesional
+        pagos_atenciones = PagoAtencion.objects.filter(
+            cita__profesional=profesional,
+            fecha_pago__range=[fecha_inicio, fecha_fin],
+            estado='COMPLETADO'
+        )
+        
+        # Pagos rápidos del profesional (si están asociados a tratamientos)
+        pagos_rapidos = Pago.objects.filter(
+            tratamiento__profesional=profesional,
+            fecha__range=[fecha_inicio, fecha_fin],
+            estado='PAGADO'
+        )
+        
+        # Calcular estadísticas
+        total_citas = citas.count()
+        total_tratamientos = tratamientos.count()
+        ingresos_tratamientos = tratamientos.aggregate(total=Sum('costo_total'))['total'] or 0
+        
+        # Calcular total pagado de todos los tipos
+        from django.db.models.functions import Cast
+        from django.db.models import IntegerField
+        
+        total_pagado_tratamientos = pagos_tratamientos.aggregate(
+            total=Sum(Cast('monto', IntegerField()))
+        )['total'] or 0
+        
+        total_pagado_atenciones = pagos_atenciones.aggregate(
+            total=Sum(Cast('monto', IntegerField()))
+        )['total'] or 0
+        
+        total_pagado_rapidos = pagos_rapidos.aggregate(
+            total=Sum(Cast('monto', IntegerField()))
+        )['total'] or 0
+        
+        total_pagado = total_pagado_tratamientos + total_pagado_atenciones + total_pagado_rapidos
+        
+        # Citas por estado
+        citas_por_estado = citas.values('estado').annotate(total=Count('id'))
+        
+        # Tratamientos por estado
+        tratamientos_por_estado = tratamientos.values('estado').annotate(
+            total=Count('id'),
+            ingresos=Sum('costo_total')
+        )
+        
+        # Citas por día
+        citas_por_dia = citas.values('fecha').annotate(total=Count('id')).order_by('fecha')
+        
+        datos_profesional = {
+            'profesional': profesional,
+            'total_citas': total_citas,
+            'total_tratamientos': total_tratamientos,
+            'ingresos_tratamientos': ingresos_tratamientos,
+            'total_pagado': total_pagado,
+            'total_pagado_tratamientos': total_pagado_tratamientos,
+            'total_pagado_atenciones': total_pagado_atenciones,
+            'total_pagado_rapidos': total_pagado_rapidos,
+            'citas_por_estado': list(citas_por_estado),
+            'tratamientos_por_estado': list(tratamientos_por_estado),
+            'citas_por_dia': list(citas_por_dia),
+        }
+        
+        datos_profesionales.append(datos_profesional)
+    
+    # Ordenar por ingresos de tratamientos
+    datos_profesionales.sort(key=lambda x: x['ingresos_tratamientos'], reverse=True)
+    
+    # Crear gráficos generales
+    # Gráfico de ingresos por profesional
+    df_profesionales = pd.DataFrame([
+        {
+            'nombre': f"{p['profesional'].nombres} {p['profesional'].apellido_paterno}",
+            'ingresos': p['ingresos_tratamientos'],
+            'citas': p['total_citas'],
+            'tratamientos': p['total_tratamientos']
+        }
+        for p in datos_profesionales
+    ])
+    
+    if not df_profesionales.empty:
+        fig_ingresos = px.bar(
+            df_profesionales,
+            x='nombre',
+            y='ingresos',
+            title='Ingresos por Profesional',
+            labels={'nombre': 'Profesional', 'ingresos': 'Ingresos ($)'},
+            color_discrete_sequence=['#1A5276']
+        )
+        fig_ingresos.update_layout(
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='#2C3E50'),
+            xaxis_tickangle=-45
+        )
+        
+        fig_citas = px.bar(
+            df_profesionales,
+            x='nombre',
+            y='citas',
+            title='Citas por Profesional',
+            labels={'nombre': 'Profesional', 'citas': 'Número de Citas'},
+            color_discrete_sequence=['#2874A6']
+        )
+        fig_citas.update_layout(
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='#2C3E50'),
+            xaxis_tickangle=-45
+        )
+        
+        fig_tratamientos = px.bar(
+            df_profesionales,
+            x='nombre',
+            y='tratamientos',
+            title='Tratamientos por Profesional',
+            labels={'nombre': 'Profesional', 'tratamientos': 'Número de Tratamientos'},
+            color_discrete_sequence=['#2ecc71']
+        )
+        fig_tratamientos.update_layout(
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='#2C3E50'),
+            xaxis_tickangle=-45
+        )
+    else:
+        fig_ingresos = go.Figure()
+        fig_citas = go.Figure()
+        fig_tratamientos = go.Figure()
+    
+    # Totales generales
+    total_citas_general = sum(p['total_citas'] for p in datos_profesionales)
+    total_tratamientos_general = sum(p['total_tratamientos'] for p in datos_profesionales)
+    total_ingresos_general = sum(p['ingresos_tratamientos'] for p in datos_profesionales)
+    total_pagado_general = sum(p['total_pagado'] for p in datos_profesionales)
+    total_pagado_tratamientos_general = sum(p['total_pagado_tratamientos'] for p in datos_profesionales)
+    total_pagado_atenciones_general = sum(p['total_pagado_atenciones'] for p in datos_profesionales)
+    total_pagado_rapidos_general = sum(p['total_pagado_rapidos'] for p in datos_profesionales)
+    
+    context = {
+        'fecha_inicio': fecha_inicio,
+        'fecha_fin': fecha_fin,
+        'datos_profesionales': datos_profesionales,
+        'grafico_ingresos': fig_ingresos.to_html(full_html=False),
+        'grafico_citas': fig_citas.to_html(full_html=False),
+        'grafico_tratamientos': fig_tratamientos.to_html(full_html=False),
+        'total_citas_general': total_citas_general,
+        'total_tratamientos_general': total_tratamientos_general,
+        'total_ingresos_general': total_ingresos_general,
+        'total_pagado_general': total_pagado_general,
+        'total_pagado_tratamientos_general': total_pagado_tratamientos_general,
+        'total_pagado_atenciones_general': total_pagado_atenciones_general,
+        'total_pagado_rapidos_general': total_pagado_rapidos_general,
+    }
+    
+    return render(request, 'informes/profesionales.html', context)

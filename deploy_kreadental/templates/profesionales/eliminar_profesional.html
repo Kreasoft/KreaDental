@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title">Eliminar Profesional</h5>
+        </div>
+        <div class="card-body">
+            <p class="alert alert-warning">
+                ¿Está seguro que desea eliminar al profesional {{ profesional.nombre }} {{ profesional.apellidos }}?
+            </p>
+            <form method="post">
+                {% csrf_token %}
+                <div class="text-end">
+                    <a href="{% url 'profesionales:lista_profesionales' %}" class="btn btn-secondary me-2">
+                        <i class="fas fa-times me-2"></i>Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i>Eliminar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

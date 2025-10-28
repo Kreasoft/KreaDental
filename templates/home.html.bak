@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1 class="text-center mb-5">
+                <i class="fas fa-tooth text-primary"></i> Sistema Dental
+            </h1>
+            
+            <!-- Tarjeta de Pacientes -->
+            <div class="card mb-4 shadow-sm hover-card">
+                <div class="card-body d-flex align-items-center p-4">
+                    <div class="flex-shrink-0 me-4">
+                        <div class="icon-circle bg-primary">
+                            <i class="fas fa-users text-white fa-2x"></i>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h3 class="card-title mb-1">Pacientes</h3>
+                        <p class="card-text text-muted">Gestiona la información de tus pacientes</p>
+                    </div>
+                    <div class="ms-auto">
+                        <a href="{% url 'pacientes:paciente_list' %}" class="btn btn-primary">
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta de Profesionales -->
+            <div class="card mb-4 shadow-sm hover-card">
+                <div class="card-body d-flex align-items-center p-4">
+                    <div class="flex-shrink-0 me-4">
+                        <div class="icon-circle bg-success">
+                            <i class="fas fa-user-md text-white fa-2x"></i>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h3 class="card-title mb-1">Profesionales</h3>
+                        <p class="card-text text-muted">Administra el equipo médico</p>
+                    </div>
+                    <div class="ms-auto">
+                        <a href="{% url 'profesionales:profesional_list' %}" class="btn btn-success">
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta de Especialidades -->
+            <div class="card mb-4 shadow-sm hover-card">
+                <div class="card-body d-flex align-items-center p-4">
+                    <div class="flex-shrink-0 me-4">
+                        <div class="icon-circle bg-info">
+                            <i class="fas fa-stethoscope text-white fa-2x"></i>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h3 class="card-title mb-1">Especialidades</h3>
+                        <p class="card-text text-muted">Gestiona las especialidades médicas</p>
+                    </div>
+                    <div class="ms-auto">
+                        <a href="{% url 'profesionales:lista_especialidades' %}" class="btn btn-info">
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta de Citas -->
+            <div class="card mb-4 shadow-sm hover-card">
+                <div class="card-body d-flex align-items-center p-4">
+                    <div class="flex-shrink-0 me-4">
+                        <div class="icon-circle bg-warning">
+                            <i class="fas fa-calendar-alt text-white fa-2x"></i>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h3 class="card-title mb-1">Citas</h3>
+                        <p class="card-text text-muted">Agenda y gestiona las citas médicas</p>
+                    </div>
+                    <div class="ms-auto">
+                        <a href="{% url 'citas:calendario_citas' %}" class="btn btn-warning">
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.icon-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hover-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border: none;
+    border-radius: 15px;
+}
+
+.hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+}
+
+.btn {
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn i {
+    font-size: 1.2rem;
+}
+</style>
+{% endblock %} 

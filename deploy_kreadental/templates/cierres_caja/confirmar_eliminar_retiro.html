@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load cierre_filters %}
+
+{% block title %}Eliminar Retiro - KreaDental{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card {
+        border: 1px solid #AED6F1;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    }
+
+    .card-header {
+        background-color: #E8F4FC;
+        border-bottom: 1px solid #AED6F1;
+        border-radius: 15px 15px 0 0 !important;
+        padding: 1.5rem;
+    }
+
+    .card-header h3 {
+        color: #1A5276;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-danger:hover {
+        background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+    }
+
+    .btn-secondary {
+        background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+        background: linear-gradient(135deg, #7f8c8d 0%, #6c7b7d 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(149, 165, 166, 0.3);
+    }
+
+    .alert-warning {
+        background: linear-gradient(135deg, #fef9e7 0%, #fcf3cf 100%);
+        border: 1px solid #f4d03f;
+        color: #8b6914;
+        border-radius: 10px;
+    }
+
+    .retiro-details {
+        background: linear-gradient(135deg, #E8F4FC 0%, #D1E7F5 100%);
+        border: 1px solid #AED6F1;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .retiro-details h5 {
+        color: #1A5276;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .detail-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #D1E7F5;
+    }
+
+    .detail-item:last-child {
+        border-bottom: none;
+    }
+
+    .detail-label {
+        color: #5D6D7E;
+        font-weight: 500;
+    }
+
+    .detail-value {
+        color: #1A5276;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Header -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3>
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Confirmar Eliminación de Retiro
+                        </h3>
+                        <a href="{% url 'cierres_caja:detalle_cierre' retiro.cierre_caja.id %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>
+                            Volver
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alerta de advertencia -->
+            <div class="alert alert-warning mb-4">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>¡Atención!</strong> Esta acción no se puede deshacer. El retiro será eliminado permanentemente del sistema.
+            </div>
+
+            <!-- Detalles del retiro -->
+            <div class="retiro-details">
+                <h5>
+                    <i class="fas fa-info-circle me-2"></i>
+                    Detalles del Retiro a Eliminar
+                </h5>
+                <div class="detail-item">
+                    <span class="detail-label">ID del Retiro:</span>
+                    <span class="detail-value">#{{ retiro.id }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Concepto:</span>
+                    <span class="detail-value">{{ retiro.concepto }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Monto:</span>
+                    <span class="detail-value">${{ retiro.monto|formatear_monto_sin_decimales }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Comprobante:</span>
+                    <span class="detail-value">
+                        {% if retiro.comprobante %}
+                            {{ retiro.comprobante }}
+                        {% else %}
+                            <span class="text-muted">No especificado</span>
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Fecha del Retiro:</span>
+                    <span class="detail-value">{{ retiro.fecha_retiro|date:"d/m/Y H:i" }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Usuario que Retiró:</span>
+                    <span class="detail-value">{{ retiro.usuario_retiro.get_full_name|default:retiro.usuario_retiro.username }}</span>
+                </div>
+                {% if retiro.observaciones %}
+                <div class="detail-item">
+                    <span class="detail-label">Observaciones:</span>
+                    <span class="detail-value">{{ retiro.observaciones }}</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Formulario de confirmación -->
+            <div class="card">
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="text-center">
+                            <h5 class="mb-3">¿Estás seguro de que quieres eliminar este retiro?</h5>
+                            <p class="text-muted mb-4">
+                                Esta acción afectará el cálculo del saldo final de la caja.
+                            </p>
+                            <div class="d-flex gap-2 justify-content-center">
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fas fa-trash me-1"></i>
+                                    Sí, Eliminar Retiro
+                                </button>
+                                <a href="{% url 'cierres_caja:detalle_cierre' retiro.cierre_caja.id %}" class="btn btn-secondary">
+                                    <i class="fas fa-times me-1"></i>
+                                    Cancelar
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

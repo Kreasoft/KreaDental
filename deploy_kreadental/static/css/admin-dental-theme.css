@@ -1,0 +1,482 @@
+/* Admin Dental Theme - Basado en el listado de pacientes */
+
+/* Variables de colores */
+:root {
+    --dental-primary: #1A5276;
+    --dental-secondary: #2874A6;
+    --dental-light: #AED6F1;
+    --dental-bg-light: #E8F4FC;
+    --dental-success: #2ecc71;
+    --dental-warning: #f39c12;
+    --dental-danger: #e74c3c;
+    --dental-text-muted: #7f8c8d;
+}
+
+/* ESTILOS FORZADOS PARA TÍTULOS - MÁXIMA PRIORIDAD */
+body #content #app_list table th,
+body #content #app_list table td,
+body #content #app_list table caption,
+body #content .app-list table th,
+body #content .app-list table td,
+body #content .app-list table caption,
+body #content .app-list .model-name,
+body #content .app-list .model-count,
+body #content .app-list a,
+body #content .app-list h2,
+body #content .app-list h3,
+body #content .app-list h4,
+body #content .app-list h5,
+body #content .app-list h6,
+body #content .app-list .module h2,
+body #content .app-list .module caption,
+body #content .app-list .inline-group h2,
+body #content .app-list .inline-group caption,
+body #content .app-list .module th,
+body #content .app-list .module td,
+body #content .app-list table thead th,
+body #content .app-list table tbody th,
+body #content .app-list table tbody td,
+body #content .app-list .count,
+body #content .app-list .model-count,
+body #content .app-list .model-name,
+body #content .app-list .model-name a,
+body #content .app-list .model-name a:link,
+body #content .app-list .model-name a:visited,
+body #content .app-list .model-name a:hover,
+body #content .app-list .model-name a:active {
+    color: var(--dental-primary) !important;
+    background: white !important;
+    font-weight: 600 !important;
+}
+
+/* Enlaces específicos */
+body #content .app-list a:link,
+body #content .app-list a:visited {
+    color: var(--dental-secondary) !important;
+    text-decoration: none !important;
+}
+
+body #content .app-list a:hover,
+body #content .app-list a:active {
+    color: var(--dental-primary) !important;
+    text-decoration: underline !important;
+}
+
+/* Header del admin */
+#header {
+    background: var(--dental-primary) !important;
+    color: white !important;
+    border-bottom: 3px solid var(--dental-secondary) !important;
+}
+
+#header a:link, #header a:visited {
+    color: white !important;
+}
+
+#branding h1 {
+    color: white !important;
+    font-family: 'Poppins', sans-serif !important;
+    font-weight: 600 !important;
+}
+
+/* Sidebar del admin */
+.module h2, .module caption, .inline-group h2 {
+    background: var(--dental-bg-light) !important;
+    color: var(--dental-primary) !important;
+    border: 1px solid var(--dental-light) !important;
+    border-radius: 8px 8px 0 0 !important;
+    font-family: 'Poppins', sans-serif !important;
+    font-weight: 600 !important;
+    padding: 1rem !important;
+}
+
+/* Contenido principal */
+#content {
+    background: #f8f9fa !important;
+}
+
+/* Tarjetas y módulos */
+.module {
+    border: 1px solid var(--dental-light) !important;
+    border-radius: 15px !important;
+    box-shadow: 0 0 20px rgba(0,0,0,0.05) !important;
+    margin-bottom: 1.5rem !important;
+    overflow: hidden !important;
+}
+
+.module .description {
+    background: var(--dental-bg-light) !important;
+    border-top: 1px solid var(--dental-light) !important;
+    padding: 1rem !important;
+    color: var(--dental-text-muted) !important;
+}
+
+/* Títulos de las tarjetas del dashboard - ESTILOS MÁS ESPECÍFICOS */
+.app-list .model-count {
+    color: var(--dental-primary) !important;
+}
+
+.app-list .model-name {
+    color: var(--dental-primary) !important;
+    font-weight: 600 !important;
+}
+
+.app-list a {
+    color: var(--dental-primary) !important;
+}
+
+.app-list a:hover {
+    color: var(--dental-secondary) !important;
+}
+
+/* Títulos de secciones */
+.app-list h2 {
+    color: var(--dental-primary) !important;
+    font-weight: 600 !important;
+    border-bottom: 2px solid var(--dental-light) !important;
+    padding-bottom: 0.5rem !important;
+}
+
+/* CORRECCIÓN ESPECÍFICA PARA TÍTULOS DE TABLAS */
+.app-list table th,
+.app-list table td,
+.app-list table caption,
+.app-list table thead th,
+.app-list table tbody th,
+.app-list table tbody td {
+    color: var(--dental-primary) !important;
+    background: white !important;
+}
+
+/* Títulos de módulos específicos */
+.app-list .module h2,
+.app-list .module caption,
+.app-list .inline-group h2,
+.app-list .module th,
+.app-list .module td {
+    color: var(--dental-primary) !important;
+    background: white !important;
+}
+
+/* Enlaces en las tablas */
+.app-list table a,
+.app-list .module a {
+    color: var(--dental-secondary) !important;
+}
+
+.app-list table a:hover,
+.app-list .module a:hover {
+    color: var(--dental-primary) !important;
+}
+
+/* Contadores y números */
+.app-list .model-count,
+.app-list .count {
+    color: var(--dental-primary) !important;
+    font-weight: 600 !important;
+}
+
+/* Tablas */
+#changelist table {
+    border: 1px solid var(--dental-light) !important;
+    border-radius: 8px !important;
+    overflow: hidden !important;
+}
+
+#changelist thead th {
+    background: #1A5276 !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    border-bottom: 1px solid var(--dental-light) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    font-size: 0.85rem !important;
+    padding: 0.75rem !important;
+}
+
+#changelist tbody tr {
+    border-bottom: 1px solid var(--dental-bg-light) !important;
+}
+
+#changelist tbody tr:hover {
+    background-color: var(--dental-bg-light) !important;
+}
+
+#changelist tbody td {
+    padding: 0.75rem !important;
+    vertical-align: middle !important;
+    font-size: 0.9rem !important;
+    color: var(--dental-primary) !important;
+}
+
+/* Botones */
+.button, input[type=submit], input[type=button], .submit-row input, a.button {
+    background: var(--dental-primary) !important;
+    color: white !important;
+    border: none !important;
+    padding: 0.5rem 1rem !important;
+    font-weight: 500 !important;
+    border-radius: 8px !important;
+    font-size: 0.9rem !important;
+    text-decoration: none !important;
+    display: inline-block !important;
+    transition: all 0.3s ease !important;
+}
+
+.button:hover, input[type=submit]:hover, input[type=button]:hover, .submit-row input:hover, a.button:hover {
+    background: var(--dental-secondary) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 8px rgba(26, 82, 118, 0.2) !important;
+}
+
+.button.default, input[type=submit].default, .submit-row input.default {
+    background: var(--dental-success) !important;
+}
+
+.button.default:hover, input[type=submit].default:hover, .submit-row input.default:hover {
+    background: #27ae60 !important;
+}
+
+.deletelink {
+    background: var(--dental-danger) !important;
+}
+
+.deletelink:hover {
+    background: #c0392b !important;
+}
+
+/* Formularios */
+.form-row {
+    padding: 1rem !important;
+    border-bottom: 1px solid var(--dental-bg-light) !important;
+}
+
+.form-row:last-child {
+    border-bottom: none !important;
+}
+
+.form-row label {
+    color: var(--dental-primary) !important;
+    font-weight: 600 !important;
+    font-size: 0.95rem !important;
+}
+
+.form-row input, .form-row textarea, .form-row select {
+    border: 1px solid var(--dental-light) !important;
+    border-radius: 8px !important;
+    padding: 0.75rem !important;
+    font-size: 0.9rem !important;
+    transition: all 0.3s ease !important;
+}
+
+.form-row input:focus, .form-row textarea:focus, .form-row select:focus {
+    border-color: var(--dental-secondary) !important;
+    box-shadow: 0 0 0 0.2rem rgba(40, 116, 166, 0.25) !important;
+    outline: none !important;
+}
+
+/* Mensajes */
+.messagelist {
+    margin: 1rem 0 !important;
+}
+
+.messagelist li {
+    padding: 1rem !important;
+    border-radius: 8px !important;
+    margin-bottom: 0.5rem !important;
+    border: none !important;
+}
+
+.messagelist li.success {
+    background: var(--dental-success) !important;
+    color: white !important;
+}
+
+.messagelist li.error {
+    background: var(--dental-danger) !important;
+    color: white !important;
+}
+
+.messagelist li.warning {
+    background: var(--dental-warning) !important;
+    color: white !important;
+}
+
+/* Breadcrumbs */
+.breadcrumbs {
+    background: var(--dental-bg-light) !important;
+    border: 1px solid var(--dental-light) !important;
+    border-radius: 8px !important;
+    padding: 1rem !important;
+    margin-bottom: 1.5rem !important;
+}
+
+.breadcrumbs a {
+    color: var(--dental-secondary) !important;
+}
+
+.breadcrumbs a:hover {
+    color: var(--dental-primary) !important;
+}
+
+/* Paginación */
+.paginator {
+    background: var(--dental-bg-light) !important;
+    border: 1px solid var(--dental-light) !important;
+    border-radius: 8px !important;
+    padding: 1rem !important;
+    margin: 1rem 0 !important;
+}
+
+.paginator a:link, .paginator a:visited {
+    background: var(--dental-primary) !important;
+    color: white !important;
+    padding: 0.5rem 0.75rem !important;
+    border-radius: 4px !important;
+    text-decoration: none !important;
+    margin: 0 0.25rem !important;
+}
+
+.paginator a:hover {
+    background: var(--dental-secondary) !important;
+}
+
+.paginator .this-page {
+    background: var(--dental-secondary) !important;
+    color: white !important;
+    padding: 0.5rem 0.75rem !important;
+    border-radius: 4px !important;
+    margin: 0 0.25rem !important;
+}
+
+/* Filtros */
+#changelist-filter {
+    background: var(--dental-bg-light) !important;
+    border: 1px solid var(--dental-light) !important;
+    border-radius: 8px !important;
+    padding: 1rem !important;
+}
+
+#changelist-filter h2 {
+    background: var(--dental-primary) !important;
+    color: white !important;
+    border-radius: 4px !important;
+    padding: 0.5rem !important;
+    margin-bottom: 1rem !important;
+    font-size: 0.9rem !important;
+}
+
+#changelist-filter li.selected {
+    border-left: 3px solid var(--dental-primary) !important;
+    background: rgba(26, 82, 118, 0.1) !important;
+}
+
+#changelist-filter a {
+    color: var(--dental-secondary) !important;
+}
+
+#changelist-filter a:hover {
+    color: var(--dental-primary) !important;
+}
+
+/* Toolbar */
+.object-tools {
+    margin-bottom: 1rem !important;
+}
+
+.object-tools a:link, .object-tools a:visited {
+    background: var(--dental-success) !important;
+    color: white !important;
+    border-radius: 8px !important;
+    padding: 0.5rem 1rem !important;
+    text-decoration: none !important;
+    font-weight: 500 !important;
+    transition: all 0.3s ease !important;
+}
+
+.object-tools a:hover {
+    background: #27ae60 !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Submit row */
+.submit-row {
+    background: var(--dental-bg-light) !important;
+    border: 1px solid var(--dental-light) !important;
+    border-radius: 8px !important;
+    padding: 1rem !important;
+    margin-top: 1rem !important;
+}
+
+/* Responsive */
+@media (max-width: 767px) {
+    .module {
+        margin-bottom: 1rem !important;
+    }
+    
+    #changelist-filter {
+        margin-bottom: 1rem !important;
+    }
+    
+    .form-row {
+        padding: 0.75rem !important;
+    }
+}
+
+/* Iconos personalizados */
+.object-tools a.addlink::before {
+    content: "➕ " !important;
+}
+
+.object-tools a.deletelink::before {
+    content: "🗑️ " !important;
+}
+
+.object-tools a.changelink::before {
+    content: "✏️ " !important;
+}
+
+.object-tools a.viewlink::before {
+    content: "👁️ " !important;
+}
+
+/* Estados de objetos */
+.field-get_estado_display {
+    padding: 0.25rem 0.5rem !important;
+    border-radius: 4px !important;
+    font-size: 0.85rem !important;
+    font-weight: 500 !important;
+}
+
+.field-get_estado_display.activo {
+    background: var(--dental-success) !important;
+    color: white !important;
+}
+
+.field-get_estado_display.inactivo {
+    background: var(--dental-danger) !important;
+    color: white !important;
+}
+
+/* Campos de fecha y tiempo */
+.field-fecha_registro,
+.field-created_at,
+.field-updated_at {
+    color: var(--dental-text-muted) !important;
+    font-size: 0.85rem !important;
+}
+
+/* Campos de email */
+.field-email a {
+    color: var(--dental-secondary) !important;
+}
+
+.field-email a:hover {
+    color: var(--dental-primary) !important;
+}
+
+/* Campos de teléfono */
+.field-telefono {
+    font-family: monospace !important;
+    color: var(--dental-primary) !important;
+} 
